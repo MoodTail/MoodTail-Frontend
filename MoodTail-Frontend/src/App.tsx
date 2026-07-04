@@ -1,122 +1,109 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import { useState } from "react";
+import { getType } from "./data/types";
+import CharacterDexPage from "./pages/CharacterDexPage";
+import RepresentativeTypeSettingPage from "./pages/RepresentativeTypeSettingPage";
+import TypeDetailPage from "./pages/TypeDetailPage";
+import TypeDexPage from "./pages/TypeDexPage";
+import DexShareModal from "./components/DexShareModal";
+import CompleteModal from "./components/CompleteModal";
+
+type Screen =
+  | { name: "typeDex" }
+  | { name: "characterDex"; typeId: string }
+  | { name: "typeDetail"; typeId: string }
+  | { name: "repSetting"; typeId: string };
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [screen, setScreen] = useState<Screen>({ name: "typeDex" });
+  const [repTypeId, setRepTypeId] = useState("idealist");
+  const [shareOpen, setShareOpen] = useState(false);
+  const [completeMessage, setCompleteMessage] = useState<string | null>(null);
+
+  const goTypeDex = () => setScreen({ name: "typeDex" });
+  const openCharacterDex = (typeId: string) => setScreen({ name: "characterDex", typeId });
+  const openTypeDetail = (typeId: string) => setScreen({ name: "typeDetail", typeId });
+  const openRepSetting = (typeId: string) => setScreen({ name: "repSetting", typeId });
+
+  const handleGoTest = () => setCompleteMessage("취향 테스트 페이지는 준비 중이에요");
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+    <div
+      style={{
+        minHeight: "100svh",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: "32px 16px",
+        boxSizing: "border-box",
+      }}
+    >
+      <div style={{ position: "relative", width: "100%", maxWidth: 390 }}>
+        {screen.name === "typeDex" && (
+          <TypeDexPage
+            repTypeId={repTypeId}
+            onOpenType={openCharacterDex}
+            onShare={() => setShareOpen(true)}
+            onBack={() => window.history.back()}
+          />
+        )}
 
-      <div className="ticks"></div>
+        {screen.name === "characterDex" && (
+          <CharacterDexPage
+            type={getType(screen.typeId)}
+            onBack={goTypeDex}
+            onShare={() => setShareOpen(true)}
+            onOpenDetail={() => openTypeDetail(screen.typeId)}
+            onGoTest={handleGoTest}
+          />
+        )}
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
+        {screen.name === "typeDetail" && (
+          <TypeDetailPage
+            type={getType(screen.typeId)}
+            onBack={() => openCharacterDex(screen.typeId)}
+            onSetRepresentative={() => openRepSetting(screen.typeId)}
+            onGoTest={handleGoTest}
+          />
+        )}
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+        {screen.name === "repSetting" && (
+          <RepresentativeTypeSettingPage
+            type={getType(screen.typeId)}
+            onBack={() => openTypeDetail(screen.typeId)}
+            onConfirm={() => {
+              setRepTypeId(screen.typeId);
+              setCompleteMessage("지정 완료되었습니다");
+            }}
+          />
+        )}
+
+        {shareOpen && (
+          <DexShareModal
+            repTypeId={repTypeId}
+            onClose={() => setShareOpen(false)}
+            onShared={() => {
+              setShareOpen(false);
+              setCompleteMessage("SNS 공유가 완료되었습니다");
+            }}
+            onSaved={() => {
+              setShareOpen(false);
+              setCompleteMessage("이미지가 저장되었습니다");
+            }}
+          />
+        )}
+
+        {completeMessage && (
+          <CompleteModal
+            message={completeMessage}
+            onClose={() => {
+              setCompleteMessage(null);
+              if (screen.name === "repSetting") goTypeDex();
+            }}
+          />
+        )}
+      </div>
+    </div>
+  );
 }
 
-export default App
+export default App;
