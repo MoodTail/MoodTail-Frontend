@@ -1,0 +1,53 @@
+.bottom-nav {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 72px;
+  background: #ffffff;
+  border-top: 1px solid #eee5dc;
+  z-index: 100;
+}
+
+.bottom-nav__list {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 53px;
+}
+
+.bottom-nav__item {
+  width: 25px;
+  height: 54px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #8d8d8d;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  cursor: pointer;
+}
+
+.bottom-nav__item.is-active {
+  color: #ff5c37;
+}
+
+.bottom-nav__icon {
+  width: 25px;
+  height: 25px;
+  flex: 0 0 25px;
+  object-fit: contain;
+  display: block;
+}
+
+.bottom-nav__label {
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+  color: currentColor;
+  white-space: nowrap;
+}
