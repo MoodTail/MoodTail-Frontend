@@ -1,0 +1,17 @@
+.custom-input {
+  width: 100%;
+  height: 48px;
+  box-sizing: border-box;
+  border: 1px solid #ff6f4f;
+  border-radius: 10px;
+  background: #fff;
+  padding: 0 16px;
+  font-size: 16px;
+  font-family: inherit;
+  color: #333;
+  outline: none;
+}
+
+.custom-input::placeholder {
+  color: #aaa;
+}
