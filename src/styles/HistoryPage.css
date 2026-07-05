@@ -1,0 +1,12 @@
+.history-page {
+  min-height: 100%;
+  padding: 48px 32px 96px;
+  background: #ffffff;
+}
+
+.history-page__title {
+  margin: 0 0 24px;
+  color: #151522;
+  font-size: 18px;
+  font-weight: 700;
+}

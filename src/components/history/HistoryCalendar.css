@@ -1,0 +1,82 @@
+.history-calendar {
+  width: 100%;
+}
+
+.history-calendar__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 22px;
+}
+
+.history-calendar__title {
+  margin: 0;
+  color: #151522;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.history-calendar__nav-button {
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #151522;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.history-calendar__weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  margin-bottom: 14px;
+}
+
+.history-calendar__weekday {
+  color: #777777;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1;
+  text-align: center;
+}
+
+.history-calendar__grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  row-gap: 20px;
+}
+
+.history-calendar__empty {
+  width: 28px;
+  height: 28px;
+}
+
+.history-calendar__date {
+  width: 28px;
+  height: 28px;
+  margin: 0 auto;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 50%;
+  background: transparent;
+  color: #666666;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 28px;
+  text-align: center;
+  cursor: pointer;
+}
+
+.history-calendar__date.is-marked {
+  border-color: #ff5c37;
+  color: #666666;
+}
+
+.history-calendar__date.is-selected {
+  background: #ff5c37;
+  border-color: #ff5c37;
+  color: #ffffff;
+}
