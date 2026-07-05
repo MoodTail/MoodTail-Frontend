@@ -1,75 +1,127 @@
-# React + TypeScript + Vite
+🐾 MoodTail
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+📖 프로젝트 소개
 
-Currently, two official plugins are available:
+‘무드테일’은 자신의 취향을 객관적인 지표로 알고 싶지만, 생소한 이름과 정보 과부하로 새로운 도전을 망설이는 입문자를 대상으로,
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+감정 데이터 기반의 **맛 지표 매칭**과 시각화된 **레이더 차트**를 통해 지금 이 순간 당신에게 가장 필요한 **‘최적의 한 잔’**을 찾아주는 서비스입니다**.**
 
-## React Compiler
+“모호한 감정을 명확한 데이터로, 당신을 위한 단 한 잔의 처방"
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
 
-## Expanding the ESLint configuration
+👥 팀원 및 역할 분담
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+이름         담당 영역
+이연우(엘리)  테스트 화면 / 캐릭터 도감 / 레시피
+김예나(나나)  히스토리 / 월간 리포트
+안정현(제이)  홈 화면 / 온보딩 + 로그인 / 트렌드 집계 + 친구와 공유 + 커스텀 추천
+김다빈(다니)  마이페이지 / 프로필 수정 / 결과 화면 및 저장, 공유
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+🛠 기술 스택
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+구분  |  스택
+프레임워크  |  React (TypeScript)
+빌드 도구  |  Vite
+상태관리  |  별도 라이브러리 없음 (React 내장 상태 활용)
+스타일링  |  Plain CSS
+배포  |  Vercel
+협업 도구  |  GitHub, Notion
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+📂 폴더 구조
 
-```
+src/
+├── components/   # 공통 컴포넌트
+├── pages/        # 페이지 단위
+├── hooks/        # 커스텀 훅
+├── apis/         # API 통신 관련
+├── styles/       # 전역 스타일
+└── utils/        # 유틸 함수
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+🌿 브랜치 컨벤션
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+브랜치  |  용도
+main  |  배포용 (항상 안정적인 상태 유지)
+dev  |  개발 통합 브랜치
+feature/기능명  |  개별 기능 개발
+fix/이슈명  |   버그 수정
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+작업 흐름
 
-```
+
+1. 이슈 생성 (작업 내용 명확히 작성)
+2. 이슈 기반 브랜치 생성: feature/기능명
+3. 작업 후 커밋 & 푸시
+4. PR 생성 (템플릿 사용)
+5. 리뷰어 최소 1명 승인
+6. dev 브랜치로 머지
+7. 일정 주기로 dev → main 배포
+
+
+📝 커밋 컨벤션
+
+타입  |  설명
+feat:  |  새로운 기능 추가
+fix:  |  버그 수정
+docs:  |  문서 수정
+style:  |  코드 포맷팅 (기능 변화 없음)
+refactor:  |  리팩토링
+chore:  |  빌드/설정 관련
+
+🔀 PR 컨벤션
+
+
+리뷰어 최소 1명 지정, 24시간 내 리뷰를 목표로 함
+머지 조건: 승인 1개 이상 + 컨벤션 위반 없음
+
+
+PR 템플릿
+
+## 📌 이슈 개요
+추가하려는 기능 간단 설명
+
+## 🛠 작업할 내용
+- [ ] 작업 내용 1
+- [ ] 작업 내용 2
+
+## 📎 참고 자료
+참고할 자료가 있다면 작성해 주세요.
+
+🚀 실행 방법
+
+bash# 1. 저장소 클론
+git clone https://github.com/MoodTail/MoodTail-Frontend.git
+
+# 2. 디렉토리 이동
+cd MoodTail-Frontend
+
+# 3. 패키지 설치
+npm install
+
+# 4. 환경변수 설정
+cp .env.example .env
+# .env 파일을 열어 필요한 값 입력
+
+# 5. 개발 서버 실행
+npm run dev
+
+개발 서버 실행 후 http://localhost:5173 에서 확인할 수 있습니다.
+
+🖥 화면 목록 및 플로우
+
+화면  설명  담당
+온보딩 / 로그인최초 진입 시 온보딩 및 로그인 화면  안정현  
+홈  |  트렌드 집계, 커스텀 추천, 친구와 공유  안정현
+캐릭터 도감  |  캐릭터 목록 및 상세  이연우
+레시피  |  레시피 목록 및 상세  이연우
+히스토리  |  사용자 기록 조회  김예나
+월간 리포트  |  월별 통계/리포트  김예나
+마이페이지 / 프로필 수정  |  사용자 정보 관리  김다빈
+결과 화면  |  결과 저장 및 공유  김다빈
+
+서비스 플로우 
+
+온보딩/로그인 → 홈 → (캐릭터 도감 / 레시피 / 히스토리) → 결과 화면 → 저장 및 공유
+                              ↓
+                          마이페이지
+
+
