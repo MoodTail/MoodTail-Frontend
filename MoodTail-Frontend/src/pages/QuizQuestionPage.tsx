@@ -1,5 +1,7 @@
+import { useState } from "react";
 import { COLORS } from "../theme/colors";
 import type { QuizQuestion } from "../data/quiz";
+import ConfirmLeaveModal from "../components/ConfirmLeaveModal";
 import PhoneFrame from "../components/PhoneFrame";
 import { ChevronLeft } from "../components/icons";
 
@@ -23,13 +25,14 @@ export default function QuizQuestionPage({
   onExit: () => void;
 }) {
   const progress = (step + 1) / totalSteps;
+  const [pendingLeave, setPendingLeave] = useState<"exit" | "back" | null>(null);
 
   return (
     <PhoneFrame>
       <div style={{ padding: "18px 20px 24px", flex: 1, display: "flex", flexDirection: "column" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 24 }}>
           <button
-            onClick={onExit}
+            onClick={() => setPendingLeave("exit")}
             style={{ background: "none", border: "none", cursor: "pointer", padding: 2, display: "flex" }}
           >
             <ChevronLeft />
@@ -116,7 +119,7 @@ export default function QuizQuestionPage({
         <div style={{ display: "flex", gap: 8 }}>
           {onPrevious && (
             <button
-              onClick={onPrevious}
+              onClick={() => setPendingLeave("back")}
               style={{
                 flex: "0 0 38%",
                 border: `1.5px solid ${COLORS.border}`,
@@ -138,7 +141,7 @@ export default function QuizQuestionPage({
             style={{
               flex: 1,
               border: "none",
-              background: selectedOptionId ? COLORS.orange : COLORS.progressTrack,
+              background: selectedOptionId ? COLORS.orange : COLORS.disabled,
               color: "#fff",
               fontSize: 14,
               fontWeight: 700,
@@ -151,9 +154,20 @@ export default function QuizQuestionPage({
           </button>
         </div>
         <p style={{ fontSize: 10.5, color: COLORS.inkSoft, textAlign: "center", margin: "8px 0 0" }}>
-          선택 시 해당 답변이 5가지 유형 지표에 반영됩니다
+          선택시 해당 답변이 5가지 맛 지표에 반영됩니다
         </p>
       </div>
+
+      {pendingLeave && (
+        <ConfirmLeaveModal
+          onContinue={() => setPendingLeave(null)}
+          onLeave={() => {
+            setPendingLeave(null);
+            if (pendingLeave === "exit") onExit();
+            else onPrevious?.();
+          }}
+        />
+      )}
     </PhoneFrame>
   );
 }
