@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import historyIcon from '../../assets/icons/history.svg'
 import historyActiveIcon from '../../assets/icons/history-active.svg'
 import dictionaryIcon from '../../assets/icons/dictionary.svg'
@@ -12,6 +11,11 @@ import mypageActiveIcon from '../../assets/icons/mypage-active.svg'
 import '../../styles/BottomNav.css'
 
 type NavKey = 'history' | 'dictionary' | 'home' | 'recipe' | 'mypage'
+
+type BottomNavProps = {
+  activeMenu: NavKey
+  onChangeMenu: (menu: NavKey) => void
+}
 
 const navItems = [
   {
@@ -46,9 +50,7 @@ const navItems = [
   },
 ] as const
 
-function BottomNav() {
-  const [activeMenu, setActiveMenu] = useState<NavKey>('home')
-
+function BottomNav({ activeMenu, onChangeMenu }: BottomNavProps) {
   return (
     <nav className="bottom-nav" aria-label="하단 메뉴">
       <div className="bottom-nav__list">
@@ -60,7 +62,7 @@ function BottomNav() {
               key={item.key}
               type="button"
               className={`bottom-nav__item ${isActive ? 'is-active' : ''}`}
-              onClick={() => setActiveMenu(item.key)}
+              onClick={() => onChangeMenu(item.key)}
             >
               <img
                 className="bottom-nav__icon"
