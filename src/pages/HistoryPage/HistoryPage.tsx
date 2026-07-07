@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import HistoryCalendar from '../components/history/HistoryCalendar'
-import '../styles/HistoryPage.css'
+import HistoryCalendar from '../../components/history/HistoryCalendar'
+import '../../styles/HistoryPage.css'
 
 function HistoryPage() {
   const [selectedDate, setSelectedDate] = useState<number>()
