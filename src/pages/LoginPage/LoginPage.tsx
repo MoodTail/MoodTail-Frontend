@@ -1,80 +1,114 @@
 import { useState } from "react";
 import type { FC } from "react";
 import Input from "../../components/Input/Input";
-import PasswordInput from "../../components/PasswordInput/PasswordInput";
+import PasswordInput from "../../components/login/PasswordInput";
 import Button from "../../components/Button/Button";
-import SnsLoginButtons from "../../components/SnsLoginButtons/SnsLoginButtons";
+import SnsLoginButtons from "../../components/login/SnsLoginButtons";
+import BackgroundBlur from "../../components/common/BackgroundBlur/BackgroundBlur";
 import "../../styles/LoginPage.css";
 import OnboardingPage from "../OnboardingPage/OnboardingPage";
+import FindPasswordPage from "../../components/login/FindPasswordPage";
 
 interface LoginPageProps {
   onLogin: () => void;
 }
 
-type LoginStep = "onboarding" | "login";
+type LoginStep = "onboarding" | "login" | "findPassword";
 
 const LoginPage: FC<LoginPageProps> = ({ onLogin }) => {
   const [step, setStep] = useState<LoginStep>("onboarding");
   const [userId, setUserId] = useState("");
   const [password, setPassword] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
-  const handleOnboardingFinish = (): void => {
-    setStep("login");
-  };
+  const handleOnboardingFinish = (): void => setStep("login");
 
   if (step === "onboarding") {
     return <OnboardingPage onFinish={handleOnboardingFinish} />;
   }
 
-  const handleLoginClick = (): void => {
-    // 로그인 API 연동 시 여기에 유효성 검사 추가
-    onLogin();
-  };
+  if (step === "findPassword") {
+    return <FindPasswordPage onBack={() => setStep("login")} />;
+  }
 
-  const handleSkipClick = (): void => {
+  const handleLoginClick = (): void => {
+    if (!userId || !password) {
+      setErrorMessage("아이디 또는 비밀번호가 일치하지 않습니다");
+      return;
+    }
+    setErrorMessage("");
     onLogin();
   };
 
   return (
     <div className="login-page">
-      <div className="login-page__logo">
-        <h1 className="login-page__logo-title">MoodTail</h1>
-        <p className="login-page__logo-subtitle">
-          오늘의 기분을, 한잔의 칵테일로
-        </p>
-      </div>
+      <BackgroundBlur
+        idPrefix="login-bg"
+        width={393}
+        height={824}
+        circles={[
+          { cx: 331, cy: 230, r: 173, color: "#FF6F4F", opacity: 0.28 },
+          { cx: 33, cy: 676, r: 199, color: "#FEF6D9", opacity: 0.38 },
+        ]}
+      />
 
-      <div className="login-page__form">
+      <h1 className="login-page__title">MoodTail</h1>
+      <p className="login-page__subtitle">오늘의 기분을, 한잔의 칵테일로</p>
+
+      <div className="login-page__id-input">
         <Input
           type="text"
           placeholder="아이디 입력"
           value={userId}
           onChange={(e) => setUserId(e.target.value)}
         />
+      </div>
+
+      <div className="login-page__password-input">
         <PasswordInput
           placeholder="비밀번호 입력"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
+      </div>
 
-        <Button
-          variant="primary"
-          className="login-page__login-button"
-          onClick={handleLoginClick}
-        >
-          로그인
-        </Button>
+      {errorMessage && <p className="login-page__error">{errorMessage}</p>}
 
+      <Button
+        variant="primary"
+        className="login-page__login-button"
+        onClick={handleLoginClick}
+      >
+        로그인
+      </Button>
+
+      <div className="login-page__links">
+        <button type="button" className="login-page__link">
+          회원가입
+        </button>
+        <span className="login-page__link-divider" />
         <button
           type="button"
-          className="login-page__skip-link"
-          onClick={handleSkipClick}
+          className="login-page__link"
+          onClick={() => setStep("findPassword")}
         >
-          로그인 없이 이용하기
+          비밀번호 찾기
         </button>
       </div>
 
-      <SnsLoginButtons />
+      <button type="button" className="login-page__skip-link" onClick={onLogin}>
+        로그인 없이 이용하기
+      </button>
+
+      <div className="login-page__divider">
+        <span className="login-page__divider-line" />
+        <span className="login-page__divider-text">또는</span>
+        <span className="login-page__divider-line" />
+      </div>
+
+      <div className="login-page__sns">
+        <SnsLoginButtons />
+      </div>
     </div>
   );
 };

@@ -1,11 +1,11 @@
 import { useState, useRef, useEffect } from "react";
 import type { FC, TouchEvent } from "react";
 import Button from "../../components/Button/Button";
-import OnboardingSlide from "../../components/OnboardingSlide/OnboardingSlide";
-import OnboardingImageGroup from "../../components/OnboardingImageGroup/OnboardingImageGroup";
-import OnboardingMarquee from "../../components/OnboardingMarquee/OnboardingMarquee";
-import OnboardingCharacterCarousel from "../../components/OnboardingCharacterCarousel/OnboardingCharacterCarousel";
-import OnboardingDots from "../../components/OnboardingDots/OnboardingDots";
+import OnboardingSlide from "../../components/onboarding/OnboardingSlide";
+import OnboardingImageGroup from "../../components/onboarding/OnboardingImageGroup";
+import OnboardingMarquee from "../../components/onboarding/OnboardingMarquee";
+import OnboardingCharacterCarousel from "../../components/onboarding/OnboardingCharacterCarousel";
+import OnboardingDots from "../../components/onboarding/OnboardingDots";
 import "../../styles/OnboardingPage.css";
 import BackgroundBlur from "../../components/common/BackgroundBlur/BackgroundBlur";
 
