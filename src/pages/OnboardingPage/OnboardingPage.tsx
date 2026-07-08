@@ -9,11 +9,11 @@ import OnboardingDots from "../../components/OnboardingDots/OnboardingDots";
 import "../../styles/OnboardingPage.css";
 
 // 온보딩 7 이미지
-import image8 from "../../assets/images/image 8.png";
-import image4 from "../../assets/images/image 4.png";
-import image10 from "../../assets/images/image 10.png";
-import image6 from "../../assets/images/image 6.png";
-import image3 from "../../assets/images/image 3.png";
+import image8 from "../../assets/images/cocktails/image 8.png";
+import image4 from "../../assets/images/cocktails/image 4.png";
+import image10 from "../../assets/images/cocktails/image 10.png";
+import image6 from "../../assets/images/cocktails/image 6.png";
+import image3 from "../../assets/images/cocktails/image 3.png";
 
 // 온보딩 9 컵 이미지 20개
 import glass1 from "../../assets/images/glass/glass-1.png";
