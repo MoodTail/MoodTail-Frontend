@@ -12,6 +12,7 @@
     #c2ede9 117.1%
   );
   margin: 0 auto;
+  z-index: 0;
 }
 
 .main-page__background-blur {
@@ -196,4 +197,8 @@
   font-size: 20px;
   font-weight: 700;
   color: #ff6f4f;
+}
+
+.app-content:has(> .main-page) {
+  overflow: hidden;
 }

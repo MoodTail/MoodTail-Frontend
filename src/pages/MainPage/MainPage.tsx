@@ -1,7 +1,6 @@
 import type { FC } from "react";
 import { useState } from "react";
 import "../../styles/MainPage.css";
-import BottomNav from "../../components/common/BottomNav";
 import Button from "../../components/Button/Button";
 import BackgroundBlur from "../../components/common/BackgroundBlur/BackgroundBlur";
 
@@ -100,8 +99,6 @@ const MainPage: FC = () => {
           </li>
         ))}
       </ul>
-
-      <BottomNav activeMenu={activeMenu} onChangeMenu={setActiveMenu} />
     </div>
   );
 };

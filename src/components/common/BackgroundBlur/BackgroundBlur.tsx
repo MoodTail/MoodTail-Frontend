@@ -28,7 +28,13 @@ const BackgroundBlur: FC<BackgroundBlurProps> = ({
   return (
     <svg
       className="background-blur"
-      style={{ position: "absolute", left, top, pointerEvents: "none" }}
+      style={{
+        position: "absolute",
+        left,
+        top,
+        zIndex: -1,
+        pointerEvents: "none",
+      }}
       width={width}
       height={height}
       viewBox={`0 0 ${width} ${height}`}
