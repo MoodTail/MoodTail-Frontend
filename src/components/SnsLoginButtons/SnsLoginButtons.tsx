@@ -1,4 +1,4 @@
-import "./SnsLoginButtons.css";
+import "../../styles/SnsLoginButtons.css";
 
 function SnsLoginButtons() {
   return (

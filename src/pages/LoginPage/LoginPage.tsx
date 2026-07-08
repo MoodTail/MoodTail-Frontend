@@ -1,65 +1,50 @@
 import { useState } from "react";
+import type { FC } from "react";
 import Input from "../../components/Input/Input";
 import PasswordInput from "../../components/PasswordInput/PasswordInput";
 import Button from "../../components/Button/Button";
 import SnsLoginButtons from "../../components/SnsLoginButtons/SnsLoginButtons";
-import "./LoginPage.css";
+import "../../styles/LoginPage.css";
+import OnboardingPage from "../OnboardingPage/OnboardingPage";
 
-function LoginPage() {
-  const [userId, setUserId] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
+interface LoginPageProps {
+  onLogin: () => void;
+}
 
-  const handleLogin = () => {
-    console.log({ userId, password });
+type LoginStep = "onboarding" | "login";
+
+const LoginPage: FC<LoginPageProps> = ({ onLogin }) => {
+  const [step, setStep] = useState<LoginStep>("onboarding");
+  const [userId, setUserId] = useState("");
+  const [password, setPassword] = useState("");
+
+  const handleOnboardingFinish = (): void => {
+    setStep("login");
   };
 
-  const handleGuestLogin = () => {
-    console.log("게스트로 이용하기");
+  if (step === "onboarding") {
+    return <OnboardingPage onFinish={handleOnboardingFinish} />;
+  }
+
+  const handleLoginClick = (): void => {
+    // 로그인 API 연동 시 여기에 유효성 검사 추가
+    onLogin();
+  };
+
+  const handleSkipClick = (): void => {
+    onLogin();
   };
 
   return (
     <div className="login-page">
-      <svg
-        className="bg-blobs"
-        viewBox="0 0 393 824"
-        preserveAspectRatio="none"
-      >
-        <circle
-          cx="331"
-          cy="240"
-          r="173"
-          fill="url(#blob1)"
-          fillOpacity={0.28}
-        />
-        <circle
-          cx="33"
-          cy="686"
-          r="199"
-          fill="url(#blob2)"
-          fillOpacity={0.38}
-        />
-        <defs>
-          <radialGradient
-            id="blob1"
-            gradientTransform="translate(331 240) rotate(90) scale(173)"
-          >
-            <stop stopColor="#FF6F4F" />
-            <stop offset="1" stopColor="white" stopOpacity={0} />
-          </radialGradient>
-          <radialGradient
-            id="blob2"
-            gradientTransform="translate(33 686) rotate(90) scale(199)"
-          >
-            <stop stopColor="#FEF6D9" />
-            <stop offset="1" stopColor="white" stopOpacity={0} />
-          </radialGradient>
-        </defs>
-      </svg>
+      <div className="login-page__logo">
+        <h1 className="login-page__logo-title">MoodTail</h1>
+        <p className="login-page__logo-subtitle">
+          오늘의 기분을, 한잔의 칵테일로
+        </p>
+      </div>
 
-      <h1 className="brand-title">MoodTail</h1>
-      <p className="brand-subtitle">오늘의 기분을, 한잔의 칵테일로</p>
-
-      <div className="login-form">
+      <div className="login-page__form">
         <Input
           type="text"
           placeholder="아이디 입력"
@@ -71,19 +56,27 @@ function LoginPage() {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
+
+        <Button
+          variant="primary"
+          className="login-page__login-button"
+          onClick={handleLoginClick}
+        >
+          로그인
+        </Button>
+
+        <button
+          type="button"
+          className="login-page__skip-link"
+          onClick={handleSkipClick}
+        >
+          로그인 없이 이용하기
+        </button>
       </div>
-
-      <Button variant="primary" className="login-btn" onClick={handleLogin}>
-        로그인
-      </Button>
-
-      <Button variant="text" className="guest-link" onClick={handleGuestLogin}>
-        로그인 없이 이용하기
-      </Button>
 
       <SnsLoginButtons />
     </div>
   );
-}
+};
 
 export default LoginPage;

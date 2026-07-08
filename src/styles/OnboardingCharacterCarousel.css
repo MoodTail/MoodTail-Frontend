@@ -1,0 +1,42 @@
+.character-carousel__item {
+  position: absolute;
+  object-fit: contain;
+  transform-origin: bottom center;
+  will-change: transform, opacity;
+  transition:
+    transform 0.7s cubic-bezier(0.4, 0, 0.2, 1),
+    width 0.7s cubic-bezier(0.4, 0, 0.2, 1),
+    height 0.7s cubic-bezier(0.4, 0, 0.2, 1),
+    bottom 0.7s cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 0.5s ease-out;
+}
+
+.character-carousel__item--center {
+  left: 50%;
+  bottom: 422px;
+  width: 258px;
+  height: 279px;
+  opacity: 1;
+  transform: translateX(-50%);
+  z-index: 3;
+}
+
+.character-carousel__item--left {
+  left: 0%;
+  bottom: 396px;
+  width: 130px;
+  height: 200px;
+  opacity: 0.45;
+  transform: translateX(-50%);
+  z-index: 1;
+}
+
+.character-carousel__item--right {
+  left: 100%;
+  bottom: 396px;
+  width: 130px;
+  height: 200px;
+  opacity: 0.45;
+  transform: translateX(-50%);
+  z-index: 1;
+}
