@@ -1,0 +1,70 @@
+.onboarding-page {
+  width: 393px;
+  height: 824px;
+  position: relative;
+  overflow: hidden;
+  box-sizing: border-box;
+  background: linear-gradient(
+    222.96deg,
+    #fee5e5 -16.18%,
+    #fff 29.6%,
+    #fff 74.42%,
+    #c2ede9 126.21%
+  );
+  margin: 0 auto;
+  flex-shrink: 0;
+}
+
+.onboarding-page__blob {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.onboarding-page__blob--orange {
+  width: 346px;
+  height: 346px;
+  left: 158px;
+  top: 67px;
+  background: radial-gradient(circle, #ff6f4f 0%, rgba(255, 255, 255, 0) 100%);
+  opacity: 0.17;
+}
+
+.onboarding-page__blob--yellow {
+  width: 398px;
+  height: 398px;
+  left: -166px;
+  top: 487px;
+  background: radial-gradient(circle, #fef6d9 0%, rgba(255, 255, 255, 0) 100%);
+  opacity: 0.38;
+}
+
+.onboarding-page__track-wrapper {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.onboarding-page__track {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.35s ease;
+}
+
+.onboarding-page__track-item {
+  position: relative;
+  flex: 0 0 100%;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.onboarding-page__start-button {
+  position: absolute;
+  left: 29px;
+  top: 687px;
+  width: 333px;
+  height: 56px;
+  border-radius: 30.5px;
+}

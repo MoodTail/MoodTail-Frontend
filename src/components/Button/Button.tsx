@@ -1,5 +1,5 @@
 import type { ButtonHTMLAttributes } from "react";
-import "./Button.css";
+import "../../styles/Button.css";
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: "primary" | "text";

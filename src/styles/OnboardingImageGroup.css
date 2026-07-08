@@ -1,0 +1,79 @@
+.onboarding-image-group {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.onboarding-image-group__image {
+  position: absolute;
+  object-fit: contain;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+.onboarding-image-group__image--sway {
+  transform-origin: bottom center;
+  animation-name: onboarding-sway;
+}
+
+.onboarding-image-group__image--bounce {
+  animation-name: onboarding-bounce;
+}
+
+.onboarding-image-group__image--sway-small {
+  transform-origin: bottom center;
+  animation-name: onboarding-sway-small;
+}
+
+/* 착지 모션: 바닥 기준으로 눌렸다 튕기므로 transform-origin을 바닥에 둠 */
+.onboarding-image-group__image--landing {
+  transform-origin: bottom center;
+  animation-name: onboarding-landing;
+  animation-timing-function: ease-out;
+}
+
+@keyframes onboarding-sway {
+  0%,
+  100% {
+    transform: rotate(-3deg);
+  }
+  50% {
+    transform: rotate(3deg);
+  }
+}
+
+@keyframes onboarding-sway-small {
+  0%,
+  100% {
+    transform: rotate(-2deg);
+  }
+  50% {
+    transform: rotate(2deg);
+  }
+}
+
+@keyframes onboarding-bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+@keyframes onboarding-landing {
+  0% {
+    transform: translateY(-4px);
+  }
+  8% {
+    transform: translateY(0);
+  }
+  14% {
+    transform: translateY(-1px);
+  }
+  20%,
+  100% {
+    transform: translateY(0);
+  }
+}

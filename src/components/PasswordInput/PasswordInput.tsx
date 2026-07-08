@@ -1,7 +1,7 @@
 import { useState } from "react";
 import type { InputHTMLAttributes } from "react";
 import Input from "../Input/Input";
-import "./PasswordInput.css";
+import "../../styles/PasswordInput.css";
 
 interface PasswordInputProps extends Omit<
   InputHTMLAttributes<HTMLInputElement>,

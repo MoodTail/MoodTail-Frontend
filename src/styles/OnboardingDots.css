@@ -1,0 +1,22 @@
+.onboarding-dots {
+  position: absolute;
+  left: 50%;
+  top: 605px;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 11px;
+}
+
+.onboarding-dots__dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background-color: #fff;
+  cursor: pointer;
+  box-shadow: inset 1px 0 2px rgba(0, 0, 0, 0.25);
+}
+
+.onboarding-dots__dot--active {
+  background-color: #fe7557;
+  box-shadow: none;
+}
