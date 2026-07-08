@@ -15,30 +15,6 @@
   flex-shrink: 0;
 }
 
-.onboarding-page__blob {
-  position: absolute;
-  border-radius: 50%;
-  pointer-events: none;
-}
-
-.onboarding-page__blob--orange {
-  width: 346px;
-  height: 346px;
-  left: 158px;
-  top: 67px;
-  background: radial-gradient(circle, #ff6f4f 0%, rgba(255, 255, 255, 0) 100%);
-  opacity: 0.17;
-}
-
-.onboarding-page__blob--yellow {
-  width: 398px;
-  height: 398px;
-  left: -166px;
-  top: 487px;
-  background: radial-gradient(circle, #fef6d9 0%, rgba(255, 255, 255, 0) 100%);
-  opacity: 0.38;
-}
-
 .onboarding-page__track-wrapper {
   position: absolute;
   inset: 0;

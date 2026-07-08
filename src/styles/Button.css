@@ -26,3 +26,14 @@
   color: rgba(255, 111, 79, 0.68);
   text-decoration: underline;
 }
+
+.btn-light {
+  background: #fff;
+  color: #ff6420;
+  border-radius: 17px;
+  font-size: 12px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
