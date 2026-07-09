@@ -1,7 +1,7 @@
 import type { FC } from "react";
 import "../../styles/OnboardingImageGroup.css";
 
-type ImageMotion = "sway" | "sway-small" | "bounce";
+type ImageMotion = "sway" | "sway-small" | "bounce" | "landing";
 
 interface SlideImage {
   src: string;
