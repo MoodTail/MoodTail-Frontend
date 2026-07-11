@@ -5,6 +5,7 @@ import RepresentativeTypeSettingPage from "./pages/RepresentativeTypeSettingPage
 import TypeDetailPage from "./pages/TypeDetailPage";
 import TypeDexPage from "./pages/TypeDexPage";
 import DexShareModal from "./components/DexShareModal";
+import SnsShareOptionsModal from "./components/SnsShareOptionsModal";
 import CompleteModal from "./components/CompleteModal";
 
 type Screen =
@@ -16,7 +17,8 @@ type Screen =
 function App() {
   const [screen, setScreen] = useState<Screen>({ name: "typeDex" });
   const [repTypeId, setRepTypeId] = useState("idealist");
-  const [shareOpen, setShareOpen] = useState(false);
+  const [shareTypeId, setShareTypeId] = useState<string | null>(null);
+  const [snsModalOpen, setSnsModalOpen] = useState(false);
   const [completeMessage, setCompleteMessage] = useState<string | null>(null);
 
   const goTypeDex = () => setScreen({ name: "typeDex" });
@@ -42,7 +44,7 @@ function App() {
           <TypeDexPage
             repTypeId={repTypeId}
             onOpenType={openCharacterDex}
-            onShare={() => setShareOpen(true)}
+            onShare={() => setShareTypeId(repTypeId)}
             onBack={() => window.history.back()}
           />
         )}
@@ -50,10 +52,8 @@ function App() {
         {screen.name === "characterDex" && (
           <CharacterDexPage
             type={getType(screen.typeId)}
-            onBack={goTypeDex}
-            onShare={() => setShareOpen(true)}
+            onShare={() => setShareTypeId(screen.typeId)}
             onOpenDetail={() => openTypeDetail(screen.typeId)}
-            onGoTest={handleGoTest}
           />
         )}
 
@@ -77,20 +77,22 @@ function App() {
           />
         )}
 
-        {shareOpen && (
+        {shareTypeId && (
           <DexShareModal
-            repTypeId={repTypeId}
-            onClose={() => setShareOpen(false)}
-            onShared={() => {
-              setShareOpen(false);
-              setCompleteMessage("SNS 공유가 완료되었습니다");
+            type={getType(shareTypeId)}
+            onClose={() => setShareTypeId(null)}
+            onShareSns={() => {
+              setShareTypeId(null);
+              setSnsModalOpen(true);
             }}
-            onSaved={() => {
-              setShareOpen(false);
-              setCompleteMessage("이미지가 저장되었습니다");
+            onSaveImage={() => {
+              setShareTypeId(null);
+              setCompleteMessage("저장 완료되었습니다");
             }}
           />
         )}
+
+        {snsModalOpen && <SnsShareOptionsModal onClose={() => setSnsModalOpen(false)} />}
 
         {completeMessage && (
           <CompleteModal

@@ -1,6 +1,7 @@
 import { COLORS, GRADIENTS } from "../theme/colors";
 import type { PersonalityType } from "../data/types";
 import GradientBackground from "../components/GradientBackground";
+import GlowSpot from "../components/GlowSpot";
 import Header from "../components/Header";
 import PhoneFrame from "../components/PhoneFrame";
 import { Mascot } from "../components/icons";
@@ -17,20 +18,7 @@ export default function RepresentativeTypeSettingPage({
   return (
     <PhoneFrame>
       <GradientBackground colors={GRADIENTS.warm} />
-      <div
-        style={{
-          position: "absolute",
-          top: "26%",
-          left: "50%",
-          width: 340,
-          height: 340,
-          transform: "translate(-50%, -50%)",
-          borderRadius: "50%",
-          background: `radial-gradient(circle, ${type.color}55 0%, ${type.color}00 70%)`,
-          filter: "blur(6px)",
-          zIndex: 0,
-        }}
-      />
+      <GlowSpot color={type.color} top="26%" />
       <div
         style={{
           position: "relative",

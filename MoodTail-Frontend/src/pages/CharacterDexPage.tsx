@@ -1,25 +1,29 @@
-import { useState } from "react";
 import { COLORS } from "../theme/colors";
-import type { PersonalityType, Cocktail } from "../data/types";
+import type { PersonalityType } from "../data/types";
 import Header from "../components/Header";
 import PhoneFrame from "../components/PhoneFrame";
-import LockedCocktailModal from "../components/LockedCocktailModal";
-import { GlassIcon, LockIcon, Mascot } from "../components/icons";
+import DexBox1 from "../components/dexBoxes/DexBox1";
+import DexBox2 from "../components/dexBoxes/DexBox2";
+import DexBox3 from "../components/dexBoxes/DexBox3";
+import DexBox4 from "../components/dexBoxes/DexBox4";
+import DexBox5 from "../components/dexBoxes/DexBox5";
+import DexBox6 from "../components/dexBoxes/DexBox6";
+import DexBox7 from "../components/dexBoxes/DexBox7";
+import DexBox8 from "../components/dexBoxes/DexBox8";
+import DexBox9 from "../components/dexBoxes/DexBox9";
+import DexBox10 from "../components/dexBoxes/DexBox10";
+import DexBox11 from "../components/dexBoxes/DexBox11";
+import DexBox12 from "../components/dexBoxes/DexBox12";
 
 export default function CharacterDexPage({
   type,
-  onBack,
   onShare,
   onOpenDetail,
-  onGoTest,
 }: {
   type: PersonalityType;
-  onBack: () => void;
   onShare: () => void;
   onOpenDetail: () => void;
-  onGoTest: () => void;
 }) {
-  const [lockedCocktail, setLockedCocktail] = useState<Cocktail | null>(null);
   const unlockedCount = type.cocktails.filter((c) => c.unlocked).length;
   const collectRate = Math.round((unlockedCount / type.cocktails.length) * 100);
 
@@ -28,7 +32,6 @@ export default function CharacterDexPage({
       <div style={{ padding: "18px 20px 0", flex: 1 }}>
         <Header
           title="캐릭터 도감"
-          onBack={onBack}
           right={
             <button
               onClick={onShare}
@@ -63,11 +66,9 @@ export default function CharacterDexPage({
             width: "100%",
             cursor: "pointer",
             textAlign: "left",
+            boxShadow: "0 8px 20px rgba(255, 107, 53, 0.16)",
           }}
         >
-          <div style={{ flexShrink: 0 }}>
-            <Mascot color={type.color} />
-          </div>
           <div style={{ flex: 1 }}>
             <div style={{ fontSize: 12, color: COLORS.inkSoft, fontWeight: 600, marginBottom: 4 }}>
               대표 타입
@@ -89,9 +90,6 @@ export default function CharacterDexPage({
           </div>
         </button>
 
-        <div style={{ fontSize: 13, fontWeight: 700, color: COLORS.inkSoft, marginBottom: 10 }}>
-          해당 타입 캐릭터 {type.cocktails.length}종
-        </div>
         <div
           style={{
             display: "grid",
@@ -100,58 +98,20 @@ export default function CharacterDexPage({
             paddingBottom: 20,
           }}
         >
-          {type.cocktails.map((cocktail) => (
-            <button
-              key={cocktail.id}
-              onClick={() => (cocktail.unlocked ? onOpenDetail() : setLockedCocktail(cocktail))}
-              style={{
-                position: "relative",
-                aspectRatio: "1 / 1",
-                borderRadius: 18,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                background: cocktail.unlocked ? COLORS.card : COLORS.lockedBg,
-                border: cocktail.unlocked ? `1px solid ${COLORS.border}` : "none",
-                cursor: "pointer",
-              }}
-            >
-              {cocktail.unlocked ? (
-                <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
-                  <GlassIcon shape={cocktail.shape} color={type.color} />
-                  <span style={{ fontSize: 10.5, fontWeight: 700, color: COLORS.ink }}>{cocktail.name}</span>
-                </div>
-              ) : (
-                <>
-                  <LockIcon />
-                  <span
-                    style={{
-                      position: "absolute",
-                      bottom: 10,
-                      fontSize: 11,
-                      fontWeight: 700,
-                      color: COLORS.lockedIcon,
-                    }}
-                  >
-                    잠김
-                  </span>
-                </>
-              )}
-            </button>
-          ))}
+          <DexBox1 />
+          <DexBox2 />
+          <DexBox3 />
+          <DexBox4 />
+          <DexBox5 />
+          <DexBox6 />
+          <DexBox7 />
+          <DexBox8 />
+          <DexBox9 />
+          <DexBox10 />
+          <DexBox11 />
+          <DexBox12 />
         </div>
       </div>
-
-      {lockedCocktail && (
-        <LockedCocktailModal
-          cocktail={lockedCocktail}
-          onClose={() => setLockedCocktail(null)}
-          onGoTest={() => {
-            setLockedCocktail(null);
-            onGoTest();
-          }}
-        />
-      )}
     </PhoneFrame>
   );
 }
