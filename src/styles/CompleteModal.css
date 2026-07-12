@@ -37,12 +37,26 @@
   word-break: keep-all;
 }
 
-.modal--login-prompt .modal__title {
-  font-size: 18px;
-}
-
 .modal-overlay.modal--saved {
   padding-top: 330px;
+}
+
+.modal.modal--saved {
+  width: 309px;
+  height: 92px;
+  padding: 0 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal--saved .modal__title {
+  width: 253px;
+  font-size: 21px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0;
+  text-align: center;
 }
 
 .modal__buttons {

@@ -1,21 +1,21 @@
-import '../../styles/Modal.css'
+import '../../styles/CompleteModal.css'
 
-type ModalButtonVariant = 'primary' | 'secondary'
+type CompleteModalButtonVariant = 'primary' | 'secondary'
 
-interface ModalButton {
+interface CompleteModalButton {
   label: string
   onClick: () => void
-  variant?: ModalButtonVariant
+  variant?: CompleteModalButtonVariant
 }
 
-interface ModalProps {
+interface CompleteModalProps {
   title: string
   description?: string
-  buttons: ModalButton[]
+  button?: CompleteModalButton
   className?: string
 }
 
-function Modal({ title, description, buttons, className }: ModalProps) {
+function CompleteModal({ title, description, button, className }: CompleteModalProps) {
   return (
     <div className={`modal-overlay${className ? ` ${className}` : ''}`}>
       <div
@@ -35,18 +35,15 @@ function Modal({ title, description, buttons, className }: ModalProps) {
             ))}
           </p>
         )}
-        {buttons.length > 0 && (
+        {button && (
           <div className="modal__buttons">
-            {buttons.map((button) => (
-              <button
-                key={button.label}
-                type="button"
-                className={`modal__button modal__button--${button.variant ?? 'primary'}`}
-                onClick={button.onClick}
-              >
-                {button.label}
-              </button>
-            ))}
+            <button
+              type="button"
+              className={`modal__button modal__button--${button.variant ?? 'primary'}`}
+              onClick={button.onClick}
+            >
+              {button.label}
+            </button>
           </div>
         )}
       </div>
@@ -54,5 +51,5 @@ function Modal({ title, description, buttons, className }: ModalProps) {
   )
 }
 
-export default Modal
-export type { ModalButton, ModalProps }
+export default CompleteModal
+export type { CompleteModalButton, CompleteModalProps }

@@ -1,0 +1,45 @@
+.nickname-edit-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 200;
+}
+
+.nickname-edit-overlay__field {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin: 160px 20px 0;
+  padding: 14px 40px 14px 16px;
+  border-radius: 14px;
+  background: #ffffff;
+}
+
+.nickname-edit-overlay__input {
+  flex: 1;
+  border: 0;
+  outline: none;
+  background: transparent;
+  font-size: 15px;
+  font-family: inherit;
+  color: #222222;
+}
+
+.nickname-edit-overlay__input::placeholder {
+  color: #b3b3b3;
+}
+
+.nickname-edit-overlay__clear {
+  position: absolute;
+  right: 12px;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: #d8d8d8;
+  color: #ffffff;
+  font-size: 11px;
+  line-height: 1;
+  cursor: pointer;
+}
