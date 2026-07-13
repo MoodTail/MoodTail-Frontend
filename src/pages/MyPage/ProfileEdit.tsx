@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react'
-import Modal from '../components/common/Modal'
-import { CHARACTER_IMAGES, CHARACTER_LABELS, type CharacterType } from '../constants/characters'
-import '../styles/ProfileEdit.css'
+import CompleteModal from '../../components/MyPage/CompleteModal'
+import NicknameEditOverlay from './NicknameEditOverlay'
+import { CHARACTER_IMAGES, CHARACTER_LABELS, type CharacterType } from '../../constants/characters'
+import chevronLeftIcon from '../../assets/icons/chevron-left.svg'
+import '../../styles/ProfileEdit.css'
 
 const SAVED_MODAL_DURATION_MS = 1200
 
@@ -21,6 +23,7 @@ function ProfileEdit({ onBack }: ProfileEditProps) {
   // TODO: 캐릭터 선택 화면 나오면 state로 변경
   const characterType = MOCK_PROFILE.characterType
   const [showSavedModal, setShowSavedModal] = useState(false)
+  const [isEditingNickname, setIsEditingNickname] = useState(false)
 
   const handleBack = () => {
     if (onBack) {
@@ -57,7 +60,7 @@ function ProfileEdit({ onBack }: ProfileEditProps) {
     <div className="profile-edit">
       <header className="profile-edit__header">
         <button type="button" className="profile-edit__back" onClick={handleBack} aria-label="뒤로가기">
-          ‹
+          <img className="profile-edit__back-icon" src={chevronLeftIcon} alt="" aria-hidden="true" />
         </button>
         <h1 className="profile-edit__title">프로필 수정</h1>
       </header>
@@ -70,29 +73,16 @@ function ProfileEdit({ onBack }: ProfileEditProps) {
       </section>
 
       <section className="profile-edit__card">
-        <label className="profile-edit__label" htmlFor="profile-edit-nickname">
-          닉네임
-        </label>
-        <div className="profile-edit__input-wrap">
-          <input
-            id="profile-edit-nickname"
-            type="text"
-            className="profile-edit__input"
-            value={nickname}
-            onChange={(event) => setNickname(event.target.value)}
-            placeholder="닉네임을 입력해주세요"
-          />
-          {nickname && (
-            <button
-              type="button"
-              className="profile-edit__input-clear"
-              onClick={() => setNickname('')}
-              aria-label="닉네임 지우기"
-            >
-              ✕
-            </button>
-          )}
-        </div>
+        <label className="profile-edit__label">닉네임</label>
+        <button
+          type="button"
+          className={`profile-edit__nickname-display${
+            nickname ? '' : ' profile-edit__nickname-display--empty'
+          }`}
+          onClick={() => setIsEditingNickname(true)}
+        >
+          {nickname || '닉네임을 입력해주세요'}
+        </button>
 
         <p className="profile-edit__label profile-edit__label--character">대표 캐릭터</p>
         <button type="button" className="profile-edit__character-chip" onClick={handleSelectCharacter}>
@@ -104,7 +94,15 @@ function ProfileEdit({ onBack }: ProfileEditProps) {
         저장하기
       </button>
 
-      {showSavedModal && <Modal className="modal--saved" title="저장 완료되었습니다" buttons={[]} />}
+      {showSavedModal && <CompleteModal className="modal--saved" title="저장 완료되었습니다" />}
+
+      {isEditingNickname && (
+        <NicknameEditOverlay
+          value={nickname}
+          onChange={setNickname}
+          onClose={() => setIsEditingNickname(false)}
+        />
+      )}
     </div>
   )
 }
