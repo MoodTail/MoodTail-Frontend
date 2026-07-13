@@ -2,7 +2,7 @@ import type { ButtonHTMLAttributes } from "react";
 import "../../styles/Button.css";
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: "primary" | "text" | "light";
+  variant?: "primary" | "text" | "light" | "share" | "shareLight" | "result";
 }
 
 function Button({
