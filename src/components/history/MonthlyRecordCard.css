@@ -1,0 +1,85 @@
+.monthly-record-card {
+  position: absolute;
+  bottom: 84px;
+  left: 50%;
+  width: 345px;
+  height: 210px;
+  margin-top: 0;
+  padding: 29px 29px 24px;
+  flex-shrink: 0;
+  transform: translateX(-50%);
+  background: #ffffff;
+  border: 0;
+  border-radius: 18px;
+  text-align: left;
+  box-shadow: 0 3px 14px rgba(255, 111, 79, 0.12);
+}
+
+.monthly-record-card__title {
+  margin: 0;
+  color: #151522;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.monthly-record-card__list {
+  height: 116px;
+  margin: 17px 0 0;
+  padding: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  touch-action: pan-y;
+  cursor: grab;
+  user-select: none;
+  list-style: none;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.monthly-record-card__list::-webkit-scrollbar {
+  display: none;
+}
+
+.monthly-record-card__list:active {
+  cursor: grabbing;
+}
+
+.monthly-record-card__item {
+  display: flex;
+  gap: 8px;
+  color: #656565;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 22px;
+  white-space: nowrap;
+}
+
+.monthly-record-card__item + .monthly-record-card__item {
+  margin-top: 5px;
+}
+
+.monthly-record-card__date {
+  flex: 0 0 32px;
+}
+
+.monthly-record-card__empty-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.monthly-record-card__empty-image {
+  width: 118px;
+  height: 108px;
+  margin-top: 6px;
+  object-fit: contain;
+}
+
+.monthly-record-card__empty-text {
+  margin: 1px 0 0;
+  color: #c7c7c7;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 20px;
+}
