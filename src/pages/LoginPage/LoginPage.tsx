@@ -1,9 +1,9 @@
 import { useState } from "react";
 import type { FC } from "react";
 import Input from "../../components/Input/Input";
-import PasswordInput from "../../components/PasswordInput/PasswordInput";
+import PasswordInput from "../../components/login/PasswordInput";
 import Button from "../../components/Button/Button";
-import SnsLoginButtons from "../../components/SnsLoginButtons/SnsLoginButtons";
+import SnsLoginButtons from "../../components/login/SnsLoginButtons";
 import "../../styles/LoginPage.css";
 import OnboardingPage from "../OnboardingPage/OnboardingPage";
 
