@@ -1,0 +1,81 @@
+.radar-chart {
+  display: block;
+  width: 100%;
+  max-width: 280px;
+  margin: 0 auto;
+  overflow: visible;
+}
+
+.radar-chart__grid {
+  fill: none;
+  stroke: #ececec;
+  stroke-width: 1;
+}
+
+.radar-chart__axis {
+  stroke: #ececec;
+  stroke-width: 1;
+  stroke-dasharray: 3 3;
+}
+
+.radar-chart__polygon--primary {
+  fill: rgba(255, 111, 79, 0.55);
+  stroke: var(--color-primary, #ff6f4f);
+  stroke-width: 1.5;
+  stroke-linejoin: round;
+}
+
+.radar-chart__polygon--compare {
+  fill: rgba(255, 190, 130, 0.45);
+  stroke: #ffb77e;
+  stroke-width: 1.5;
+  stroke-linejoin: round;
+}
+
+.radar-chart__dot--primary {
+  fill: var(--color-primary, #ff6f4f);
+  stroke: #ffffff;
+  stroke-width: 1.5;
+}
+
+.radar-chart__dot--compare {
+  fill: #ffb77e;
+}
+
+.radar-chart__label {
+  font-size: 12px;
+  font-weight: 600;
+  fill: #4a4a4a;
+}
+
+.taste-chips {
+  display: flex;
+  gap: 6px;
+  margin-top: 20px;
+}
+
+.taste-chips__item {
+  flex: 1;
+  padding: 8px 0;
+  border: 1px solid #ececec;
+  border-radius: 12px;
+  text-align: center;
+}
+
+.taste-chips__item--active {
+  border-color: var(--color-primary, #ff6f4f);
+}
+
+.taste-chips__label {
+  display: block;
+  font-size: 11px;
+  color: #8d8d8d;
+}
+
+.taste-chips__value {
+  display: block;
+  margin-top: 2px;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--color-primary, #ff6f4f);
+}
