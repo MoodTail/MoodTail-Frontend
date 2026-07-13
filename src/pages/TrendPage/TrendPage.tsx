@@ -16,7 +16,15 @@ function TrendPage({ onBack }: TrendPageProps) {
 
   return (
     <div className="trend-page">
-      <BackgroundBlur />
+      <BackgroundBlur
+        idPrefix="trend-bg"
+        width={393}
+        height={824}
+        circles={[
+          { cx: 331, cy: 230, r: 173, color: "#FF6F4F", opacity: 0.28 },
+          { cx: 33, cy: 676, r: 199, color: "#FEF6D9", opacity: 0.38 },
+        ]}
+      />
       <TrendHeader
         title="트렌드 집계"
         description="지난달과 이번달의 도수, 당도, 산도 변화를 한눈에 비교해요"

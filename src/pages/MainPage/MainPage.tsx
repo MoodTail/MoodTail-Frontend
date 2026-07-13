@@ -1,7 +1,7 @@
 import type { FC } from "react";
 import "../../styles/MainPage.css";
 import Button from "../../components/Button/Button";
-import BackgroundBlur from "../../components/common/BackgroundBlur/BackgroundBlur";
+import BackgroundBlur from "../../components/common/BackgroundBlur";
 
 // ui 구현용으로 잔 이미지 하나 무작위로 넣음
 import cocktail from "../../assets/images/glass/glass-1.png";

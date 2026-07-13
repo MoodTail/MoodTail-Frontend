@@ -1,88 +1,79 @@
-function BackgroundBlur() {
+import type { FC } from "react";
+
+interface BlurCircle {
+  cx: number;
+  cy: number;
+  r: number;
+  color: string;
+  opacity: number;
+}
+
+interface BackgroundBlurProps {
+  width: number;
+  height: number;
+  circles: BlurCircle[];
+  top?: number;
+  left?: number;
+  idPrefix: string;
+}
+
+/**
+ * 페이지 배경에 들어가는 원형 그라데이션 블러.
+ * ⚠️ 반드시 부모 컴포넌트에서 가장 첫 번째 자식으로 렌더링해야 합니다.
+ *   (z-index를 따로 안 써도 DOM 순서상 자연스럽게 맨 뒤에 깔립니다.)
+ */
+const BackgroundBlur: FC<BackgroundBlurProps> = ({
+  width,
+  height,
+  circles,
+  top = 0,
+  left = 0,
+  idPrefix,
+}) => {
   return (
     <svg
-      className="trend-background"
-      viewBox="0 0 393 1155"
+      className="background-blur"
+      style={{
+        position: "absolute",
+        left,
+        top,
+        zIndex: -1,
+        pointerEvents: "none",
+      }}
+      width={width}
+      height={height}
+      viewBox={`0 0 ${width} ${height}`}
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
-      preserveAspectRatio="none"
     >
-      <circle
-        cx="20"
-        cy="159"
-        r="159"
-        fill="url(#trendGradient1)"
-        fillOpacity="0.68"
-      />
-      <circle
-        cx="334"
-        cy="367"
-        r="159"
-        fill="url(#trendGradient2)"
-        fillOpacity="0.37"
-      />
-      <circle
-        cx="38"
-        cy="895"
-        r="199"
-        fill="url(#trendGradient3)"
-        fillOpacity="0.56"
-      />
-      <circle
-        cx="219"
-        cy="956"
-        r="199"
-        fill="url(#trendGradient4)"
-        fillOpacity="0.56"
-      />
+      {circles.map((c, i) => (
+        <circle
+          key={i}
+          cx={c.cx}
+          cy={c.cy}
+          r={c.r}
+          fill={`url(#${idPrefix}-${i})`}
+          fillOpacity={c.opacity}
+        />
+      ))}
       <defs>
-        <radialGradient
-          id="trendGradient1"
-          cx="0"
-          cy="0"
-          r="1"
-          gradientUnits="userSpaceOnUse"
-          gradientTransform="translate(20 159) rotate(90) scale(159)"
-        >
-          <stop stopColor="#FEF6D9" />
-          <stop offset="1" stopColor="white" stopOpacity="0" />
-        </radialGradient>
-        <radialGradient
-          id="trendGradient2"
-          cx="0"
-          cy="0"
-          r="1"
-          gradientUnits="userSpaceOnUse"
-          gradientTransform="translate(334 367) rotate(90) scale(159)"
-        >
-          <stop stopColor="#FF6F4F" />
-          <stop offset="1" stopColor="white" stopOpacity="0" />
-        </radialGradient>
-        <radialGradient
-          id="trendGradient3"
-          cx="0"
-          cy="0"
-          r="1"
-          gradientUnits="userSpaceOnUse"
-          gradientTransform="translate(38 895) rotate(90) scale(199)"
-        >
-          <stop stopColor="#FF6F4F" />
-          <stop offset="1" stopColor="white" stopOpacity="0" />
-        </radialGradient>
-        <radialGradient
-          id="trendGradient4"
-          cx="0"
-          cy="0"
-          r="1"
-          gradientUnits="userSpaceOnUse"
-          gradientTransform="translate(219 956) rotate(90) scale(199)"
-        >
-          <stop stopColor="#FEECAD" />
-          <stop offset="1" stopColor="white" stopOpacity="0" />
-        </radialGradient>
+        {circles.map((c, i) => (
+          <radialGradient
+            key={i}
+            id={`${idPrefix}-${i}`}
+            cx="0"
+            cy="0"
+            r="1"
+            gradientUnits="userSpaceOnUse"
+            gradientTransform={`translate(${c.cx} ${c.cy}) rotate(90) scale(${c.r})`}
+          >
+            <stop stopColor={c.color} />
+            <stop offset="1" stopColor="white" stopOpacity="0" />
+          </radialGradient>
+        ))}
       </defs>
     </svg>
   );
-}
+};
 
 export default BackgroundBlur;
