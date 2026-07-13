@@ -1,0 +1,48 @@
+.cocktail-top-list {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.cocktail-top-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px 12px 16px;
+  border: 1px solid rgba(255, 111, 79, 0.3);
+  border-radius: 18px;
+  background: #ffffff;
+}
+
+.cocktail-top-card__rank {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--color-primary, #ff6f4f);
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.cocktail-top-card__glass {
+  width: 56px;
+  height: 56px;
+  margin: 12px 0 10px;
+  object-fit: contain;
+}
+
+.cocktail-top-card__name {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: #222222;
+}
+
+.cocktail-top-card__match {
+  margin: 2px 0 0;
+  font-size: 12px;
+  color: #8d8d8d;
+}
