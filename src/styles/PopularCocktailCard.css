@@ -1,7 +1,7 @@
 .popular-cocktail-card {
   position: relative;
   margin: 24px 20px 0;
-  padding: 24px 20px 32px;
+  padding: 24px 20px 10px;
   border-radius: 26px;
   background: #fff;
   box-shadow: 5px -2px 23.6px 0 rgba(255, 111, 79, 0.21);
@@ -67,7 +67,7 @@
 }
 
 .cocktail-rank-item__description {
-  margin: 4px 0 0;
+  margin: 2px 0 0;
   font-size: 11px;
   font-weight: 500;
   color: #68646a;
@@ -80,10 +80,8 @@
 }
 
 .popular-cocktail-card__toggle {
-  position: absolute;
-  left: 50%;
-  bottom: 12px;
-  transform: translateX(-50%);
+  display: block;
+  margin: 6px auto 0;
   background: none;
   border: none;
   padding: 0;

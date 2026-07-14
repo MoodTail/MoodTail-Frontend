@@ -20,9 +20,9 @@ function CocktailRankItem({
       </div>
       <div className="cocktail-rank-item__text">
         <p className="cocktail-rank-item__name">{name}</p>
-        <p className="cocktail-rank-item__dexcription">{description}</p>
+        <p className="cocktail-rank-item__description">{description}</p>
       </div>
-      <span className="cocktail-rank-item__percent">{percent}</span>
+      <span className="cocktail-rank-item__percent">{percent}%</span>
     </div>
   );
 }

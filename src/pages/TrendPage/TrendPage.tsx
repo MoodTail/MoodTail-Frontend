@@ -19,10 +19,12 @@ function TrendPage({ onBack }: TrendPageProps) {
       <BackgroundBlur
         idPrefix="trend-bg"
         width={393}
-        height={824}
+        height={1233}
         circles={[
-          { cx: 331, cy: 230, r: 173, color: "#FF6F4F", opacity: 0.28 },
-          { cx: 33, cy: 676, r: 199, color: "#FEF6D9", opacity: 0.38 },
+          { cx: 20, cy: 210, r: 159, color: "#FEF6D9", opacity: 0.68 },
+          { cx: 334, cy: 418, r: 159, color: "#FF6F4F", opacity: 0.37 },
+          { cx: 38, cy: 946, r: 199, color: "#FF6F4F", opacity: 0.56 },
+          { cx: 219, cy: 1007, r: 199, color: "#FEECAD", opacity: 0.56 },
         ]}
       />
       <TrendHeader

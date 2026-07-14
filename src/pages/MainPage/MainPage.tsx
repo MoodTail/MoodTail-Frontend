@@ -1,7 +1,8 @@
-import type { FC } from "react";
+import { useState, type FC } from "react";
 import "../../styles/MainPage.css";
 import Button from "../../components/Button/Button";
 import BackgroundBlur from "../../components/common/BackgroundBlur";
+import TrendPage from "../TrendPage/TrendPage";
 
 // ui 구현용으로 잔 이미지 하나 무작위로 넣음
 import cocktail from "../../assets/images/glass/glass-1.png";
@@ -11,13 +12,19 @@ interface MenuItem {
   onClick?: () => void;
 }
 
-const MENU_ITEMS: MenuItem[] = [
-  { label: "트렌드집계 확인" },
-  { label: "다른 사용자량" },
-  { label: "커스텀 추천" },
-];
-
 const MainPage: FC = () => {
+  const [view, setView] = useState<"home" | "trend">("home");
+
+  const menuItems: MenuItem[] = [
+    { label: "트렌드집계 확인", onClick: () => setView("trend") },
+    { label: "다른 사용자량" },
+    { label: "커스텀 추천" },
+  ];
+
+  if (view === "trend") {
+    return <TrendPage onBack={() => setView("home")} />;
+  }
+
   return (
     <div className="main-page">
       {/* 배경 블러 */}
@@ -56,7 +63,6 @@ const MainPage: FC = () => {
       <h2 className="main-page__section-title">오늘의 추천 칵테일</h2>
 
       <div className="main-page__cocktail-card">
-        {/* 썸네일 */}
         <div className="main-page__cocktail-thumb">
           <img
             src={cocktail}
@@ -65,7 +71,6 @@ const MainPage: FC = () => {
           />
         </div>
 
-        {/* 텍스트 영역 */}
         <div className="main-page__cocktail-info">
           <p className="main-page__cocktail-name">선라이즈 소다</p>
           <p className="main-page__cocktail-tags">달콤 · 청량 · 과일향</p>
@@ -79,8 +84,8 @@ const MainPage: FC = () => {
 
       {/* 메뉴 리스트 */}
       <ul className="main-page__menu-list">
-        {MENU_ITEMS.map((item) => (
-          <li key={item.label} className="main-page__muni-item">
+        {menuItems.map((item) => (
+          <li key={item.label} className="main-page__memu-item">
             <button
               type="button"
               className="main-page__menu-item-button"
