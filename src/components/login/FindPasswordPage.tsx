@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { FC } from "react";
-import BackgroundBlur from "../../components/common/BackgroundBlur/BackgroundBlur";
+import BackgroundBlur from "../../components/common/BackgroundBlur";
 import "../../styles/FindPasswordPage.css";
 
 interface FindPasswordPageProps {
