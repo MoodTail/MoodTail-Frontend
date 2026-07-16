@@ -11,7 +11,7 @@ function TasteBar({ label, value, max = 100 }: TasteBarProps) {
     <div className="taste-bar">
       <span className="taste-bar__label">{label}</span>
       <div className="taste-bar__track">
-        <div className="taste-bar__fill" style={{ width: `${percent}` }} />
+        <div className="taste-bar__fill" style={{ width: `${percent}%` }} />
       </div>
       <span className="taste-bar__value">{value}</span>
     </div>

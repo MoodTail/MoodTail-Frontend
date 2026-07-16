@@ -27,7 +27,11 @@
 }
 
 .rank-change-item__badge {
-  padding: 6px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 92px;
+  height: 28px;
   border-radius: 14px;
   font-size: 12px;
   font-weight: 600;
