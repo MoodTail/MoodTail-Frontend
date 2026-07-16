@@ -42,7 +42,11 @@ function toDateKey(date: Date) {
   return `${year}-${month}-${day}`
 }
 
-function HistoryPage() {
+interface HistoryPageProps {
+  onOpenPhotoDetails: (hasTestResult: boolean) => void
+}
+
+function HistoryPage({ onOpenPhotoDetails }: HistoryPageProps) {
   const [activeMonth, setActiveMonth] = useState(INITIAL_CALENDAR_DATE)
   const [selectedDate, setSelectedDate] = useState<Date>()
   const [isMonthlyReportModalOpen, setIsMonthlyReportModalOpen] = useState(true)
@@ -136,7 +140,7 @@ function HistoryPage() {
             // TODO: 칵테일 기록 화면 연결
           }}
           onViewDetails={() => {
-            // TODO: 날짜 상세 화면 연결
+            onOpenPhotoDetails(true)
           }}
           onClose={handleCloseHistoryDetail}
         />
@@ -148,7 +152,7 @@ function HistoryPage() {
           month={selectedDate.getMonth() + 1}
           date={selectedDate.getDate()}
           onAddPhoto={() => {
-            // TODO: 사진 추가 화면 연결
+            onOpenPhotoDetails(false)
           }}
           onRecordCocktail={() => {
             // TODO: 칵테일 기록 화면 연결
@@ -161,5 +165,7 @@ function HistoryPage() {
 }
 
 export default HistoryPage
+
+export type { HistoryPageProps }
 
 //웹훅 설정 확인용

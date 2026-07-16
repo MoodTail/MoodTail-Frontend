@@ -1,0 +1,91 @@
+.history-photo-page {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: linear-gradient(180deg, #ffffff 0%, #ffffff 83%, #f8ffff 100%);
+  color: #151522;
+}
+
+.history-photo-page__header {
+  position: absolute;
+  top: 48px;
+  left: 30px;
+  display: flex;
+  height: 30px;
+  align-items: center;
+}
+
+.history-photo-page__header h1 {
+  margin: 0 0 0 8px;
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 30px;
+}
+
+.history-photo-page__back-button {
+  display: grid;
+  width: 20px;
+  height: 30px;
+  padding: 0;
+  place-items: center;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.history-photo-page__back-button img {
+  display: block;
+  width: 9px;
+  height: 16px;
+}
+
+.history-photo-page__tabs {
+  position: absolute;
+  top: 118px;
+  left: 30px;
+  display: flex;
+  gap: 10px;
+}
+
+.history-photo-page__tab {
+  height: 32px;
+  padding: 0;
+  border: 1px solid rgba(255, 111, 79, 0.24);
+  border-radius: 16px;
+  background: #ffffff;
+  color: #ff6f4f;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 1px 5px rgba(255, 111, 79, 0.16);
+}
+
+.history-photo-page__tab--record {
+  width: 132px;
+}
+
+.history-photo-page__tab--result {
+  width: 96px;
+}
+
+.history-photo-page__tab.is-active {
+  border-color: #ff6f4f;
+  background: #ff6f4f;
+  color: #ffffff;
+  box-shadow: none;
+}
+
+.history-photo-page__result-placeholder {
+  position: absolute;
+  top: 177px;
+  left: 30px;
+  display: grid;
+  width: 333px;
+  height: 170px;
+  place-items: center;
+  border: 1px solid rgba(255, 111, 79, 0.28);
+  border-radius: 28px;
+  color: #a3a3a3;
+  font-size: 13px;
+}
