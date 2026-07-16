@@ -1,7 +1,8 @@
-import type { FC } from "react";
+import { useState, type FC } from "react";
 import "../../styles/MainPage.css";
 import Button from "../../components/Button/Button";
 import BackgroundBlur from "../../components/common/BackgroundBlur";
+import TrendPage from "../TrendPage/TrendPage";
 
 // ui 구현용으로 잔 이미지 하나 무작위로 넣음
 import cocktail from "../../assets/images/glass/glass-1.png";
@@ -11,13 +12,19 @@ interface MenuItem {
   onClick?: () => void;
 }
 
-const MENU_ITEMS: MenuItem[] = [
-  { label: "트렌드집계 확인" },
-  { label: "다른 사용자량" },
-  { label: "커스텀 추천" },
-];
-
 const MainPage: FC = () => {
+  const [view, setView] = useState<"home" | "trend">("home");
+
+  const menuItems: MenuItem[] = [
+    { label: "트렌드집계 확인", onClick: () => setView("trend") },
+    { label: "다른 사용자량" },
+    { label: "커스텀 추천" },
+  ];
+
+  if (view === "trend") {
+    return <TrendPage onBack={() => setView("home")} />;
+  }
+
   return (
     <div className="main-page">
       {/* 배경 블러 */}
@@ -79,7 +86,7 @@ const MainPage: FC = () => {
 
       {/* 메뉴 리스트 */}
       <ul className="main-page__menu-list">
-        {MENU_ITEMS.map((item) => (
+        {menuItems.map((item) => (
           <li key={item.label} className="main-page__muni-item">
             <button
               type="button"
