@@ -1,0 +1,59 @@
+.taste-average-card {
+  margin: 24px 20px 0;
+  padding: 24px 20px;
+  border-radius: 26px;
+  background: #fff;
+  box-shadow: -2px 8px 22px 0 rgba(255, 111, 79, 0.42);
+}
+
+.taste-average-card__title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: #17182f;
+}
+
+.taste-average-card__description {
+  margin: 4px 0 20px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #68646a;
+}
+
+.taste-average-card__list {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.taste-bar {
+  display: grid;
+  grid-template-columns: 34px 1fr 20px;
+  align-items: center;
+  gap: 12px;
+}
+
+.taste-bar__label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #17182f;
+}
+
+.taste-bar__track {
+  height: 8px;
+  border-radius: 4px;
+  background: #f2d7ce;
+}
+
+.taste-bar__fill {
+  height: 100%;
+  border-radius: 4px;
+  background: #ff613d;
+}
+
+.taste-bar__value {
+  font-size: 13px;
+  font-weight: 600;
+  color: #68646a;
+  text-align: right;
+}

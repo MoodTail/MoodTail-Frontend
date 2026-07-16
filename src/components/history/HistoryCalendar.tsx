@@ -1,91 +1,58 @@
+import Calendar from 'react-calendar'
+import 'react-calendar/dist/Calendar.css'
 import './HistoryCalendar.css'
 
 interface HistoryCalendarProps {
-  year: number
-  month: number
-  markedDates?: number[]
-  selectedDate?: number
-  onDateClick?: (date: number) => void
-  onPrevMonth?: () => void
-  onNextMonth?: () => void
+  initialDate?: Date
+  markedDates?: Date[]
+  selectedDate?: Date
+  onDateClick?: (date: Date) => void
+  onActiveMonthChange?: (date: Date) => void
 }
 
-const weekDays = ['일', '월', '화', '수', '목', '금', '토']
+function toDateKey(date: Date) {
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+
+  return `${year}-${month}-${day}`
+}
 
 function HistoryCalendar({
-  year,
-  month,
+  initialDate = new Date(),
   markedDates = [],
   selectedDate,
   onDateClick,
-  onPrevMonth,
-  onNextMonth,
+  onActiveMonthChange,
 }: HistoryCalendarProps) {
-  const firstDay = new Date(year, month - 1, 1).getDay()
-  const lastDate = new Date(year, month, 0).getDate()
-
-  const emptyCells = Array.from({ length: firstDay })
-  const dates = Array.from({ length: lastDate }, (_, index) => index + 1)
+  const markedDateKeys = new Set(markedDates.map(toDateKey))
 
   return (
-    <section className="history-calendar">
-      <div className="history-calendar__header">
-        <button
-          type="button"
-          className="history-calendar__nav-button"
-          onClick={onPrevMonth}
-          aria-label="이전 달"
-        >
-          ‹
-        </button>
-
-        <h2 className="history-calendar__title">
-          {year}년 {month}월
-        </h2>
-
-        <button
-          type="button"
-          className="history-calendar__nav-button"
-          onClick={onNextMonth}
-          aria-label="다음 달"
-        >
-          ›
-        </button>
-      </div>
-
-      <div className="history-calendar__weekdays">
-        {weekDays.map((day) => (
-          <span key={day} className="history-calendar__weekday">
-            {day}
-          </span>
-        ))}
-      </div>
-
-      <div className="history-calendar__grid">
-        {emptyCells.map((_, index) => (
-          <span key={`empty-${index}`} className="history-calendar__empty" />
-        ))}
-
-        {dates.map((date) => {
-          const isMarked = markedDates.includes(date)
-          const isSelected = selectedDate === date
-
-          return (
-            <button
-              key={date}
-              type="button"
-              className={`history-calendar__date ${isMarked ? 'is-marked' : ''} ${
-                isSelected ? 'is-selected' : ''
-              }`}
-              onClick={() => onDateClick?.(date)}
-            >
-              {date}
-            </button>
-          )
-        })}
-      </div>
-    </section>
+    <Calendar
+      className="history-calendar"
+      locale="ko-KR"
+      calendarType="gregory"
+      defaultActiveStartDate={initialDate}
+      value={selectedDate ?? null}
+      onClickDay={(date) => onDateClick?.(date)}
+      onActiveStartDateChange={({ activeStartDate, view }) => {
+        if (activeStartDate && view === 'month') {
+          onActiveMonthChange?.(activeStartDate)
+        }
+      }}
+      prevLabel="‹"
+      nextLabel="›"
+      prev2Label={null}
+      next2Label={null}
+      showNeighboringMonth={false}
+      formatDay={(_, date) => String(date.getDate())}
+      formatMonthYear={(_, date) => `${date.getFullYear()}년 ${date.getMonth() + 1}월`}
+      tileClassName={({ date, view }) =>
+        view === 'month' && markedDateKeys.has(toDateKey(date)) ? 'is-marked' : null
+      }
+    />
   )
 }
 
 export default HistoryCalendar
+export type { HistoryCalendarProps }
