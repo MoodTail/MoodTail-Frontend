@@ -1,0 +1,234 @@
+.login-screen {
+  position: relative;
+  width: 393px;
+  height: 824px;
+  margin: 0 auto;
+  overflow: hidden;
+  background: linear-gradient(
+    224.79deg,
+    #fee5e5 -16.15%,
+    #fff 17.41%,
+    #fff 81.62%,
+    #c2ede9 117.1%
+  );
+  font-family:
+    "Pretendard",
+    -apple-system,
+    BlinkMacSystemFont,
+    sans-serif;
+}
+
+.bg-blobs {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* 상태바 */
+.status-bar {
+  position: absolute;
+  top: 24px;
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 20px;
+  box-sizing: border-box;
+}
+
+.status-time {
+  font-size: 17px;
+  font-weight: 600;
+  color: #000;
+}
+
+.status-icons {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.icon-signal,
+.icon-wifi,
+.icon-battery {
+  display: inline-block;
+  background: #000;
+}
+
+.icon-signal {
+  width: 18px;
+  height: 12px;
+}
+
+.icon-wifi {
+  width: 16px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.icon-battery {
+  width: 24px;
+  height: 12px;
+  border-radius: 3px;
+}
+
+/* 브랜드 영역 */
+.brand-title {
+  position: absolute;
+  top: 170px;
+  left: 0;
+  width: 100%;
+  margin: 0;
+  font-size: 32px;
+  font-weight: 700;
+  text-align: center;
+  color: #ff6f4f;
+}
+
+.brand-subtitle {
+  position: absolute;
+  top: 212px;
+  left: 0;
+  width: 100%;
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  text-align: center;
+  color: #ff6f4f;
+}
+
+/* 입력 폼 */
+.login-form {
+  position: absolute;
+  top: 292px;
+  left: 40px;
+  width: 310px;
+}
+
+.input-wrapper {
+  position: relative;
+  width: 310px;
+  height: 48px;
+  margin-bottom: 12px;
+}
+
+.login-input {
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  border: 1px solid #ff6f4f;
+  border-radius: 10px;
+  background: #fff;
+  padding: 0 40px 0 16px;
+  font-size: 16px;
+  color: #333;
+  outline: none;
+}
+
+.login-input::placeholder {
+  color: #aaa;
+}
+
+.eye-toggle {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+/* 로그인 버튼 */
+.login-btn {
+  position: absolute;
+  top: 414px;
+  left: 40px;
+  width: 310px;
+  height: 50px;
+  border: none;
+  border-radius: 100px;
+  background: #ff6f4f;
+  color: #fff;
+  font-size: 20px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.login-btn:hover {
+  background: #ff5c37;
+}
+
+/* 로그인 없이 이용하기 */
+.guest-link {
+  position: absolute;
+  top: 472px;
+  left: 0;
+  width: 100%;
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 10px;
+  font-weight: 600;
+  text-align: center;
+  color: rgba(255, 111, 79, 0.68);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* SNS 로그인 */
+.sns-label {
+  position: absolute;
+  top: 653px;
+  left: 0;
+  width: 100%;
+  margin: 0;
+  font-size: 14px;
+  text-align: center;
+  color: #000;
+}
+
+.sns-icons {
+  position: absolute;
+  top: 689px;
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.sns-icon {
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: none;
+  background: none;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.eye-off-icon {
+  position: relative;
+  display: inline-block;
+  width: 24px;
+  height: 17px;
+}
+
+.eye-off-base {
+  display: block;
+}
+
+.eye-off-slash {
+  position: absolute;
+  top: -3px;
+  left: -1px;
+}
