@@ -17,6 +17,11 @@ interface BackgroundBlurProps {
   idPrefix: string;
 }
 
+/**
+ * 페이지 배경에 들어가는 원형 그라데이션 블러.
+ * ⚠️ 반드시 부모 컴포넌트에서 가장 첫 번째 자식으로 렌더링해야 합니다.
+ *   (z-index를 따로 안 써도 DOM 순서상 자연스럽게 맨 뒤에 깔립니다.)
+ */
 const BackgroundBlur: FC<BackgroundBlurProps> = ({
   width,
   height,

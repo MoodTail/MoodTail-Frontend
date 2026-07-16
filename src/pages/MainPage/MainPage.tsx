@@ -1,8 +1,7 @@
 import type { FC } from "react";
-import { useState } from "react";
 import "../../styles/MainPage.css";
 import Button from "../../components/Button/Button";
-import BackgroundBlur from "../../components/common/BackgroundBlur/BackgroundBlur";
+import BackgroundBlur from "../../components/common/BackgroundBlur";
 
 // ui 구현용으로 잔 이미지 하나 무작위로 넣음
 import cocktail from "../../assets/images/glass/glass-1.png";
@@ -12,8 +11,6 @@ interface MenuItem {
   onClick?: () => void;
 }
 
-type NavKey = "history" | "dictionary" | "home" | "recipe" | "mypage";
-
 const MENU_ITEMS: MenuItem[] = [
   { label: "트렌드집계 확인" },
   { label: "다른 사용자량" },
@@ -21,8 +18,6 @@ const MENU_ITEMS: MenuItem[] = [
 ];
 
 const MainPage: FC = () => {
-  const [activeMenu, setActiveMenu] = useState<NavKey>("home");
-
   return (
     <div className="main-page">
       {/* 배경 블러 */}

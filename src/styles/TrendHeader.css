@@ -1,0 +1,25 @@
+.trend-header {
+  padding: 24px 20px 0;
+}
+
+.trend-header__back {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  display: block;
+  margin-bottom: 16px;
+}
+
+.trend-header__title {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+  color: #10161f;
+}
+
+.trend-header__description {
+  margin: 8px 0 0;
+  font-size: 11px;
+  color: #373750;
+}

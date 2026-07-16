@@ -2,10 +2,10 @@ import { useState } from "react";
 import type { FC } from "react";
 import Input from "../../components/Input/Input";
 import PasswordInput from "../../components/login/PasswordInput";
-import Button from "../../components/Button/Button";
 import SnsLoginButtons from "../../components/login/SnsLoginButtons";
-import BackgroundBlur from "../../components/common/BackgroundBlur/BackgroundBlur";
+import BackgroundBlur from "../../components/common/BackgroundBlur";
 import "../../styles/LoginPage.css";
+import "../../styles/SnsLoginButtons.css";
 import OnboardingPage from "../OnboardingPage/OnboardingPage";
 import FindPasswordPage from "../../components/login/FindPasswordPage";
 
@@ -27,16 +27,7 @@ const LoginPage: FC<LoginPageProps> = ({ onLogin }) => {
     return <OnboardingPage onFinish={handleOnboardingFinish} />;
   }
 
-  if (step === "findPassword") {
-    return <FindPasswordPage onBack={() => setStep("login")} />;
-  }
-
   const handleLoginClick = (): void => {
-    if (!userId || !password) {
-      setErrorMessage("아이디 또는 비밀번호가 일치하지 않습니다");
-      return;
-    }
-    setErrorMessage("");
     onLogin();
   };
 
@@ -72,15 +63,13 @@ const LoginPage: FC<LoginPageProps> = ({ onLogin }) => {
         />
       </div>
 
-      {errorMessage && <p className="login-page__error">{errorMessage}</p>}
-
-      <Button
-        variant="primary"
+      <button
+        type="button"
         className="login-page__login-button"
         onClick={handleLoginClick}
       >
         로그인
-      </Button>
+      </button>
 
       <div className="login-page__links">
         <button type="button" className="login-page__link">

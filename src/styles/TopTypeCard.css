@@ -1,0 +1,58 @@
+.top-type-card {
+  margin: 24px 20px 0;
+  padding: 16px 15px;
+  border-radius: 26px;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 7px 22px 0 rgba(255, 111, 79, 0.28);
+}
+
+.top-type-card__title {
+  margin: 0 0 20px;
+  font-size: 20px;
+  font-weight: 700;
+  color: #17182f;
+  text-align: center;
+}
+
+.top-type-card__list {
+  display: flex;
+  gap: 8px;
+}
+
+.top-type-item {
+  flex: 1;
+  padding: 16px 8px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid #efe3d8;
+  box-shadow: 0 8px 22px 0 rgba(122, 59, 31, 0.08);
+  text-align: center;
+}
+
+.top-type-item__badge {
+  width: 44px;
+  height: 44px;
+  margin: 0 auto 10px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.top-type-item__rank {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.top-type-item__label {
+  margin: 0 0 4px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #17182f;
+}
+
+.top-type-item__percent {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+}

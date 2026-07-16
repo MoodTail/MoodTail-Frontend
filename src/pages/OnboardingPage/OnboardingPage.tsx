@@ -7,7 +7,7 @@ import OnboardingMarquee from "../../components/onboarding/OnboardingMarquee";
 import OnboardingCharacterCarousel from "../../components/onboarding/OnboardingCharacterCarousel";
 import OnboardingDots from "../../components/onboarding/OnboardingDots";
 import "../../styles/OnboardingPage.css";
-import BackgroundBlur from "../../components/common/BackgroundBlur/BackgroundBlur";
+import BackgroundBlur from "../../components/common/BackgroundBlur";
 
 // 온보딩 7 이미지
 import image8 from "../../assets/images/cocktails/image 8.png";

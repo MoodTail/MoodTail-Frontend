@@ -21,22 +21,29 @@
 }
 
 .inquiry__back {
-  width: 28px;
-  height: 28px;
+  width: 27px;
+  height: 27px;
   padding: 0;
   border: 0;
   background: transparent;
-  color: #222222;
-  font-size: 26px;
-  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
+}
+
+.inquiry__back-icon {
+  width: 9px;
+  height: 15px;
 }
 
 .inquiry__title {
   margin: 0;
-  font-size: 18px;
+  font-size: 22px;
   font-weight: 700;
-  color: #222222;
+  line-height: 1.32;
+  letter-spacing: 0;
+  color: #1a1a2e;
 }
 
 .inquiry__description {
@@ -45,6 +52,26 @@
   font-weight: 400;
   line-height: 1.32;
   color: #6b6b6b;
+}
+
+.inquiry__email {
+  margin-bottom: 12px;
+  padding: 14px 16px;
+  border: 1px solid #e5e5e5;
+  outline: none;
+  border-radius: 16px;
+  background: #ffffff;
+  font-size: 14px;
+  font-family: inherit;
+  color: #222222;
+}
+
+.inquiry__email::placeholder {
+  color: #b3b3b3;
+}
+
+.inquiry__email:focus {
+  border-color: var(--color-primary, #ff6f4f);
 }
 
 .inquiry__textarea-wrap {
@@ -85,9 +112,10 @@
 .inquiry__submit {
   margin-top: auto;
   width: 100%;
-  padding: 16px 0;
+  height: 54px;
+  padding: 0;
   border: 0;
-  border-radius: 16px;
+  border-radius: 27px;
   background: var(--color-primary, #ff6f4f);
   color: #ffffff;
   font-size: 16px;
