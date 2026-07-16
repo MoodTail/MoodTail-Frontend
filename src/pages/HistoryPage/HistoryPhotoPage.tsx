@@ -1,6 +1,8 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import chevronLeftIcon from '../../assets/icons/chevron-left.svg'
-import HistoryPhotoUploader from '../../components/history/HistoryPhotoUploader'
+import HistoryPhotoUploader, {
+  type HistoryPhotoUploaderHandle,
+} from '../../components/history/HistoryPhotoUploader'
 import './HistoryPhotoPage.css'
 
 interface HistoryPhotoPageProps {
@@ -10,6 +12,12 @@ interface HistoryPhotoPageProps {
 
 function HistoryPhotoPage({ onBack, hasTestResult }: HistoryPhotoPageProps) {
   const [activeTab, setActiveTab] = useState<'record' | 'result'>('record')
+  const photoUploaderRef = useRef<HistoryPhotoUploaderHandle>(null)
+
+  const handleOpenTestResult = () => {
+    photoUploaderRef.current?.collapseSheet()
+    setActiveTab('result')
+  }
 
   return (
     <div className="history-photo-page">
@@ -45,16 +53,21 @@ function HistoryPhotoPage({ onBack, hasTestResult }: HistoryPhotoPageProps) {
             className={`history-photo-page__tab history-photo-page__tab--result${
               activeTab === 'result' ? ' is-active' : ''
             }`}
-            onClick={() => setActiveTab('result')}
+            onClick={handleOpenTestResult}
           >
             테스트 결과
           </button>
         )}
       </div>
 
-      {activeTab === 'record' ? (
-        <HistoryPhotoUploader collapsible />
-      ) : (
+      <div hidden={activeTab !== 'record'}>
+        <HistoryPhotoUploader
+          ref={photoUploaderRef}
+          collapsible
+        />
+      </div>
+
+      {activeTab === 'result' && (
         <div className="history-photo-page__result-placeholder">
           테스트 결과 화면은 추후 연결될 예정입니다.
         </div>

@@ -1,4 +1,12 @@
-import { useEffect, useRef, useState, type ChangeEvent, type PointerEvent } from 'react'
+import {
+  forwardRef,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  useState,
+  type ChangeEvent,
+  type PointerEvent,
+} from 'react'
 import cameraIcon from '../../assets/icons/camera.svg'
 import galleryIcon from '../../assets/icons/gallery.svg'
 import photoEditIcon from '../../assets/icons/photo_edit.svg'
@@ -29,7 +37,14 @@ interface HistoryPhotoUploaderProps {
   collapsible?: boolean
 }
 
-function HistoryPhotoUploader({ collapsible = false }: HistoryPhotoUploaderProps) {
+interface HistoryPhotoUploaderHandle {
+  collapseSheet: () => void
+}
+
+const HistoryPhotoUploader = forwardRef<
+  HistoryPhotoUploaderHandle,
+  HistoryPhotoUploaderProps
+>(function HistoryPhotoUploader({ collapsible = false }, ref) {
   const [photos, setPhotos] = useState<PhotoPreview[]>([])
   const [cropQueue, setCropQueue] = useState<PhotoToCrop[]>([])
   const [editingPhoto, setEditingPhoto] = useState<PhotoPreview>()
@@ -56,6 +71,13 @@ function HistoryPhotoUploader({ collapsible = false }: HistoryPhotoUploaderProps
   useEffect(() => {
     cropQueueRef.current = cropQueue
   }, [cropQueue])
+
+  useImperativeHandle(ref, () => ({
+    collapseSheet: () => {
+      setIsSheetExpanded(false)
+      setSheetDragOffset(undefined)
+    },
+  }), [])
 
   useEffect(
     () => () => {
@@ -369,7 +391,7 @@ function HistoryPhotoUploader({ collapsible = false }: HistoryPhotoUploaderProps
       )}
     </>
   )
-}
+})
 
 export default HistoryPhotoUploader
-export type { HistoryPhotoUploaderProps }
+export type { HistoryPhotoUploaderHandle, HistoryPhotoUploaderProps }
