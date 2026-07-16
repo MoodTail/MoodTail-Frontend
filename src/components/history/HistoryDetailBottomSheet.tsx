@@ -1,5 +1,6 @@
 import detailModalCharacter from '../../assets/images/history/detail_modal_character.png'
 import BottomSheetPortal from './BottomSheetPortal'
+import HistoryPrimaryButton from './HistoryPrimaryButton'
 import useBottomSheetClose from './useBottomSheetClose'
 import './HistoryDetailBottomSheet.css'
 
@@ -71,13 +72,12 @@ function HistoryDetailBottomSheet({
           aria-hidden="true"
         />
 
-        <button
-          type="button"
+        <HistoryPrimaryButton
           className="history-detail-sheet__detail-button"
           onClick={onViewDetails}
         >
           사진 추가 및 상세 보기
-        </button>
+        </HistoryPrimaryButton>
       </section>
       </div>
     </BottomSheetPortal>
