@@ -7,6 +7,7 @@ import BackgroundBlur from "../../components/common/BackgroundBlur";
 import "../../styles/LoginPage.css";
 import "../../styles/SnsLoginButtons.css";
 import OnboardingPage from "../OnboardingPage/OnboardingPage";
+import FindPasswordPage from "../../components/login/FindPasswordPage";
 
 interface LoginPageProps {
   onLogin: () => void;
@@ -18,6 +19,7 @@ const LoginPage: FC<LoginPageProps> = ({ onLogin }) => {
   const [step, setStep] = useState<LoginStep>("onboarding");
   const [userId, setUserId] = useState("");
   const [password, setPassword] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
   const handleOnboardingFinish = (): void => setStep("login");
 
