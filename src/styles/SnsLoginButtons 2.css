@@ -1,0 +1,32 @@
+.sns-login-wrapper {
+  position: absolute;
+  top: 640px;
+  left: 0;
+  width: 100%;
+  text-align: center;
+}
+
+.sns-label {
+  margin: 0 0 16px;
+  font-size: 14px;
+  color: #000;
+}
+
+.sns-icons {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.sns-icon {
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: none;
+  background: none;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

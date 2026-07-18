@@ -1,0 +1,93 @@
+.popular-cocktail-card {
+  position: relative;
+  margin: 24px 20px 0;
+  padding: 24px 20px 10px;
+  border-radius: 26px;
+  background: #fff;
+  box-shadow: 5px -2px 23.6px 0 rgba(255, 111, 79, 0.21);
+}
+
+.popular-cocktail-card--expanded {
+  box-shadow: 19px -2px 23.6px 0 rgba(255, 111, 79, 0.06);
+}
+
+.popular-cocktail-card__title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: #17182f;
+}
+
+.popular-cocktail-card__description {
+  margin: 2px 0 20px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #68646a;
+}
+
+.popular-cocktail-card__list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.cocktail-rank-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 15px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid #efe3d8;
+  box-shadow: 0 8px 22px 0 rgba(122, 59, 31, 0.08);
+}
+
+.cocktail-rank-item__badge {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.cocktail-rank-item__text {
+  flex: 1;
+}
+
+.cocktail-rank-item__name {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: #17182f;
+}
+
+.cocktail-rank-item__description {
+  margin: 4px 0 0;
+  font-size: 11px;
+  font-weight: 500;
+  color: #68646a;
+}
+
+.cocktail-rank-item__percent {
+  font-size: 13px;
+  font-weight: 600;
+  color: #ff613d;
+}
+
+.popular-cocktail-card__toggle {
+  display: block;
+  margin: 6px auto 0;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+.popular-cocktail-card__toggle--expanded svg {
+  transform: rotate(180deg);
+}
