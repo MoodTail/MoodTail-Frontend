@@ -1,29 +1,38 @@
 .type-match-card {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 16px 12px;
-  border-radius: 18px;
-  background: #f7f7f7;
+  position: relative;
+  flex: none;
+  width: 168px;
+  height: 104px;
+  overflow: hidden;
+  padding: 4px 12px 0;
+  border: 1px solid #ffffff;
+  border-radius: 24px;
+  background: #ffffff;
+  box-shadow: -1px 2px 22px 0 rgba(255, 92, 46, 0.09);
   text-align: center;
 }
 
 .type-match-card__label {
   margin: 0;
-  font-size: 12px;
-  color: #8d8d8d;
-}
-
-.type-match-card__image {
-  width: 48px;
-  height: 48px;
-  margin: 10px 0 8px;
-  object-fit: contain;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: 0;
+  color: #10161f;
 }
 
 .type-match-card__name {
-  margin: 0;
-  font-size: 14px;
-  font-weight: 700;
+  margin: 2px 0 0;
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: 0;
+}
+
+.type-match-card__image {
+  position: absolute;
+  top: 37.5%;
+  left: 19.2%;
+  width: 56%;
+  height: auto;
 }

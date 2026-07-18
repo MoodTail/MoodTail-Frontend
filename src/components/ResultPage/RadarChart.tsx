@@ -22,10 +22,10 @@ const AXES: { key: keyof RadarChartData; label: string; angle: number }[] = [
   { key: '청량감', label: '청량감', angle: 198 },
 ]
 
-const SIZE = 280
+const SIZE = 340
 const CENTER = SIZE / 2
-const MAX_RADIUS = 92
-const GRID_STEPS = [0.25, 0.5, 0.75, 1]
+const MAX_RADIUS = 115
+const GRID_STEPS = [1 / 3, 2 / 3, 1]
 
 function pointAt(angleDeg: number, radius: number) {
   const angleRad = (Math.PI / 180) * angleDeg
@@ -48,7 +48,7 @@ function dataPolygonPoints(data: RadarChartData, maxValue: number) {
 }
 
 function labelPosition(angle: number) {
-  const point = pointAt(angle, MAX_RADIUS + 24)
+  const point = pointAt(angle, MAX_RADIUS + 14)
   const cos = Math.cos((Math.PI / 180) * angle)
   const anchor: 'start' | 'middle' | 'end' = cos > 0.3 ? 'start' : cos < -0.3 ? 'end' : 'middle'
   return { ...point, anchor }
@@ -68,7 +68,7 @@ function RadarChart({ myData, compareData, maxValue = 100 }: RadarChartProps) {
       {GRID_STEPS.map((step) => (
         <polygon
           key={step}
-          className="radar-chart__grid"
+          className={`radar-chart__grid${step === 1 ? ' radar-chart__grid--outer' : ''}`}
           points={toPolygonString(gridPolygonPoints(MAX_RADIUS * step))}
         />
       ))}
@@ -106,7 +106,7 @@ function RadarChart({ myData, compareData, maxValue = 100 }: RadarChartProps) {
             className="radar-chart__dot radar-chart__dot--compare"
             cx={point.x}
             cy={point.y}
-            r={4}
+            r={6}
           />
         ))}
 
@@ -116,7 +116,7 @@ function RadarChart({ myData, compareData, maxValue = 100 }: RadarChartProps) {
           className="radar-chart__dot radar-chart__dot--primary"
           cx={point.x}
           cy={point.y}
-          r={5}
+          r={6}
         />
       ))}
 

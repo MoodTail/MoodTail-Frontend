@@ -11,10 +11,10 @@ function TypeMatchCard({ label, typeName, typeNameColor, image }: TypeMatchCardP
   return (
     <div className="type-match-card">
       <p className="type-match-card__label">{label}</p>
-      <img className="type-match-card__image" src={image} alt="" />
       <p className="type-match-card__name" style={{ color: typeNameColor }}>
         {typeName}
       </p>
+      <img className="type-match-card__image" src={image} alt="" />
     </div>
   )
 }
