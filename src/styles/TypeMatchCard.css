@@ -31,8 +31,8 @@
 
 .type-match-card__image {
   position: absolute;
-  top: 37.5%;
-  left: 19.2%;
-  width: 56%;
-  height: auto;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
