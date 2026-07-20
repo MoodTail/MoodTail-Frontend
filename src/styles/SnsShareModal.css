@@ -1,0 +1,100 @@
+.sns-share-modal-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 210;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(0, 0, 0, 0.25);
+}
+
+.sns-share-modal {
+  position: relative;
+  width: 319px;
+  max-width: 100%;
+  padding: 36px 32px 24px;
+  border-radius: 23px;
+  background: #ffffff;
+  box-shadow: 9px 13px 22px rgba(255, 92, 46, 0.15);
+}
+
+.sns-share-modal__close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 16px;
+  height: 17px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.sns-share-modal__close img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.sns-share-modal__tip {
+  margin: 0 0 12px;
+  font-family: 'Pretendard', sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 22px;
+  letter-spacing: 0;
+  color: rgba(255, 111, 79, 0.59);
+}
+
+.sns-share-modal__copy-button,
+.sns-share-modal__kakao-button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 255px;
+  max-width: 100%;
+  padding: 0 12px 0 10.72px;
+  border: 0;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.sns-share-modal__copy-button {
+  height: 36px;
+  background: #d9d9d9;
+}
+
+.sns-share-modal__copy-button span {
+  font-family: 'Pretendard', sans-serif;
+  font-size: 17px;
+  font-weight: 500;
+  line-height: 22px;
+  letter-spacing: 0;
+  color: #ffffff;
+}
+
+.sns-share-modal__copy-button img {
+  width: 18px;
+  height: auto;
+}
+
+.sns-share-modal__kakao-button {
+  height: 40px;
+  margin-top: 12px;
+  background: #ffe812;
+}
+
+.sns-share-modal__kakao-button span {
+  font-family: 'Pretendard', sans-serif;
+  font-size: 17px;
+  font-weight: 500;
+  line-height: 22px;
+  letter-spacing: 0;
+  color: #000000;
+}
+
+.sns-share-modal__kakao-button img {
+  width: 18px;
+  height: auto;
+}
