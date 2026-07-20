@@ -1,4 +1,4 @@
-import defaultAvatar from "../../assets/images/character/default-avatar.png";
+import defaultAvatar from "../../assets/images/character/default.png";
 import "../../styles/MatchIntroCard.css";
 
 interface MatchIntroCardProps {
@@ -37,9 +37,9 @@ function MatchIntroCard({
       </div>
 
       <p className="match-intro-card__description">
-        초대 링크나 코드를 보내면
+        상대방의 코드를 입력하면
         <br />
-        상대방의 최신 테스트 결과를 불러와요.
+        최신 테스트 결과를 불러와요.
       </p>
     </div>
   );
