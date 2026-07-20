@@ -41,11 +41,18 @@ function toDateKey(date: Date) {
 }
 
 interface HistoryPageProps {
-  onOpenPhotoDetails: (hasTestResult: boolean) => void
+  onOpenPhotoDetails: (hasTestResult: boolean, date: Date) => void
+  onOpenCocktailRecord: (hasTestResult: boolean, date: Date) => void
+  onOpenTestResult: (hasTestResult: boolean, date: Date) => void
   onOpenMonthlyReport: (month: Date) => void
 }
 
-function HistoryPage({ onOpenPhotoDetails, onOpenMonthlyReport }: HistoryPageProps) {
+function HistoryPage({
+  onOpenPhotoDetails,
+  onOpenCocktailRecord,
+  onOpenTestResult,
+  onOpenMonthlyReport,
+}: HistoryPageProps) {
   const [activeMonth, setActiveMonth] = useState(INITIAL_CALENDAR_DATE)
   const [selectedDate, setSelectedDate] = useState<Date>()
   const [isMonthlyReportModalOpen, setIsMonthlyReportModalOpen] = useState(true)
@@ -147,11 +154,12 @@ function HistoryPage({ onOpenPhotoDetails, onOpenMonthlyReport }: HistoryPagePro
           type={selectedRecord.type}
           message="재미있으면 그걸로 충분한 거 아닐까?"
           onRecordCocktail={() => {
-            // TODO: 칵테일 기록 화면 연결
+            onOpenCocktailRecord(true, selectedDate)
           }}
           onViewDetails={() => {
-            onOpenPhotoDetails(true)
+            onOpenPhotoDetails(true, selectedDate)
           }}
+          onViewTestResult={() => onOpenTestResult(true, selectedDate)}
           onClose={handleCloseHistoryDetail}
         />
       )}
@@ -162,11 +170,12 @@ function HistoryPage({ onOpenPhotoDetails, onOpenMonthlyReport }: HistoryPagePro
           month={selectedDate.getMonth() + 1}
           date={selectedDate.getDate()}
           onAddPhoto={() => {
-            onOpenPhotoDetails(false)
+            onOpenPhotoDetails(false, selectedDate)
           }}
           onRecordCocktail={() => {
-            // TODO: 칵테일 기록 화면 연결
+            onOpenCocktailRecord(false, selectedDate)
           }}
+          onViewTestResult={() => onOpenTestResult(false, selectedDate)}
           onClose={handleCloseHistoryDetail}
         />
       )}

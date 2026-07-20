@@ -50,7 +50,8 @@ const HistoryPhotoUploader = forwardRef<
   const [editingPhoto, setEditingPhoto] = useState<PhotoPreview>()
   const [deletingPhoto, setDeletingPhoto] = useState<PhotoPreview>()
   const [modalTitle, setModalTitle] = useState<string>()
-  const [isSheetExpanded, setIsSheetExpanded] = useState(true)
+  const [isSheetExpanded, setIsSheetExpanded] = useState(false)
+  const [isSheetInstantlyHidden, setIsSheetInstantlyHidden] = useState(false)
   const [sheetDragOffset, setSheetDragOffset] = useState<number>()
   const previewsRef = useRef<PhotoPreview[]>([])
   const cropQueueRef = useRef<PhotoToCrop[]>([])
@@ -118,6 +119,11 @@ const HistoryPhotoUploader = forwardRef<
     const currentPhoto = cropQueue[0]
     if (!currentPhoto) return
 
+    setIsSheetInstantlyHidden(true)
+    setIsSheetExpanded(false)
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => setIsSheetInstantlyHidden(false))
+    })
     setPhotos((current) => [
       ...current,
       {
@@ -246,11 +252,18 @@ const HistoryPhotoUploader = forwardRef<
         onPointerUp={stopDragging}
         onPointerCancel={stopDragging}
         onPointerLeave={stopDragging}
+        onClick={() => {
+          if (!photos.length) setIsSheetExpanded(true)
+        }}
       >
         {photos.length === 0 ? (
-          <p className="history-photo-uploader__empty">여기에 사진이 추가됩니다</p>
+          <div className="history-photo-uploader__empty">
+            <span aria-hidden="true">+</span>
+            <strong>카메라로 찍기 또는 갤러리에서 불러오기</strong>
+          </div>
         ) : (
-          photos.map((photo) => (
+          <>
+          {photos.map((photo) => (
             <article key={photo.id} className="history-photo-uploader__preview-card">
               <img
                 className="history-photo-uploader__preview"
@@ -283,14 +296,27 @@ const HistoryPhotoUploader = forwardRef<
                 </button>
               </div>
             </article>
-          ))
+          ))}
+          <button
+            type="button"
+            className="history-photo-uploader__add-more"
+            onPointerDown={(event) => event.stopPropagation()}
+            onClick={(event) => {
+              event.stopPropagation()
+              setIsSheetExpanded(true)
+            }}
+          >
+            <span aria-hidden="true">+</span>
+            <strong>추가하기</strong>
+          </button>
+          </>
         )}
       </div>
 
       {collapsible && (
         <button
           type="button"
-          className={`history-photo-uploader__overlay${isSheetExpanded || sheetDragOffset !== undefined ? ' is-expanded' : ''}${sheetDragOffset !== undefined ? ' is-dragging' : ''}`}
+          className={`history-photo-uploader__overlay${isSheetExpanded || sheetDragOffset !== undefined ? ' is-expanded' : ''}${sheetDragOffset !== undefined ? ' is-dragging' : ''}${isSheetInstantlyHidden ? ' is-instantly-hidden' : ''}`}
           style={{ background: `rgba(0, 0, 0, ${0.32 * sheetOpenProgress})` }}
           aria-label="사진 추가 바텀시트 접기"
           onClick={() => setIsSheetExpanded(false)}
@@ -298,7 +324,7 @@ const HistoryPhotoUploader = forwardRef<
       )}
 
       <section
-        className={`history-photo-uploader${collapsible ? ' history-photo-uploader--collapsible' : ''}${collapsible && !isSheetExpanded ? ' is-collapsed' : ''}${sheetDragOffset !== undefined ? ' is-dragging' : ''}`}
+        className={`history-photo-uploader${collapsible ? ' history-photo-uploader--collapsible' : ''}${collapsible && !isSheetExpanded ? ' is-collapsed' : ''}${sheetDragOffset !== undefined ? ' is-dragging' : ''}${isSheetInstantlyHidden ? ' is-instantly-hidden' : ''}`}
         style={sheetDragOffset === undefined ? undefined : { transform: `translateY(${sheetDragOffset}px)` }}
         aria-label="사진 추가"
         onPointerDown={collapsible ? handleSheetPointerDown : undefined}
