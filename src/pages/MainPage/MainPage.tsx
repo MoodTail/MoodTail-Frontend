@@ -63,7 +63,6 @@ const MainPage: FC = () => {
       <h2 className="main-page__section-title">오늘의 추천 칵테일</h2>
 
       <div className="main-page__cocktail-card">
-        {/* 썸네일 */}
         <div className="main-page__cocktail-thumb">
           <img
             src={cocktail}
@@ -72,7 +71,6 @@ const MainPage: FC = () => {
           />
         </div>
 
-        {/* 텍스트 영역 */}
         <div className="main-page__cocktail-info">
           <p className="main-page__cocktail-name">선라이즈 소다</p>
           <p className="main-page__cocktail-tags">달콤 · 청량 · 과일향</p>
@@ -87,7 +85,7 @@ const MainPage: FC = () => {
       {/* 메뉴 리스트 */}
       <ul className="main-page__menu-list">
         {menuItems.map((item) => (
-          <li key={item.label} className="main-page__muni-item">
+<li key={item.label} className="main-page__menu-item">
             <button
               type="button"
               className="main-page__menu-item-button"

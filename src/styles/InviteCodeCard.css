@@ -1,0 +1,25 @@
+.invite-code-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 23px 31px 0;
+  padding: 19px 24px;
+  border-radius: 22px;
+  background: #fff4f2;
+  border: 1px solid #efe4d9;
+  box-shadow: 0 8px 20px 0 rgba(140, 56, 33, 0.08);
+}
+
+.invite-code-card__label {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #6f6d68;
+}
+
+.invite-code-card__code {
+  margin: 20px 0 0;
+  font-size: 28px;
+  font-weight: 700;
+  color: #17182f;
+}
