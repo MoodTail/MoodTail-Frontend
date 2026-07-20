@@ -6,6 +6,7 @@ import MonthlyRecordCard, {
 } from '../../components/history/MonthlyRecordCard'
 import HistoryDetailBottomSheet from '../../components/history/HistoryDetailBottomSheet'
 import EmptyHistoryDateBottomSheet from '../../components/history/EmptyHistoryDateBottomSheet'
+import SaveCompleteModal from '../../components/Modal/SaveCompleteModal'
 import '../../styles/HistoryPage.css'
 
 const INITIAL_CALENDAR_DATE = new Date()
@@ -26,9 +27,6 @@ const MOCK_HISTORY_RECORDS: MonthlyTestRecord[] = [
   { date: `${initialYear}-${initialMonth}-10`, type: '분석가', cocktail: '네그로니' },
 ]
 
-// TODO: API 연결 후 monthlyRecords.length >= 5 조건으로 교체
-const IS_MONTHLY_REPORT_READY_UI_MOCK = true
-
 function toMonthKey(date: Date) {
   const year = date.getFullYear()
   const month = String(date.getMonth() + 1).padStart(2, '0')
@@ -43,14 +41,23 @@ function toDateKey(date: Date) {
 }
 
 interface HistoryPageProps {
-  onOpenPhotoDetails: (hasTestResult: boolean) => void
+  onOpenPhotoDetails: (hasTestResult: boolean, date: Date) => void
+  onOpenCocktailRecord: (hasTestResult: boolean, date: Date) => void
+  onOpenTestResult: (hasTestResult: boolean, date: Date) => void
+  onOpenMonthlyReport: (month: Date) => void
 }
 
-function HistoryPage({ onOpenPhotoDetails }: HistoryPageProps) {
+function HistoryPage({
+  onOpenPhotoDetails,
+  onOpenCocktailRecord,
+  onOpenTestResult,
+  onOpenMonthlyReport,
+}: HistoryPageProps) {
   const [activeMonth, setActiveMonth] = useState(INITIAL_CALENDAR_DATE)
   const [selectedDate, setSelectedDate] = useState<Date>()
   const [isMonthlyReportModalOpen, setIsMonthlyReportModalOpen] = useState(true)
   const [isHistoryDetailOpen, setIsHistoryDetailOpen] = useState(false)
+  const [isNoMonthlyReportModalOpen, setIsNoMonthlyReportModalOpen] = useState(false)
 
   const activeMonthKey = toMonthKey(activeMonth)
   const monthlyRecords = MOCK_HISTORY_RECORDS.filter((record) =>
@@ -78,8 +85,14 @@ function HistoryPage({ onOpenPhotoDetails }: HistoryPageProps) {
   }
 
   const handleViewMonthlyReport = () => {
+    if (monthlyRecords.length < 5) {
+      setIsMonthlyReportModalOpen(false)
+      setIsNoMonthlyReportModalOpen(true)
+      return
+    }
+
     setIsMonthlyReportModalOpen(false)
-    // TODO: 월간 리포트 화면 연결
+    onOpenMonthlyReport(activeMonth)
   }
 
   const handleGoToTest = () => {
@@ -87,7 +100,7 @@ function HistoryPage({ onOpenPhotoDetails }: HistoryPageProps) {
     // TODO: 테스트 화면 구현 후 이동 연결
   }
 
-  const monthlyReportNotice = IS_MONTHLY_REPORT_READY_UI_MOCK
+  const monthlyReportNotice = monthlyRecords.length >= 5
     ? {
         title: '월간 리포트가 도착했어요',
         description: '이번 달 테스트 기록이 5회 이상 쌓였어요.\n이달의 타입과 칵테일 통계를 확인해보세요.',
@@ -115,7 +128,11 @@ function HistoryPage({ onOpenPhotoDetails }: HistoryPageProps) {
 
       <MonthlyRecordCard records={monthlyRecords} />
 
-      <button type="button" className="history-page__monthly-report-button">
+      <button
+        type="button"
+        className="history-page__monthly-report-button"
+        onClick={handleViewMonthlyReport}
+      >
         월간 리포트 보기
       </button>
 
@@ -137,11 +154,12 @@ function HistoryPage({ onOpenPhotoDetails }: HistoryPageProps) {
           type={selectedRecord.type}
           message="재미있으면 그걸로 충분한 거 아닐까?"
           onRecordCocktail={() => {
-            // TODO: 칵테일 기록 화면 연결
+            onOpenCocktailRecord(true, selectedDate)
           }}
           onViewDetails={() => {
-            onOpenPhotoDetails(true)
+            onOpenPhotoDetails(true, selectedDate)
           }}
+          onViewTestResult={() => onOpenTestResult(true, selectedDate)}
           onClose={handleCloseHistoryDetail}
         />
       )}
@@ -152,12 +170,20 @@ function HistoryPage({ onOpenPhotoDetails }: HistoryPageProps) {
           month={selectedDate.getMonth() + 1}
           date={selectedDate.getDate()}
           onAddPhoto={() => {
-            onOpenPhotoDetails(false)
+            onOpenPhotoDetails(false, selectedDate)
           }}
           onRecordCocktail={() => {
-            // TODO: 칵테일 기록 화면 연결
+            onOpenCocktailRecord(false, selectedDate)
           }}
+          onViewTestResult={() => onOpenTestResult(false, selectedDate)}
           onClose={handleCloseHistoryDetail}
+        />
+      )}
+
+      {isNoMonthlyReportModalOpen && (
+        <SaveCompleteModal
+          title="월간리포트가 없습니다"
+          onClose={() => setIsNoMonthlyReportModalOpen(false)}
         />
       )}
     </div>
