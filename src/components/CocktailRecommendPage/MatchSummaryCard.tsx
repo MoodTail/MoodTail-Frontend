@@ -1,4 +1,5 @@
 import type { FC } from "react";
+import defaultProfile from "../../assets/images/character/default-profile.png";
 import "../../styles/MatchSummaryCard.css";
 
 interface MatchSummaryCardProps {
@@ -9,7 +10,7 @@ interface MatchSummaryCardProps {
   compact?: boolean;
 }
 
-const DEFAULT_AVATAR = "/images/default-avatar.png";
+const DEFAULT_AVATAR = defaultProfile;
 
 const MatchSummaryCard: FC<MatchSummaryCardProps> = ({
   matchPercent,
@@ -26,13 +27,13 @@ const MatchSummaryCard: FC<MatchSummaryCardProps> = ({
         {title ?? `나와 상대의 일치율은 ${matchPercent}%에요`}
       </p>
       <img
-        src={myAvatarUrl ?? DEFAULT_AVATAR}
+        src={myAvatarUrl || DEFAULT_AVATAR}
         alt="나"
         className="match-summary-card__avatar match-summary-card__avatar--mine"
       />
       <span className="match-summary-card__badge">{matchPercent}%</span>
       <img
-        src={partnerAvatarUrl ?? DEFAULT_AVATAR}
+        src={partnerAvatarUrl || DEFAULT_AVATAR}
         alt="상대"
         className="match-summary-card__avatar match-summary-card__avatar--friend"
       />

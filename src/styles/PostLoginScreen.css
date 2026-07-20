@@ -93,37 +93,63 @@
   inset: 0;
 }
 
-.post-login-screen__blob {
+.post-login-screen__welcome-text {
   position: absolute;
-  width: 260px;
-  height: 260px;
-  border-radius: 50%;
-  filter: blur(40px);
-  animation: post-login-blob-converge 0.8s ease-in forwards;
+  left: 122px;
+  top: 378px;
+  margin: 0;
+  font-size: 32px;
+  font-weight: 700;
+  background: linear-gradient(
+    90deg,
+    #ffe3d7 0%,
+    #ff9a7a 45%,
+    #ff6f4f 75%,
+    #ff6f4f 100%
+  );
+  background-size: 250% 100%;
+  background-position: 150% 0;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: #ff6f4f;
+  animation: post-login-welcome-sweep 2.75s ease-out forwards;
 }
 
-.post-login-screen__blob--pink {
-  top: -60px;
-  right: -60px;
-  background: radial-gradient(circle, #ff6f4f 0%, rgba(255, 111, 79, 0) 70%);
-  --converge-x: -90px;
-  --converge-y: 90px;
-}
-
-.post-login-screen__blob--mint {
-  bottom: -60px;
-  left: -60px;
-  background: radial-gradient(circle, #c2ede9 0%, rgba(194, 237, 233, 0) 70%);
-  --converge-x: 90px;
-  --converge-y: -90px;
-}
-
-@keyframes post-login-blob-converge {
+@keyframes post-login-welcome-sweep {
   from {
-    transform: translate(0, 0) scale(1);
+    background-position: 150% 0;
   }
   to {
-    transform: translate(var(--converge-x, 0), var(--converge-y, 0)) scale(1.12);
+    background-position: 0% 0;
+  }
+}
+
+.post-login-screen__blend {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.post-login-screen__blend-gradient {
+  position: absolute;
+  inset: -25%;
+  background: linear-gradient(
+    224.79deg,
+    #fee5e5 -16.15%,
+    #fff 17.41%,
+    #fff 81.62%,
+    #c2ede9 117.1%
+  );
+  animation: post-login-gradient-shift 0.8s ease-in forwards;
+}
+
+@keyframes post-login-gradient-shift {
+  from {
+    transform: translate(0, 0);
+  }
+  to {
+    transform: translate(-8%, 8%);
   }
 }
 
@@ -142,6 +168,15 @@
   }
   to {
     opacity: 1;
+  }
+}
+
+@keyframes post-login-blob-converge {
+  from {
+    transform: translate(0, 0) scale(1);
+  }
+  to {
+    transform: translate(var(--converge-x, 0), var(--converge-y, 0)) scale(1.12);
   }
 }
 

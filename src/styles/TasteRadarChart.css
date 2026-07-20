@@ -2,54 +2,53 @@
   position: relative;
 }
 
+/* 배경 회색 오각형: 애니메이션 제거, 항상 고정 */
 .taste-radar-chart__grid {
-  opacity: 0;
-  transform: scale(0);
-  transform-origin: center;
-  animation: radar-grid-reveal 0.4s ease-out 0.2s forwards;
+  opacity: 1;
+  transform: scale(1);
 }
 
 .taste-radar-chart__line {
   transform: scale(0);
   transform-origin: center;
-  animation: radar-line-expand 0.45s ease-out forwards;
+  animation: radar-line-expand 2.4s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
 }
 .taste-radar-chart__line--mine {
-  animation-delay: 0.45s;
+  animation-delay: 0.2s;
 }
 .taste-radar-chart__line--friend {
-  animation-delay: 0.55s;
+  animation-delay: 0.35s;
 }
 
 .taste-radar-chart__fill {
   opacity: 0;
-  animation: radar-fill-in 0.2s ease-out forwards;
+  animation: radar-fill-in 0.3s ease-out forwards;
 }
 .taste-radar-chart__fill--mine {
-  animation-delay: 0.8s;
+  animation-delay: 2.4s;
 }
 .taste-radar-chart__fill--friend {
-  animation-delay: 0.9s;
+  animation-delay: 2.55s;
 }
 
-@keyframes radar-grid-reveal {
-  from {
-    opacity: 0;
-    transform: scale(0);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
 @keyframes radar-line-expand {
-  from {
+  0% {
     transform: scale(0);
   }
-  to {
+  60% {
+    transform: scale(1.1);
+  }
+  80% {
+    transform: scale(0.95);
+  }
+  92% {
+    transform: scale(1.03);
+  }
+  100% {
     transform: scale(1);
   }
 }
+
 @keyframes radar-fill-in {
   from {
     opacity: 0;
