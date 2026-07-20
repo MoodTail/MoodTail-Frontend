@@ -1,0 +1,70 @@
+.taste-radar-chart {
+  position: relative;
+}
+
+.taste-radar-chart__grid {
+  opacity: 0;
+  transform: scale(0);
+  transform-origin: center;
+  animation: radar-grid-reveal 0.4s ease-out 0.2s forwards;
+}
+
+.taste-radar-chart__line {
+  transform: scale(0);
+  transform-origin: center;
+  animation: radar-line-expand 0.45s ease-out forwards;
+}
+.taste-radar-chart__line--mine {
+  animation-delay: 0.45s;
+}
+.taste-radar-chart__line--friend {
+  animation-delay: 0.55s;
+}
+
+.taste-radar-chart__fill {
+  opacity: 0;
+  animation: radar-fill-in 0.2s ease-out forwards;
+}
+.taste-radar-chart__fill--mine {
+  animation-delay: 0.8s;
+}
+.taste-radar-chart__fill--friend {
+  animation-delay: 0.9s;
+}
+
+@keyframes radar-grid-reveal {
+  from {
+    opacity: 0;
+    transform: scale(0);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+@keyframes radar-line-expand {
+  from {
+    transform: scale(0);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+@keyframes radar-fill-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.taste-radar-chart__axis-label {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 16px;
+  color: #6f6d68;
+  white-space: nowrap;
+}

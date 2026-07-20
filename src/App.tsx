@@ -19,9 +19,11 @@ function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [activeMenu, setActiveMenu] = useState<NavKey>("home");
   const [historyView, setHistoryView] = useState<HistoryView>("calendar");
-  const [historyPhotoHasTestResult, setHistoryPhotoHasTestResult] = useState(true);
+  const [historyPhotoHasTestResult, setHistoryPhotoHasTestResult] =
+    useState(true);
   const [historyPhotoDate, setHistoryPhotoDate] = useState(new Date());
-  const [historyRecordTab, setHistoryRecordTab] = useState<HistoryRecordTab>("photo");
+  const [historyRecordTab, setHistoryRecordTab] =
+    useState<HistoryRecordTab>("photo");
   const [monthlyReportMonth, setMonthlyReportMonth] = useState(new Date());
 
   const openHistoryRecordPage = (

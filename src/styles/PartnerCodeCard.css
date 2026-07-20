@@ -1,0 +1,34 @@
+.partner-code-card {
+  margin: 20px 32px 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.partner-code-card__input {
+  width: 100%;
+  height: 74px;
+  padding: 0 24px;
+  border-radius: 22px;
+  border: 1px solid #efe4d9;
+  outline: none;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 8px 20px 0 rgba(140, 56, 33, 0.08);
+  font-size: 16px;
+  font-family: inherit;
+  color: #17182f;
+}
+.partner-code-card__input::placeholder {
+  color: #a7a29b;
+}
+
+.partner-code-card--error .partner-code-card__input {
+  border-color: #ff6f4f;
+  box-shadow: none;
+}
+
+.partner-code-card__error {
+  margin: 8px 0 0 4px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #ff4f58;
+}
