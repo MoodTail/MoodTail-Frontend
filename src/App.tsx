@@ -82,6 +82,7 @@ function App() {
           selectedDate={historyPhotoDate}
           initialTab={historyRecordTab}
           onBack={() => setHistoryView("calendar")}
+          onOpenFullResult={() => setHistoryView("test-result")}
         />
       ),
       "test-result": <TestResultPage onBack={() => setHistoryView("photo")} />,

@@ -1,0 +1,24 @@
+.action-complete-toast {
+  position: absolute;
+  right: 40px;
+  bottom: 92px;
+  left: 40px;
+  z-index: 3;
+  display: grid;
+  height: 52px;
+  place-items: center;
+  border-radius: 26px;
+  background: #ff6f4f;
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 600;
+  pointer-events: none;
+  animation: action-complete-toast 2600ms ease-in-out forwards;
+}
+
+@keyframes action-complete-toast {
+  0% { opacity: 0; transform: translateY(20px); }
+  12% { opacity: 1; transform: translateY(0); }
+  84% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(20px); }
+}

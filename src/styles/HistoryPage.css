@@ -1,9 +1,10 @@
 .history-page {
   position: relative;
+  isolation: isolate;
   height: 100%;
   padding: 48px 32px 18px;
   overflow: hidden;
-  background: linear-gradient(180deg, #ffffff 0%, #ffffff 53%, #fff9f7 100%);
+  background: transparent;
 }
 
 .history-page__title {
