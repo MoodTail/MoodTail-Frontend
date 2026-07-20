@@ -19,3 +19,8 @@
   padding-bottom: 74px;
   overflow-y: auto;
 }
+
+.app-content--full {
+  padding-bottom: 0;
+  overflow: hidden;
+}

@@ -1,0 +1,125 @@
+.history-photo-crop-editor {
+  position: absolute;
+  inset: 0;
+  z-index: 500;
+  overflow: hidden;
+  background: linear-gradient(180deg, #ffffff 0%, #ffffff 82%, #f8ffff 100%);
+}
+
+.history-photo-crop-editor__stage {
+  position: absolute;
+  top: 96px;
+  left: 0;
+  width: 393px;
+  height: 566px;
+  overflow: hidden;
+  background: #ffffff;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+}
+
+.history-photo-crop-editor__stage:active {
+  cursor: grabbing;
+}
+
+.history-photo-crop-editor__backdrop {
+  position: absolute;
+  inset: -36px;
+  width: calc(100% + 72px);
+  height: calc(100% + 72px);
+  object-fit: cover;
+  filter: blur(28px) saturate(0.85);
+  opacity: 0.32;
+  pointer-events: none;
+  user-select: none;
+}
+
+.history-photo-crop-editor__stage::after {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: rgba(255, 255, 255, 0.38);
+  content: '';
+  pointer-events: none;
+}
+
+.history-photo-crop-editor__viewport {
+  position: absolute;
+  top: 226px;
+  left: 30px;
+  z-index: 2;
+  width: 333px;
+  height: 170px;
+  overflow: hidden;
+  border-radius: 28px;
+  pointer-events: none;
+}
+
+.history-photo-crop-editor__image {
+  position: absolute;
+  top: 311px;
+  left: 50%;
+  z-index: 1;
+  display: block;
+  max-width: none;
+  object-fit: fill;
+  pointer-events: none;
+  will-change: transform;
+}
+
+.history-photo-crop-editor__viewport .history-photo-crop-editor__image {
+  top: 50%;
+}
+
+.history-photo-crop-editor__image--dimmed {
+  filter: brightness(0.68);
+}
+
+.history-photo-crop-editor__guide {
+  position: absolute;
+  top: 186px;
+  left: 0;
+  z-index: 2;
+  width: 100%;
+  margin: 0;
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 22px;
+  text-align: center;
+  pointer-events: none;
+}
+
+.history-photo-crop-editor__frame {
+  position: absolute;
+  top: 226px;
+  left: 30px;
+  z-index: 2;
+  width: 333px;
+  height: 170px;
+  border: 3px solid #70adff;
+  border-radius: 28px;
+  pointer-events: none;
+}
+
+.history-photo-crop-editor__save-button {
+  position: absolute;
+  bottom: 30px;
+  left: 30px;
+  width: 333px;
+  height: 54px;
+  padding: 0;
+  border: 0;
+  border-radius: 27px;
+  background: #ff6f4f;
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.history-photo-crop-editor__save-button:disabled {
+  cursor: default;
+  opacity: 0.55;
+}

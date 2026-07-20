@@ -19,7 +19,7 @@
 }
 
 .popular-cocktail-card__description {
-  margin: 4px 0 20px;
+  margin: 2px 0 20px;
   font-size: 12px;
   font-weight: 500;
   color: #68646a;
@@ -86,4 +86,8 @@
   border: none;
   padding: 0;
   cursor: pointer;
+}
+
+.popular-cocktail-card__toggle--expanded svg {
+  transform: rotate(180deg);
 }

@@ -73,28 +73,26 @@ function PopularCocktailCard({
           <CocktailRankItem key={cocktail.rank} {...cocktail} />
         ))}
       </div>
-      {!isExpanded && (
-        <button
-          type="button"
-          className="popular-cocktail-card__toggle"
-          onClick={onToggle}
-          aria-label="더보기"
+      <button
+        type="button"
+        className={`popular-cocktail-card__toggle ${isExpanded ? "popular-cocktail-card__toggle--expanded" : ""}`}
+        onClick={onToggle}
+        aria-label={isExpanded ? "접기" : "더보기"}
+      >
+        <svg
+          width="28"
+          height="15"
+          viewBox="0 0 28 15"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
         >
-          <svg
-            width="28"
-            height="15"
-            viewBox="0 0 28 15"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M13.8564 14.25L0 0L27.7129 0L13.8564 14.25Z"
-              fill="#FF613D"
-              fillOpacity="0.74"
-            />
-          </svg>
-        </button>
-      )}
+          <path
+            d="M13.8564 14.25L0 0L27.7129 0L13.8564 14.25Z"
+            fill="#FF613D"
+            fillOpacity="0.74"
+          />
+        </svg>
+      </button>
     </section>
   );
 }

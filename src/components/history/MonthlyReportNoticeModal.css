@@ -1,0 +1,74 @@
+.monthly-report-modal-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 300;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 256px;
+  background: rgba(0, 0, 0, 0.32);
+}
+
+.monthly-report-modal {
+  position: relative;
+  width: 309px;
+  height: 224px;
+  padding: 0 28px;
+  background: #ffffff;
+  border: 1px solid #ffffff;
+  border-radius: 30px;
+  text-align: center;
+  box-shadow: 9px 13px 22px rgba(255, 92, 46, 0.09);
+}
+
+.monthly-report-modal__title {
+  margin: 32px 0 0;
+  color: #10161f;
+  font-size: 21px;
+  font-weight: 700;
+  line-height: 1.3;
+  word-break: keep-all;
+}
+
+.monthly-report-modal__description {
+  min-height: 44px;
+  margin: 20px -4px 0;
+  color: #656565;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 22px;
+  word-break: keep-all;
+}
+
+.monthly-report-modal__actions {
+  position: absolute;
+  top: 145px;
+  left: 27px;
+  display: flex;
+  gap: 14px;
+  margin: 0;
+}
+
+.monthly-report-modal__button {
+  flex: 0 0 120px;
+  width: 120px;
+  height: 54px;
+  padding: 0;
+  border-radius: 27px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.monthly-report-modal__button--primary {
+  border: 1px solid #ff6f4f;
+  background: #ff6f4f;
+  color: #ffffff;
+}
+
+.monthly-report-modal__button--secondary {
+  border: 1px solid rgba(255, 111, 79, 0.14);
+  background: #ffffff;
+  color: #ff6f4f;
+  box-shadow: 0 1px 4px rgba(255, 111, 79, 0.18);
+}

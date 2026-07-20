@@ -85,7 +85,7 @@ const MainPage: FC = () => {
       {/* 메뉴 리스트 */}
       <ul className="main-page__menu-list">
         {menuItems.map((item) => (
-          <li key={item.label} className="main-page__memu-item">
+<li key={item.label} className="main-page__menu-item">
             <button
               type="button"
               className="main-page__menu-item-button"
