@@ -1,0 +1,87 @@
+.match-summary-card {
+  position: relative;
+  width: 329px;
+  height: 185px;
+  box-sizing: border-box;
+  border-radius: 28px;
+  background: #fff;
+  border: 1px solid #ebdbd1;
+  box-shadow: 0 10px 22px 0 rgba(255, 111, 79, 0.14);
+}
+
+.match-summary-card__text {
+  position: absolute;
+  left: 54px;
+  top: 25px;
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: #1b1c30;
+}
+
+.match-summary-card__avatar {
+  position: absolute;
+  width: 109px;
+  height: 109px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #fff;
+  filter: drop-shadow(1px 3px 7.8px rgba(255, 111, 79, 0.63));
+  z-index: 1;
+}
+.match-summary-card__avatar--mine {
+  left: 33px;
+  top: 61px;
+}
+.match-summary-card__avatar--friend {
+  left: 189px;
+  top: 61px;
+}
+
+.match-summary-card__badge {
+  position: absolute;
+  left: 134px;
+  top: 84px;
+  width: 63px;
+  height: 63px;
+  border-radius: 50%;
+  background: #ff613d;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 18px;
+  font-weight: 700;
+  z-index: 2;
+}
+
+.match-summary-card--compact {
+  width: 289px;
+  height: 116px;
+  border-radius: 28px;
+  box-shadow: 0 10px 22px 0 rgba(255, 111, 79, 0.14);
+}
+.match-summary-card--compact .match-summary-card__text {
+  left: 45.5px;
+  top: 11.5px;
+  font-size: 16px;
+}
+.match-summary-card--compact .match-summary-card__avatar {
+  width: 63.89px;
+  height: 63.89px;
+}
+.match-summary-card--compact .match-summary-card__avatar--mine {
+  left: 64.56px;
+  top: 42.44px;
+}
+.match-summary-card--compact .match-summary-card__avatar--friend {
+  left: 159.56px;
+  top: 42.44px;
+}
+.match-summary-card--compact .match-summary-card__badge {
+  left: 124px;
+  top: 54.38px;
+  width: 40px;
+  height: 40px;
+  font-size: 12px;
+}
