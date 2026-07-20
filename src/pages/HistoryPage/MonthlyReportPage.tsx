@@ -3,7 +3,13 @@ import chevronLeftIcon from "../../assets/icons/chevron-left.svg";
 import monthlyReportCharacter from "../../assets/images/history/monthly_report_character.png";
 import Button from "../../components/Button/Button";
 import SaveCompleteModal from "../../components/Modal/SaveCompleteModal";
+import MonthlyReportBackground from "../../components/common/MonthlyReportBackground";
 import "./MonthlyReportPage.css";
+
+const SECONDARY_TYPES = [
+  { rank: 2, name: '낭만주의자', count: 3 },
+  { rank: 3, name: '낭만주의자', count: 2 },
+];
 
 interface MonthlyReportPageProps {
   onBack: () => void;
@@ -206,6 +212,7 @@ function MonthlyReportPage({ onBack, reportMonth }: MonthlyReportPageProps) {
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [isSaveCompleteModalOpen, setIsSaveCompleteModalOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const hasSecondaryTypeData = SECONDARY_TYPES.length > 0;
 
   const handleSaveImage = async () => {
     if (isSaving) return;
@@ -252,6 +259,7 @@ function MonthlyReportPage({ onBack, reportMonth }: MonthlyReportPageProps) {
         reportMonth.getMonth() + 1,
       ).padStart(2, '0')}`}
     >
+      <MonthlyReportBackground variant={hasSecondaryTypeData ? 'long' : 'short'} />
       <header className="monthly-report-page__header">
         <button
           type="button"
@@ -270,34 +278,30 @@ function MonthlyReportPage({ onBack, reportMonth }: MonthlyReportPageProps) {
       <main className="monthly-report-page__content">
         <SummaryCard />
 
-        <section className="monthly-report-page__box monthly-report-page__types">
-          <h2>다음으로 많이 나온 타입</h2>
-          <div className="monthly-report-page__type-list">
-            <article className="monthly-report-page__type-card">
-              <span className="monthly-report-page__type-rank monthly-report-page__type-rank--second">
-                2
-              </span>
-              <div className="monthly-report-page__type-copy">
-                <h3>낭만주의자</h3>
-                <p className="monthly-report-page__type-count monthly-report-page__type-count--second">
-                  3회
-                </p>
-              </div>
-            </article>
-
-            <article className="monthly-report-page__type-card">
-              <span className="monthly-report-page__type-rank monthly-report-page__type-rank--third">
-                3
-              </span>
-              <div className="monthly-report-page__type-copy">
-                <h3>낭만주의자</h3>
-                <p className="monthly-report-page__type-count monthly-report-page__type-count--third">
-                  2회
-                </p>
-              </div>
-            </article>
-          </div>
-        </section>
+        {hasSecondaryTypeData && (
+          <section className="monthly-report-page__box monthly-report-page__types">
+            <h2>다음으로 많이 나온 타입</h2>
+            <div className="monthly-report-page__type-list">
+              {SECONDARY_TYPES.map(({ rank, name, count }) => (
+                <article className="monthly-report-page__type-card" key={rank}>
+                  <span
+                    className={`monthly-report-page__type-rank monthly-report-page__type-rank--${rank === 2 ? 'second' : 'third'}`}
+                  >
+                    {rank}
+                  </span>
+                  <div className="monthly-report-page__type-copy">
+                    <h3>{name}</h3>
+                    <p
+                      className={`monthly-report-page__type-count monthly-report-page__type-count--${rank === 2 ? 'second' : 'third'}`}
+                    >
+                      {count}회
+                    </p>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </section>
+        )}
 
         <section className="monthly-report-page__box monthly-report-page__taste-chart">
           <h2>맛 지표 비교</h2>

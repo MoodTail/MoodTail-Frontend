@@ -1,0 +1,42 @@
+.history-background {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  width: 100%;
+  min-width: 393px;
+  height: max(824px, 100%);
+  overflow: hidden;
+  background: linear-gradient(
+    193deg,
+    #fee5e5 -15.82%,
+    #ffffff 17.71%,
+    #ffffff 83.94%,
+    #c2ede9 117.68%
+  );
+  pointer-events: none;
+}
+
+.history-background__glow {
+  position: absolute;
+  border-radius: 50%;
+}
+
+.history-background__glow--top {
+  top: 36px;
+  left: -160px;
+  width: 360px;
+  height: 360px;
+  background: rgba(255, 201, 44, 0.04);
+  filter: blur(34px);
+  backdrop-filter: blur(34px);
+}
+
+.history-background__glow--bottom {
+  top: 431px;
+  left: 131px;
+  width: 437px;
+  height: 437px;
+  background: rgba(255, 97, 61, 0.02);
+  filter: blur(40px);
+  backdrop-filter: blur(40px);
+}
