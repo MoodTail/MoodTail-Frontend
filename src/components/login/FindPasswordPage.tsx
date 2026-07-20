@@ -44,7 +44,9 @@ const FindPasswordPage: FC<FindPasswordPageProps> = ({ onBack }) => {
       <h1 className="find-password-page__title">비밀번호 찾기</h1>
 
       <p className="find-password-page__desc">
-        가입한 아이디 또는 이메일을 입력하시면 비밀번호 재설정 안내를 보내드려요
+        가입한 아이디 또는 이메일을 입력하시면 비밀번호
+        <br />
+        재설정 안내를 보내드려요
       </p>
 
       <div className="find-password-page__icon">
