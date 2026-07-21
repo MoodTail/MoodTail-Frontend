@@ -2,6 +2,7 @@ import { COLORS } from "../theme/colors";
 import type { PersonalityType } from "../data/types";
 import Header from "../components/Header";
 import PhoneFrame from "../components/PhoneFrame";
+import DexBackground from "../components/DexBackground";
 import DexBox1 from "../components/dexBoxes/DexBox1";
 import DexBox2 from "../components/dexBoxes/DexBox2";
 import DexBox3 from "../components/dexBoxes/DexBox3";
@@ -19,16 +20,18 @@ export default function CharacterDexPage({
   type,
   onShare,
   onOpenDetail,
+  onOpenTypeDetail,
 }: {
   type: PersonalityType;
   onShare: () => void;
   onOpenDetail: () => void;
+  onOpenTypeDetail: (typeId: string) => void;
 }) {
   const unlockedCount = type.cocktails.filter((c) => c.unlocked).length;
   const collectRate = Math.round((unlockedCount / type.cocktails.length) * 100);
 
   return (
-    <PhoneFrame>
+    <PhoneFrame background={<DexBackground />}>
       <div style={{ padding: "18px 20px 0", flex: 1 }}>
         <Header
           title="캐릭터 도감"
@@ -98,7 +101,7 @@ export default function CharacterDexPage({
             paddingBottom: 20,
           }}
         >
-          <DexBox1 />
+          <DexBox1 onClick={() => onOpenTypeDetail("idealist")} />
           <DexBox2 />
           <DexBox3 />
           <DexBox4 />

@@ -1,9 +1,10 @@
 
+import drink0 from "../assets/drinks/0.png";
 import { COLORS } from "../theme/colors";
 import { TYPES } from "../data/types";
 import Header from "../components/Header";
 import PhoneFrame from "../components/PhoneFrame";
-import { Mascot } from "../components/icons";
+import DexBackground from "../components/DexBackground";
 import DexBox1 from "../components/dexBoxes/DexBox1";
 import DexBox2 from "../components/dexBoxes/DexBox2";
 import DexBox3 from "../components/dexBoxes/DexBox3";
@@ -19,19 +20,20 @@ import DexBox12 from "../components/dexBoxes/DexBox12";
 
 export default function TypeDexPage({
   repTypeId,
-  onOpenType,
+  onOpenTypeDetail,
   onShare,
   onBack,
 }: {
   repTypeId: string;
   onOpenType: (typeId: string) => void;
+  onOpenTypeDetail: (typeId: string) => void;
   onShare: () => void;
   onBack: () => void;
 }) {
   const repType = TYPES.find((t) => t.id === repTypeId)!;
 
   return (
-    <PhoneFrame>
+    <PhoneFrame background={<DexBackground />}>
       <div style={{ padding: "18px 20px 0", flex: 1 }}>
         <Header
           title="캐릭터 도감"
@@ -57,7 +59,7 @@ export default function TypeDexPage({
         />
 
         <button
-          onClick={() => onOpenType(repType.id)}
+          onClick={() => onOpenTypeDetail(repType.id)}
           style={{
             background: COLORS.card,
             border: `1px solid ${COLORS.border}`,
@@ -72,7 +74,7 @@ export default function TypeDexPage({
             textAlign: "left",
           }}
         >
-          <Mascot color={repType.color} />
+          <img src={drink0} alt="" style={{ width: 60, height: 60, objectFit: "contain" }} />
           <div style={{ flex: 1 }}>
             <div style={{ fontSize: 12, color: COLORS.inkSoft, fontWeight: 600, marginBottom: 4 }}>
               대표 타입
@@ -89,7 +91,7 @@ export default function TypeDexPage({
             paddingBottom: 20,
           }}
         >
-          <DexBox1 />
+          <DexBox1 onClick={() => onOpenTypeDetail("idealist")} />
           <DexBox2 />
           <DexBox3 />
           <DexBox4 />

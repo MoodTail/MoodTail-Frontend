@@ -5,9 +5,11 @@ import GradientBackground from "./GradientBackground";
 export default function Modal({
   children,
   onClose,
+  background,
 }: {
   children: ReactNode;
   onClose: () => void;
+  background?: ReactNode;
 }) {
   return (
     <div
@@ -35,7 +37,7 @@ export default function Modal({
           boxShadow: "0 20px 40px rgba(43,35,28,0.25)",
         }}
       >
-        <GradientBackground colors={GRADIENTS.mint} />
+        {background ?? <GradientBackground colors={GRADIENTS.mint} />}
         <div style={{ position: "relative", zIndex: 1, padding: 22 }}>{children}</div>
       </div>
     </div>

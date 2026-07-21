@@ -1,6 +1,8 @@
+import drink0 from "../assets/drinks/0.png";
 import { COLORS } from "../theme/colors";
 import type { PersonalityType } from "../data/types";
 import Modal from "./Modal";
+import DexBackground from "./DexBackground";
 import { CloseIcon } from "./icons";
 import DexBox1 from "./dexBoxes/DexBox1";
 import DexBox2 from "./dexBoxes/DexBox2";
@@ -30,7 +32,7 @@ export default function DexShareModal({
   const collectRate = Math.round((unlockedCount / type.cocktails.length) * 100);
 
   return (
-    <Modal onClose={onClose}>
+    <Modal onClose={onClose} background={<DexBackground />}>
       <div style={{ position: "relative", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 16 }}>
         <span style={{ fontSize: 22, fontWeight: 800, color: COLORS.orange }}>MoodTail</span>
         <button
@@ -55,26 +57,30 @@ export default function DexShareModal({
           padding: 18,
           display: "flex",
           alignItems: "center",
-          justifyContent: "space-between",
+          gap: 14,
           marginBottom: 14,
           boxShadow: "0 8px 20px rgba(255, 107, 53, 0.16)",
         }}
       >
-        <div>
+        <img src={drink0} alt="" style={{ width: 44, height: 44, objectFit: "contain", flexShrink: 0 }} />
+        <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ fontSize: 12, color: COLORS.inkSoft, fontWeight: 600, marginBottom: 4 }}>
             대표 타입
           </div>
-          <div style={{ fontSize: 19, fontWeight: 800, color: COLORS.ink }}>{type.name}</div>
+          <div style={{ fontSize: 17, fontWeight: 800, color: COLORS.ink, whiteSpace: "nowrap" }}>
+            {type.name}
+          </div>
         </div>
         <div
           style={{
             background: COLORS.orangeSoft,
             color: COLORS.orange,
-            fontSize: 12,
+            fontSize: 11,
             fontWeight: 700,
-            padding: "6px 12px",
+            padding: "5px 9px",
             borderRadius: 14,
             whiteSpace: "nowrap",
+            flexShrink: 0,
           }}
         >
           수집률 {collectRate}%
