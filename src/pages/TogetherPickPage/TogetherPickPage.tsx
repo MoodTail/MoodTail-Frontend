@@ -32,7 +32,7 @@ function TogetherPickPage({
   const [showNoResultModal, setShowNoResultModal] = useState(false);
 
   const [showLoginModal, setShowLoginModal] = useState(
-    () => localStorage.getItem("isGuest") === "true",
+    () => !isLoggedIn || localStorage.getItem("isGuest") === "true",
   );
 
   const handleCopy = () => {

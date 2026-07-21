@@ -15,6 +15,7 @@ function PartnerCodeCard({ value, onChange, isError }: PartnerCodeCardProps) {
         type="text"
         className="partner-code-card__input"
         placeholder="상대 초대 코드 입력"
+        value={value}
         onChange={(e) => onChange(e.target.value)}
       />
       {isError && (
