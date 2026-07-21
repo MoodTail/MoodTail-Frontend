@@ -3,6 +3,7 @@ import "../../styles/MainPage.css";
 import Button from "../../components/Button/Button";
 import BackgroundBlur from "../../components/common/BackgroundBlur";
 import TrendPage from "../TrendPage/TrendPage";
+import ShareModal from "../../components/Modal/ShareModal";
 
 // ui 구현용으로 잔 이미지 하나 무작위로 넣음
 import cocktail from "../../assets/images/glass/glass-1.png";
@@ -14,11 +15,13 @@ interface MenuItem {
 
 const MainPage: FC = () => {
   const [view, setView] = useState<"home" | "trend">("home");
+  const [isShareOpen, setIsShareOpen] = useState(false); // TODO: 확인용 임시 코드, 삭제 예정
 
   const menuItems: MenuItem[] = [
     { label: "트렌드집계 확인", onClick: () => setView("trend") },
     { label: "다른 사용자량" },
     { label: "커스텀 추천" },
+    { label: "공유 모달 미리보기 (임시)", onClick: () => setIsShareOpen(true) },
   ];
 
   if (view === "trend") {
@@ -101,6 +104,15 @@ const MainPage: FC = () => {
           </li>
         ))}
       </ul>
+
+      {isShareOpen && (
+        <ShareModal
+          onClose={() => setIsShareOpen(false)}
+          shareUrl="https://moodtail.app/share/example"
+          tipText="TIP: 캐릭터는 무료 12종이나 된답니다! 전부 해금할 수 있을까요?"
+          onKakaoShare={() => console.log("카카오톡 공유")}
+        />
+      )}
     </div>
   );
 };
