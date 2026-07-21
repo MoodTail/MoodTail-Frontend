@@ -1,24 +1,24 @@
 import { useRef } from 'react'
 import { toPng } from 'html-to-image'
-import ShareCard, { type ShareCardProps } from '../ShareCard'
+import ResultShareCard, { type ResultShareCardProps } from '../ResultShareCard'
 import closeIcon from '../../../assets/icons/close.svg'
-import '../../../styles/ShareResultModal.css'
+import '../../../styles/ResultShareModal.css'
 
-interface ShareResultModalProps {
+interface ResultShareModalProps {
   isOpen: boolean
-  shareCard: ShareCardProps
+  shareCard: ResultShareCardProps
   onClose: () => void
   onSnsShare: () => void
   onImageSaved: () => void
 }
 
-function ShareResultModal({
+function ResultShareModal({
   isOpen,
   shareCard,
   onClose,
   onSnsShare,
   onImageSaved,
-}: ShareResultModalProps) {
+}: ResultShareModalProps) {
   const cardRef = useRef<HTMLDivElement>(null)
 
   if (!isOpen) return null
@@ -35,29 +35,29 @@ function ShareResultModal({
   }
 
   return (
-    <div className="share-result-modal-overlay" onClick={onClose}>
+    <div className="result-share-modal-overlay" onClick={onClose}>
       <div
-        className="share-result-modal"
+        className="result-share-modal"
         role="dialog"
         aria-modal="true"
         aria-label="결과 공유"
         onClick={(event) => event.stopPropagation()}
       >
-        <button type="button" className="share-result-modal__close" onClick={onClose} aria-label="닫기">
+        <button type="button" className="result-share-modal__close" onClick={onClose} aria-label="닫기">
           <img src={closeIcon} alt="" aria-hidden="true" />
         </button>
 
         <div ref={cardRef}>
-          <ShareCard {...shareCard} />
+          <ResultShareCard {...shareCard} />
         </div>
 
-        <div className="share-result-modal__buttons">
-          <button type="button" className="share-result-modal__button share-result-modal__button--primary" onClick={onSnsShare}>
+        <div className="result-share-modal__buttons">
+          <button type="button" className="result-share-modal__button result-share-modal__button--primary" onClick={onSnsShare}>
             SNS 공유하기
           </button>
           <button
             type="button"
-            className="share-result-modal__button share-result-modal__button--secondary"
+            className="result-share-modal__button result-share-modal__button--secondary"
             onClick={handleSaveImage}
           >
             이미지 저장
@@ -68,5 +68,5 @@ function ShareResultModal({
   )
 }
 
-export default ShareResultModal
-export type { ShareResultModalProps }
+export default ResultShareModal
+export type { ResultShareModalProps }

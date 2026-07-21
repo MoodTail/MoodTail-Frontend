@@ -1,4 +1,4 @@
-.share-card {
+.result-share-card {
   position: relative;
   width: 100%;
   height: 420.46px;
@@ -7,7 +7,7 @@
   text-align: center;
 }
 
-.share-card__inner {
+.result-share-card__inner {
   position: absolute;
   inset: 0;
   border: 0.79px solid rgba(255, 255, 255, 0.75);
@@ -16,7 +16,7 @@
   overflow: hidden;
 }
 
-.share-card__hill {
+.result-share-card__hill {
   position: absolute;
   top: 234.82px;
   left: -44.49px;
@@ -26,7 +26,7 @@
   background: #ff623e;
 }
 
-.share-card__character {
+.result-share-card__character {
   position: absolute;
   top: 48.67px;
   left: 69.98px;
@@ -37,7 +37,7 @@
   filter: drop-shadow(6.35px 3.17px 10.55px rgba(254, 164, 144, 0.25));
 }
 
-.share-card__type-name {
+.result-share-card__type-name {
   position: absolute;
   top: 302.26px;
   left: 0;
@@ -53,7 +53,7 @@
   text-align: center;
 }
 
-.share-card__type-description {
+.result-share-card__type-description {
   position: absolute;
   top: 336.38px;
   left: 0;
@@ -69,7 +69,7 @@
   text-align: center;
 }
 
-.share-card__quote {
+.result-share-card__quote {
   position: absolute;
   top: 388.74px;
   left: 0;
