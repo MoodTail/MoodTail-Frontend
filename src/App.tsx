@@ -9,14 +9,19 @@ import CharacterPage from "./pages/CharacterPage/CharacterPage";
 import MainPage from "./pages/MainPage/MainPage";
 import RecipePage from "./pages/RecipePage/RecipePage";
 import MyPage from "./pages/MyPage/MyPage";
+import ProfileEdit from "./pages/MyPage/ProfileEdit";
+import Inquiry from "./pages/MyPage/Inquiry";
+import Terms from "./pages/MyPage/Terms";
 import LoginPage from "./pages/LoginPage/LoginPage";
 import "./App.css";
 
 export type NavKey = "history" | "dictionary" | "home" | "recipe" | "mypage";
 type HistoryView = "calendar" | "photo" | "test-result" | "monthly-report";
+type MyPageView = "main" | "profile-edit" | "inquiry" | "terms";
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isGuest, setIsGuest] = useState(false);
   const [activeMenu, setActiveMenu] = useState<NavKey>("home");
   const [historyView, setHistoryView] = useState<HistoryView>("calendar");
   const [historyPhotoHasTestResult, setHistoryPhotoHasTestResult] =
@@ -25,6 +30,7 @@ function App() {
   const [historyRecordTab, setHistoryRecordTab] =
     useState<HistoryRecordTab>("photo");
   const [monthlyReportMonth, setMonthlyReportMonth] = useState(new Date());
+  const [mypageView, setMypageView] = useState<MyPageView>("main");
 
   const openHistoryRecordPage = (
     hasTestResult: boolean,
@@ -66,14 +72,28 @@ function App() {
       case "recipe":
         return <RecipePage />;
       case "mypage":
-        return <MyPage />;
+        return (
+          <MyPage
+            isLoggedIn={!isGuest}
+            onEditProfile={() => setMypageView("profile-edit")}
+            onInquiry={() => setMypageView("inquiry")}
+            onTerms={() => setMypageView("terms")}
+          />
+        );
       default:
         return <MainPage />;
     }
   };
 
   if (!isLoggedIn) {
-    return <LoginPage onLogin={() => setIsLoggedIn(true)} />;
+    return (
+      <LoginPage
+        onLogin={() => {
+          setIsGuest(localStorage.getItem("isGuest") === "true");
+          setIsLoggedIn(true);
+        }}
+      />
+    );
   }
 
   if (historyView !== "calendar") {
@@ -101,6 +121,24 @@ function App() {
         <main className="app">
           <section className="app-content app-content--full">
             {historyDetailPage}
+          </section>
+        </main>
+      </div>
+    );
+  }
+
+  if (mypageView !== "main") {
+    const mypageDetailPage = {
+      "profile-edit": <ProfileEdit onBack={() => setMypageView("main")} />,
+      inquiry: <Inquiry onBack={() => setMypageView("main")} />,
+      terms: <Terms onBack={() => setMypageView("main")} />,
+    }[mypageView];
+
+    return (
+      <div className="app-shell">
+        <main className="app">
+          <section className="app-content app-content--full">
+            {mypageDetailPage}
           </section>
         </main>
       </div>
