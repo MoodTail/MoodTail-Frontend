@@ -1,6 +1,5 @@
 .trend-page {
   position: relative;
-  min-height: 100vh;
   overflow: hidden;
   background: linear-gradient(
     224.79deg,
@@ -10,4 +9,12 @@
     #c2ede9 117.1%
   );
   padding-bottom: 24px;
+}
+
+body.hide-bottom-nav .bottom-nav {
+  display: none !important;
+}
+
+body.hide-bottom-nav .app-content {
+  padding-bottom: 0;
 }
