@@ -1,0 +1,138 @@
+.history-action-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(0, 0, 0, 0.32);
+  animation: history-action-overlay-fade-in 180ms ease-out;
+}
+
+.history-action-sheet {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 393px;
+  height: 310px;
+  overflow: hidden;
+  background: #fff;
+  border-radius: 24px 24px 0 0;
+  animation: history-action-sheet-slide-up 300ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.history-action-overlay.is-closing { pointer-events: none; animation: history-action-overlay-fade-out 260ms ease-in forwards; }
+.history-action-overlay.is-closing .history-action-sheet { animation: history-action-sheet-slide-down 260ms cubic-bezier(0.64, 0, 0.78, 0) forwards; }
+
+.history-action-sheet__handle {
+  position: absolute;
+  top: 11px;
+  left: 50%;
+  width: 60px;
+  height: 4px;
+  padding: 0;
+  transform: translateX(-50%);
+  border: 0;
+  border-radius: 2px;
+  background: #ff6f4f;
+  cursor: pointer;
+}
+
+.history-action-sheet__date {
+  position: absolute;
+  top: 32px;
+  left: 24px;
+  height: 20px;
+  margin: 0;
+  color: #6f6b69;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 20px;
+}
+
+.history-action-sheet__title {
+  position: absolute;
+  top: 58px;
+  left: 24px;
+  width: 345px;
+  height: 32px;
+  margin: 0;
+  color: #171727;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 32px;
+  letter-spacing: -0.5px;
+}
+
+.history-action-sheet__actions {
+  position: absolute;
+  top: 106px;
+  left: 24px;
+  display: flex;
+  width: 345px;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.history-action-sheet__action {
+  position: relative;
+  display: flex;
+  width: 345px;
+  height: 52px;
+  align-items: center;
+  padding: 0 44px 0 60px;
+  border: 1px solid #e7ddd8;
+  border-radius: 16px;
+  background: #fffbf9;
+  color: #171727;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.history-action-sheet__icon-wrap {
+  position: absolute;
+  top: 7px;
+  left: 7px;
+  display: flex;
+  width: 36px;
+  height: 36px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #fde9e2;
+}
+
+.history-action-sheet__icon-wrap img { display: none; }
+.history-action-sheet__icon-wrap::after {
+  width: 22px;
+  height: 22px;
+  background: #ff6f4f;
+  content: '';
+  mask-position: center;
+  mask-repeat: no-repeat;
+  mask-size: contain;
+}
+.history-action-sheet__action:nth-child(1) .history-action-sheet__icon-wrap::after { mask-image: url('../../assets/icons/history-bottomsheet-camera.svg'); }
+.history-action-sheet__action:nth-child(2) .history-action-sheet__icon-wrap::after { mask-image: url('../../assets/icons/history-bottomsheet-cocktail.svg'); }
+.history-action-sheet__action:nth-child(3) .history-action-sheet__icon-wrap::after { mask-image: url('../../assets/icons/history-bottomsheet-test.svg'); }
+.history-action-sheet__copy { display: flex; min-width: 0; flex-direction: column; justify-content: center; }
+.history-action-sheet__copy strong { font-size: 16px; font-weight: 700; line-height: 22px; }
+.history-action-sheet__copy small { overflow: hidden; color: #77716e; font-size: 11px; font-weight: 400; line-height: 16px; text-overflow: ellipsis; white-space: nowrap; }
+
+.history-action-sheet__arrow {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 14px;
+  height: 14px;
+  transform: rotate(-45deg);
+  border-right: 1.8px solid #ff6f4f;
+  border-bottom: 1.8px solid #ff6f4f;
+}
+
+@keyframes history-action-overlay-fade-in { from { background: rgba(0, 0, 0, 0); } to { background: rgba(0, 0, 0, 0.32); } }
+@keyframes history-action-sheet-slide-up { from { transform: translateY(100%); } to { transform: translateY(0); } }
+@keyframes history-action-overlay-fade-out { from { background: rgba(0, 0, 0, 0.32); } to { background: rgba(0, 0, 0, 0); } }
+@keyframes history-action-sheet-slide-down { from { transform: translateY(0); } to { transform: translateY(100%); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .history-action-overlay, .history-action-sheet { animation-duration: 1ms; }
+}

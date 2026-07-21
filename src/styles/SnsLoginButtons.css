@@ -11,6 +11,8 @@
   height: 39.06px;
   border-radius: 8px;
   cursor: pointer;
+  display: flex;
+  align-items: center;
 }
 
 .sns-login-buttons__button--kakao {
@@ -24,22 +26,19 @@
 }
 
 .sns-login-buttons__icon-wrap {
-  position: absolute;
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
+  margin-left: 20px;
 }
 
 .sns-login-buttons__button--kakao .sns-login-buttons__icon-wrap {
-  left: 6.79px;
-  top: 6.79px;
-  width: 22px;
-  height: 20px;
+  width: 21.23px;
+  height: 19.46px;
 }
 
 .sns-login-buttons__button--google .sns-login-buttons__icon-wrap {
-  left: 6.36px;
-  top: 6.36px;
   width: 27.34px;
   height: 27.34px;
 }
@@ -50,20 +49,12 @@
 }
 
 .sns-login-buttons__label {
-  position: absolute;
+  flex: 1;
+  text-align: center;
   font-size: 17px;
   font-weight: 500;
   line-height: 22px;
   color: #000;
   white-space: nowrap;
-}
-
-.sns-login-buttons__button--kakao .sns-login-buttons__label {
-  left: 64.5px;
-  top: 9.29px;
-}
-
-.sns-login-buttons__button--google .sns-login-buttons__label {
-  left: 86.5px;
-  top: 9.29px;
+  margin-right: 20px;
 }

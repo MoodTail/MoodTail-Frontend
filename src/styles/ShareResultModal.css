@@ -1,0 +1,229 @@
+.share-result-modal__overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.4);
+}
+
+.share-result-modal {
+  position: relative;
+  width: 326px;
+  height: 795px;
+  border-radius: 23px;
+  background: #fff;
+  overflow: hidden;
+}
+
+.share-result-modal__close {
+  position: absolute;
+  left: 285px;
+  top: 15px;
+  width: 30px;
+  height: 30px;
+  border: none;
+  background: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+.share-result-modal__brand {
+  position: absolute;
+  left: 0;
+  top: 76px;
+  width: 100%;
+  margin: 0;
+  font-size: 32px;
+  font-weight: 700;
+  text-align: center;
+  color: #ff6f4f;
+}
+
+.share-result-modal__top-card {
+  position: absolute;
+  left: 16px;
+  top: 129.5px;
+  width: 294px;
+  height: 196px;
+  box-sizing: border-box;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid #efe4d9;
+  box-shadow: 6px 6px 20px 0 rgba(140, 56, 33, 0.08);
+}
+
+.share-result-modal__top-image {
+  position: absolute;
+  left: 17.64px;
+  top: 38.41px;
+  width: 73.98px;
+  height: 117.77px;
+  object-fit: contain;
+}
+
+.share-result-modal__top-tagline {
+  position: absolute;
+  left: 105.05px;
+  top: 20.5px;
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #ff613d;
+}
+
+.share-result-modal__top-name {
+  position: absolute;
+  left: 105.05px;
+  top: 49.5px;
+  margin: 0;
+  font-size: 26px;
+  font-weight: 700;
+  color: #17182f;
+}
+
+.share-result-modal__top-desc {
+  position: absolute;
+  left: 105.05px;
+  top: 89.5px;
+  width: 170px;
+  margin: 0;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+  color: #6f6d68;
+}
+
+.share-result-modal__top-badge {
+  position: absolute;
+  top: 147px;
+  width: 84px;
+  height: 30px;
+  border-radius: 15px;
+  background: #ff613d;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 8px;
+  font-weight: 600;
+  text-align: center;
+}
+.share-result-modal__top-badge--mine {
+  left: 105px;
+}
+.share-result-modal__top-badge--friend {
+  left: 196px;
+}
+
+.share-result-modal__rank-title {
+  position: absolute;
+  left: 25px;
+  top: 342px;
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: #17182f;
+}
+
+.share-result-modal__rank-list {
+  position: absolute;
+  left: 18.5px;
+  top: 375.5px;
+  width: 289px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.share-result-modal__rank-item {
+  position: relative;
+  width: 289px;
+  height: 61px;
+  box-sizing: border-box;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid #efe4d9;
+  box-shadow: 0 8px 20px 0 rgba(140, 56, 33, 0.08);
+  display: flex;
+  align-items: center;
+  padding: 0 20px 0 10px;
+}
+
+.share-result-modal__rank-badge {
+  flex-shrink: 0;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.share-result-modal__rank-info {
+  flex: 1;
+  margin-left: 12px;
+}
+.share-result-modal__rank-name {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 700;
+  color: #17182f;
+}
+.share-result-modal__rank-desc {
+  margin: 2px 0 0;
+  font-size: 12px;
+  font-weight: 500;
+  color: #6f6d68;
+}
+.share-result-modal__rank-percent {
+  flex-shrink: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #ff613d;
+}
+
+.share-result-modal__match-wrap {
+  position: absolute;
+  left: 18.5px;
+  top: 590.5px;
+}
+
+.share-result-modal__actions {
+  position: absolute;
+  left: 20px;
+  top: 722.6px;
+  width: 286px;
+  height: 48.39px;
+  display: flex;
+  gap: 13px;
+}
+
+.share-result-modal__sns {
+  width: 136.49px;
+  height: 48.39px;
+  border: none;
+  border-radius: 24.2px;
+  background: linear-gradient(to right, #ff6f4f 0%, #ff613d 100%);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.share-result-modal__save {
+  width: 136.49px;
+  height: 48.39px;
+  border: 0.79px solid #fff;
+  border-radius: 24.2px;
+  background: rgba(255, 255, 255, 0.78);
+  box-shadow: 1.6px 0.8px 3.2px 0 rgba(255, 101, 66, 0.46);
+  color: #ff613d;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}

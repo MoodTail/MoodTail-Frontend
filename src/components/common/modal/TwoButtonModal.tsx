@@ -17,6 +17,10 @@ interface TwoButtonModalProps {
   onOverlayClick?: () => void
 }
 
+// Figma 기준값: 제목-본문 간격, 본문-버튼 간격 (모달마다 미세하게 다르지만 공용 컴포넌트라 하나로 통일)
+const TITLE_TO_DESCRIPTION_GAP = 13
+const DESCRIPTION_TO_BUTTONS_GAP = 14
+
 function TwoButtonModal({
   isOpen,
   title,
@@ -26,6 +30,8 @@ function TwoButtonModal({
   onOverlayClick,
 }: TwoButtonModalProps) {
   if (!isOpen) return null
+
+  const descriptionLines = description ? description.split('\n') : []
 
   return (
     <div className="two-button-modal-overlay" onClick={onOverlayClick}>
@@ -39,7 +45,7 @@ function TwoButtonModal({
         <p className="two-button-modal__title">{title}</p>
         {description && (
           <p className="two-button-modal__description">
-            {description.split('\n').map((line, index, lines) => (
+            {descriptionLines.map((line, index, lines) => (
               <span key={line}>
                 {line}
                 {index < lines.length - 1 && <br />}
@@ -47,7 +53,14 @@ function TwoButtonModal({
             ))}
           </p>
         )}
-        <div className="two-button-modal__buttons">
+        <div
+          className="two-button-modal__buttons"
+          style={{
+            marginTop: description
+              ? DESCRIPTION_TO_BUTTONS_GAP
+              : TITLE_TO_DESCRIPTION_GAP + DESCRIPTION_TO_BUTTONS_GAP,
+          }}
+        >
           <button
             type="button"
             className={`two-button-modal__button two-button-modal__button--${leftButton.variant ?? 'primary'}`}
