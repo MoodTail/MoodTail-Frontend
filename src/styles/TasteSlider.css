@@ -1,0 +1,59 @@
+.taste-slider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+}
+
+.taste-slider__label {
+  flex-shrink: 0;
+  width: 40px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #17182f;
+}
+
+.taste-slider__value {
+  flex-shrink: 0;
+  width: 22px;
+  font-size: 13px;
+  font-weight: 600;
+  text-align: right;
+  color: #68646a;
+}
+
+.taste-slider__input {
+  flex: 1;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 5px;
+  border-radius: 999px;
+  outline: none;
+  cursor: pointer;
+}
+
+.taste-slider__input::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #ff613d;
+  border: none;
+  cursor: pointer;
+}
+
+.taste-slider__input::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #ff613d;
+  border: none;
+  cursor: pointer;
+}
+
+.taste-slider__input::-moz-range-track {
+  height: 5px;
+  border-radius: 999px;
+  background: transparent;
+}

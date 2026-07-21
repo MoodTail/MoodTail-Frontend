@@ -1,5 +1,6 @@
 import type { FC } from "react";
 import "../../styles/MatchSummaryCard.css";
+import defaultProfile from "../../assets/images/character/default-profile.png";
 
 interface MatchSummaryCardProps {
   matchPercent: number;
@@ -9,7 +10,7 @@ interface MatchSummaryCardProps {
   compact?: boolean;
 }
 
-const DEFAULT_AVATAR = "/images/default-avatar.png";
+const DEFAULT_AVATAR = defaultProfile;
 
 const MatchSummaryCard: FC<MatchSummaryCardProps> = ({
   matchPercent,

@@ -1,7 +1,9 @@
-import type { FC } from "react";
+import { useState, type FC } from "react";
 import cocktail from "../../assets/images/glass/glass-1.png";
 import MatchSummaryCard from "./MatchSummaryCard";
+import SaveCompleteToast from "../common/SaveCompleteToast";
 import "../../styles/ShareResultModal.css";
+import Button from "../Button/Button";
 
 interface RankEntry {
   rank: number;
@@ -39,6 +41,13 @@ const ShareResultModal: FC<ShareResultModalProps> = ({
   myAvatarUrl,
   partnerAvatarUrl,
 }) => {
+  const [showSaveToast, setShowSaveToast] = useState(false);
+
+  const handleSaveImage = () => {
+    onSaveImage();
+    setShowSaveToast(true);
+  };
+
   return (
     <div className="share-result-modal__overlay">
       <div className="share-result-modal">
@@ -116,21 +125,27 @@ const ShareResultModal: FC<ShareResultModalProps> = ({
         </div>
 
         <div className="share-result-modal__actions">
-          <button
-            type="button"
+          <Button
+            variant="share"
             className="share-result-modal__sns"
             onClick={onShareSns}
           >
             SNS 공유하기
-          </button>
-          <button
-            type="button"
+          </Button>
+          <Button
+            variant="shareLight"
             className="share-result-modal__save"
-            onClick={onSaveImage}
+            onClick={handleSaveImage}
           >
             이미지 저장
-          </button>
+          </Button>
         </div>
+
+        <SaveCompleteToast
+          message="저장 완료되었습니다"
+          isVisible={showSaveToast}
+          onHide={() => setShowSaveToast(false)}
+        />
       </div>
     </div>
   );

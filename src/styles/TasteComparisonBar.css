@@ -1,0 +1,38 @@
+.taste-comparison-bar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 32px;
+}
+
+.taste-comparison-bar__value {
+  font-size: 11px;
+  font-weight: 700;
+  color: #68646a;
+  margin-bottom: 8px;
+}
+
+.taste-comparison-bar__track {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.taste-comparison-bar__fill {
+  width: 12px;
+  border-radius: 6px;
+  display: block;
+}
+.taste-comparison-bar__fill--cocktail {
+  background: #ff9279;
+}
+.taste-comparison-bar__fill--mine {
+  background: #90b4f9;
+}
+
+.taste-comparison-bar__label {
+  margin-top: 12px;
+  font-size: 16px;
+  font-weight: 700;
+  color: #17182f;
+}

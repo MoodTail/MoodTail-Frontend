@@ -1,0 +1,112 @@
+.custom-recommend-page {
+  position: relative;
+  width: 100%;
+  max-width: 393px;
+  min-height: max(824px, 100dvh);
+  margin: 0 auto;
+  overflow: hidden;
+  background: linear-gradient(
+    224.79deg,
+    #fee5e5 -16.15%,
+    #fff 17.41%,
+    #fff 83.44%,
+    #c2ede9 117.1%
+  );
+}
+
+.custom-recommend-page__back {
+  position: absolute;
+  left: 10px;
+  top: 66px;
+  width: 27px;
+  height: 27px;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+.custom-recommend-page__title {
+  position: absolute;
+  left: 41px;
+  top: 66px;
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  color: #17182f;
+}
+
+.custom-recommend-page__subtitle {
+  position: absolute;
+  left: 41px;
+  top: 104px;
+  margin: 0;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 21px;
+  color: #6f6d68;
+}
+
+.custom-recommend-page__card {
+  position: absolute;
+  left: 19.5px;
+  top: 165.5px;
+  width: 353px;
+  height: 361px;
+  box-sizing: border-box;
+  border-radius: 26px;
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid #efe3d8;
+  box-shadow: 0 8px 22px 0 rgba(122, 59, 31, 0.08);
+}
+
+.custom-recommend-page__card-title {
+  position: absolute;
+  left: 24.71px;
+  top: 24.5px;
+  margin: 0;
+  font-size: 19px;
+  font-weight: 700;
+  color: #17182f;
+}
+
+.custom-recommend-page__card-desc {
+  position: absolute;
+  left: 24.71px;
+  top: 54.5px;
+  width: 305.6px;
+  margin: 0;
+  font-size: 13px;
+  font-weight: 500;
+  color: #68646a;
+}
+
+.custom-recommend-page__sliders {
+  position: absolute;
+  left: 24.71px;
+  top: 101px;
+  width: 305px;
+  display: flex;
+  flex-direction: column;
+  gap: 29px;
+}
+
+.custom-recommend-page__cta {
+  position: absolute;
+  left: 36px;
+  top: 709px;
+  width: 329px;
+  height: 56px;
+  border: none;
+  border-radius: 28px;
+  background: #ff613d;
+  box-shadow: 0 7px 16px 0 rgba(140, 56, 33, 0.13);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+body.hide-bottom-nav .bottom-nav {
+  display: none !important;
+}
