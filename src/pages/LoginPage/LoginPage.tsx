@@ -19,12 +19,15 @@ const LoginPage: FC<LoginPageProps> = ({ onLogin }) => {
   const [step, setStep] = useState<LoginStep>("onboarding");
   const [userId, setUserId] = useState("");
   const [password, setPassword] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
 
   const handleOnboardingFinish = (): void => setStep("login");
 
   if (step === "onboarding") {
     return <OnboardingPage onFinish={handleOnboardingFinish} />;
+  }
+
+  if (step === "findPassword") {
+    return <FindPasswordPage onBack={() => setStep("login")} />;
   }
 
   const handleLoginClick = (): void => {
