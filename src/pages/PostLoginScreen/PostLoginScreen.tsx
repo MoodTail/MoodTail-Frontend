@@ -83,7 +83,7 @@ const PostLoginScreen: FC<PostLoginScreenProps> = ({ onComplete }) => {
 
   useEffect(() => {
     if (phase !== "welcome") return;
-    const finish = setTimeout(onComplete, 1300);
+    const finish = setTimeout(onComplete, 3300);
     return () => clearTimeout(finish);
   }, [phase, onComplete]);
 
@@ -107,8 +107,7 @@ const PostLoginScreen: FC<PostLoginScreenProps> = ({ onComplete }) => {
 
       {phase === "blend" && (
         <div className="post-login-screen__blend">
-          <span className="post-login-screen__blob post-login-screen__blob--pink" />
-          <span className="post-login-screen__blob post-login-screen__blob--mint" />
+          <span className="post-login-screen__blend-gradient" />
           <span className="post-login-screen__whiteout" />
         </div>
       )}
