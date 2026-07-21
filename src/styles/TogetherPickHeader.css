@@ -1,0 +1,35 @@
+.together-pick-header {
+  padding: 66px 0 0 10px;
+}
+
+.together-pick-header__top-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+.together-pick-header__back {
+  flex-shrink: 0;
+  width: 27px;
+  height: 27px;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+.together-pick-header__title {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  color: #17182f;
+}
+
+.together-pick-header__description {
+  margin: 8px 0 0 36px;
+  width: 321px;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 23px;
+  color: #6f6d68;
+}

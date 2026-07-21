@@ -138,3 +138,24 @@
   top: 655.63px;
   width: 249px;
 }
+
+.login-page {
+  background:
+    radial-gradient(
+      circle 173px at 331px 240px,
+      rgba(255, 111, 79, 0.17) 0%,
+      rgba(255, 111, 79, 0) 100%
+    ),
+    radial-gradient(
+      circle 199px at 33px 686px,
+      rgba(254, 246, 217, 0.38) 0%,
+      rgba(254, 246, 217, 0) 100%
+    ),
+    linear-gradient(
+      224.79deg,
+      #fee5e5 0%,
+      #fff 32.15%,
+      #fff 63.63%,
+      #c2ede9 100%
+    );
+}

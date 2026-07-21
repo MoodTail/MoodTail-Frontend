@@ -8,12 +8,19 @@ import "../../styles/LoginPage.css";
 import "../../styles/SnsLoginButtons.css";
 import OnboardingPage from "../OnboardingPage/OnboardingPage";
 import FindPasswordPage from "../../components/login/FindPasswordPage";
+import SignupPage from "../SignupPage/SignupPage";
+import PostLoginScreen from "../PostLoginScreen/PostLoginScreen";
 
 interface LoginPageProps {
   onLogin: () => void;
 }
 
-type LoginStep = "onboarding" | "login" | "findPassword";
+type LoginStep =
+  | "onboarding"
+  | "login"
+  | "findPassword"
+  | "signup"
+  | "postLogin";
 
 const LoginPage: FC<LoginPageProps> = ({ onLogin }) => {
   const [step, setStep] = useState<LoginStep>("onboarding");
@@ -26,12 +33,26 @@ const LoginPage: FC<LoginPageProps> = ({ onLogin }) => {
     return <OnboardingPage onFinish={handleOnboardingFinish} />;
   }
 
+  if (step === "signup") {
+    return <SignupPage onSignupComplete={() => setStep("login")} />;
+  }
+
   if (step === "findPassword") {
     return <FindPasswordPage onBack={() => setStep("login")} />;
   }
 
+  if (step === "postLogin") {
+    return <PostLoginScreen onComplete={onLogin} />;
+  }
+
   const handleLoginClick = (): void => {
-    onLogin();
+    localStorage.removeItem("isGuest");
+    setStep("postLogin");
+  };
+
+  const handleSkipLogin = (): void => {
+    localStorage.setItem("isGuest", "true");
+    setStep("postLogin");
   };
 
   return (
@@ -75,7 +96,11 @@ const LoginPage: FC<LoginPageProps> = ({ onLogin }) => {
       </button>
 
       <div className="login-page__links">
-        <button type="button" className="login-page__link">
+        <button
+          type="button"
+          className="login-page__link"
+          onClick={() => setStep("signup")}
+        >
           회원가입
         </button>
         <span className="login-page__link-divider" />
@@ -88,7 +113,11 @@ const LoginPage: FC<LoginPageProps> = ({ onLogin }) => {
         </button>
       </div>
 
-      <button type="button" className="login-page__skip-link" onClick={onLogin}>
+      <button
+        type="button"
+        className="login-page__skip-link"
+        onClick={handleSkipLogin}
+      >
         로그인 없이 이용하기
       </button>
 

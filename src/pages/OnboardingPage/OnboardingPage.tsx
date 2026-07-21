@@ -7,7 +7,6 @@ import OnboardingMarquee from "../../components/onboarding/OnboardingMarquee";
 import OnboardingCharacterCarousel from "../../components/onboarding/OnboardingCharacterCarousel";
 import OnboardingDots from "../../components/onboarding/OnboardingDots";
 import "../../styles/OnboardingPage.css";
-import BackgroundBlur from "../../components/common/BackgroundBlur";
 
 // 온보딩 7 이미지
 import image8 from "../../assets/images/cocktails/image 8.png";
@@ -209,16 +208,6 @@ const OnboardingPage: FC<OnboardingPageProps> = ({ onFinish }) => {
 
   return (
     <div className="onboarding-page">
-      <BackgroundBlur
-        idPrefix="onboarding-bg"
-        width={393}
-        height={824}
-        circles={[
-          { cx: 331, cy: 240, r: 173, color: "#FF6F4F", opacity: 0.17 },
-          { cx: 33, cy: 686, r: 199, color: "#FEF6D9", opacity: 0.38 },
-        ]}
-      />
-
       <div
         className="onboarding-page__track-wrapper"
         onTouchStart={handleTouchStart}

@@ -1,11 +1,15 @@
 .save-complete-modal-overlay {
-  position: absolute;
-  inset: 0;
+  position: fixed;
+  top: 0;
+  left: 50%;
   z-index: 1000;
   display: flex;
+  width: min(393px, 100vw);
+  height: min(824px, 100dvh);
   align-items: center;
   justify-content: center;
   padding: 24px;
+  transform: translateX(-50%);
   background: rgba(0, 0, 0, 0.45);
 }
 

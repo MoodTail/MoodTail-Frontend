@@ -3,6 +3,9 @@ import "../../styles/MainPage.css";
 import Button from "../../components/Button/Button";
 import BackgroundBlur from "../../components/common/BackgroundBlur";
 import TrendPage from "../TrendPage/TrendPage";
+import TogetherPickPage from "../TogetherPickPage/TogetherPickPage";
+import CustomRecommend from "../CustomRecommend/CustomRecommend";
+import CustomRecommendResultPage from "../CustomRecommendResultPage/CustomRecommendResultPage";
 
 // ui 구현용으로 잔 이미지 하나 무작위로 넣음
 import cocktail from "../../assets/images/glass/glass-1.png";
@@ -12,17 +15,65 @@ interface MenuItem {
   onClick?: () => void;
 }
 
+interface TasteValues {
+  strength: number;
+  sweetness: number;
+  acidity: number;
+  bitterness: number;
+  refreshing: number;
+}
+
+type ViewState = "home" | "trend" | "together" | "custom" | "customResult";
+
 const MainPage: FC = () => {
-  const [view, setView] = useState<"home" | "trend">("home");
+  const [view, setView] = useState<ViewState>("home");
+
+  const [myTasteValues, setMyTasteValues] = useState<TasteValues | null>(null);
 
   const menuItems: MenuItem[] = [
     { label: "트렌드집계 확인", onClick: () => setView("trend") },
-    { label: "다른 사용자량" },
-    { label: "커스텀 추천" },
+    { label: "같이 고르기", onClick: () => setView("together") },
+    { label: "커스텀 추천", onClick: () => setView("custom") },
   ];
 
   if (view === "trend") {
     return <TrendPage onBack={() => setView("home")} />;
+  }
+
+  if (view === "together") {
+    return <TogetherPickPage onBack={() => setView("home")} />;
+  }
+
+  if (view === "custom") {
+    return (
+      <CustomRecommend
+        onBack={() => setView("home")}
+        onViewResult={(values) => {
+          setMyTasteValues(values);
+          setView("customResult");
+        }}
+      />
+    );
+  }
+
+  if (view === "customResult" && myTasteValues) {
+    return (
+      <CustomRecommendResultPage
+        onBack={() => setView("custom")}
+        onRetry={() => setView("custom")}
+        cocktailName="피치 하이볼"
+        description="달콤함과 청량감은 살리고 도수는 부담 없이 맞춘 추천이에요."
+        matchPercent={92}
+        myValues={myTasteValues}
+        cocktailValues={{
+          strength: 40,
+          sweetness: 80,
+          acidity: 60,
+          bitterness: 20,
+          refreshing: 100,
+        }}
+      />
+    );
   }
 
   return (
@@ -63,7 +114,6 @@ const MainPage: FC = () => {
       <h2 className="main-page__section-title">오늘의 추천 칵테일</h2>
 
       <div className="main-page__cocktail-card">
-        {/* 썸네일 */}
         <div className="main-page__cocktail-thumb">
           <img
             src={cocktail}
@@ -72,7 +122,6 @@ const MainPage: FC = () => {
           />
         </div>
 
-        {/* 텍스트 영역 */}
         <div className="main-page__cocktail-info">
           <p className="main-page__cocktail-name">선라이즈 소다</p>
           <p className="main-page__cocktail-tags">달콤 · 청량 · 과일향</p>
@@ -87,7 +136,7 @@ const MainPage: FC = () => {
       {/* 메뉴 리스트 */}
       <ul className="main-page__menu-list">
         {menuItems.map((item) => (
-          <li key={item.label} className="main-page__muni-item">
+          <li key={item.label} className="main-page__menu-item">
             <button
               type="button"
               className="main-page__menu-item-button"

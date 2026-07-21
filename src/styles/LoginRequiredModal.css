@@ -1,0 +1,65 @@
+.login-required-modal__overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(23, 24, 47, 0.45);
+}
+
+.login-required-modal {
+  position: relative;
+  width: 305px;
+  height: 190px;
+  border-radius: 30px;
+  background: #fff;
+  box-shadow: 9px 13px 22px 0 rgba(255, 92, 46, 0.09);
+  box-sizing: border-box;
+  text-align: center;
+  padding-top: 26px;
+}
+
+.login-required-modal__title {
+  margin: 0;
+  font-size: 21px;
+  font-weight: 700;
+  color: #10161f;
+}
+
+.login-required-modal__description {
+  margin: 10px auto 0;
+  width: 253px;
+  font-size: 14px;
+  color: #656565;
+  line-height: 20px;
+}
+
+.login-required-modal__actions {
+  display: flex;
+  justify-content: space-between;
+  margin: 19px 16px 0;
+}
+
+.login-required-modal__login,
+.login-required-modal__close {
+  width: 131px;
+  height: 54px;
+  border-radius: 27px;
+  border: none;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 700;
+  font-family: inherit;
+}
+
+.login-required-modal__login {
+  background: #ff6f4f;
+  color: #fff;
+}
+
+.login-required-modal__close {
+  background: #fff;
+  color: #ff6f4f;
+  box-shadow: 0 3px 4.2px 0 rgba(255, 111, 79, 0.28);
+}

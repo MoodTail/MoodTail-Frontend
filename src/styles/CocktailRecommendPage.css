@@ -1,0 +1,365 @@
+.cocktail-recommend-page {
+  position: relative;
+  width: 100%;
+  max-width: 393px;
+  min-height: max(998px, 100dvh);
+  margin: 0 auto;
+  overflow: hidden;
+  background: linear-gradient(
+    224.79deg,
+    #fee5e5 -16.15%,
+    #fff 17.41%,
+    #fff 83.44%,
+    #c2ede9 117.1%
+  );
+  padding-bottom: 24px;
+}
+
+.cocktail-recommend-page__back {
+  position: absolute;
+  left: 10px;
+  top: 66px;
+  width: 27px;
+  height: 27px;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+.cocktail-recommend-page__title {
+  position: absolute;
+  left: 41px;
+  top: 66px;
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  color: #17182f;
+}
+
+.cocktail-recommend-page__subtitle {
+  position: absolute;
+  left: 42px;
+  top: 100px;
+  margin: 0;
+  font-size: 15px;
+  font-weight: 500;
+  color: #6f6d68;
+}
+
+.cocktail-recommend-page__top-card {
+  position: absolute;
+  left: 31.5px;
+  top: 142.5px;
+  width: 329px;
+  height: 196px;
+  box-sizing: border-box;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid #efe4d9;
+  box-shadow: 0 8px 20px 0 rgba(140, 56, 33, 0.08);
+}
+
+.cocktail-recommend-page__top-image {
+  position: absolute;
+  left: 22px;
+  top: 35px;
+  width: 78px;
+  height: 125px;
+  object-fit: contain;
+}
+
+.cocktail-recommend-page__top-tagline {
+  position: absolute;
+  left: 117.5px;
+  top: 20.5px;
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #ff613d;
+}
+
+.cocktail-recommend-page__top-name {
+  position: absolute;
+  left: 117.5px;
+  top: 49.5px;
+  margin: 0;
+  font-size: 26px;
+  font-weight: 700;
+  color: #17182f;
+}
+
+.cocktail-recommend-page__top-desc {
+  position: absolute;
+  left: 117.5px;
+  top: 89.5px;
+  width: 180px;
+  margin: 0;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+  color: #6f6d68;
+  white-space: pre-line;
+}
+
+.cocktail-recommend-page__top-badge {
+  position: absolute;
+  top: 147px;
+  height: 30px;
+  padding: 0 8px;
+  border-radius: 15px;
+  background: #ff613d;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.cocktail-recommend-page__top-badge--mine {
+  left: 117px;
+  width: 94px;
+  font-size: 10px;
+}
+.cocktail-recommend-page__top-badge--friend {
+  left: 219px;
+  width: 94px;
+  font-size: 9px;
+}
+
+.cocktail-recommend-page__taste-card {
+  position: absolute;
+  left: 31px;
+  top: 354px;
+  width: 329px;
+  height: 112px;
+  box-sizing: border-box;
+  border-radius: 24px;
+  background: #fefefd;
+  border: 1px solid #ebdbd1;
+  box-shadow: 8px 13px 18px 0 rgba(255, 111, 79, 0.08);
+}
+
+.cocktail-recommend-page__taste-row {
+  position: absolute;
+  left: 0;
+  top: 21px;
+  width: 329px;
+  height: 30px;
+}
+.cocktail-recommend-page__taste-row--second {
+  top: 63px;
+}
+
+.cocktail-recommend-page__taste-pill {
+  position: absolute;
+  padding: 0 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+  box-sizing: border-box;
+}
+.cocktail-recommend-page__taste-pill--taste {
+  left: 26px;
+  top: 0px;
+  width: 75px;
+  height: 29.26px;
+  border-radius: 14.63px;
+  background: #ffe8e0;
+  border: 1px solid #ffa894;
+  color: #ff6f4f;
+}
+.cocktail-recommend-page__taste-pill--owner-a,
+.cocktail-recommend-page__taste-pill--owner-b {
+  left: 129px;
+  top: 2px;
+  width: 34.48px;
+  height: 26px;
+  border-radius: 13px;
+}
+.cocktail-recommend-page__taste-pill--owner-a {
+  background: #e8f2ff;
+  border: 1px solid #a6c2ff;
+  color: #216bff;
+}
+.cocktail-recommend-page__taste-pill--owner-b {
+  background: #e5fbf7;
+  border: 1px solid #8ce5db;
+  color: #30c9bd;
+}
+
+.cocktail-recommend-page__taste-word {
+  position: absolute;
+  font-family: "Pretendard", sans-serif;
+  color: #1b1c30;
+  white-space: nowrap;
+  margin: 0;
+}
+.cocktail-recommend-page__taste-word--eun {
+  left: 105px;
+  top: 6px;
+  width: 14.94px;
+  font-size: 14px;
+  font-weight: 400;
+}
+.cocktail-recommend-page__taste-word--desc {
+  left: 168px;
+  top: 6px;
+  width: 137.9px;
+  font-size: 16px;
+  font-weight: 500;
+}
+.cocktail-recommend-page__rank-title {
+  position: absolute;
+  left: 39px;
+  top: 483px;
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: #17182f;
+}
+
+.cocktail-recommend-page__rank-list {
+  position: absolute;
+  left: 31.5px;
+  top: 516.5px;
+  width: 329px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.cocktail-recommend-page__rank-item {
+  position: relative;
+  width: 329px;
+  height: 56px;
+  box-sizing: border-box;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid #efe4d9;
+  box-shadow: 0 8px 20px 0 rgba(140, 56, 33, 0.08);
+  display: flex;
+  align-items: center;
+  padding: 0 24px 0 13px;
+}
+
+.cocktail-recommend-page__rank-badge {
+  flex-shrink: 0;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.cocktail-recommend-page__rank-info {
+  flex: 1;
+  margin-left: 10px;
+}
+.cocktail-recommend-page__rank-name {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 700;
+  color: #17182f;
+}
+.cocktail-recommend-page__rank-desc {
+  margin: 2px 0 0;
+  font-size: 12px;
+  font-weight: 500;
+  color: #6f6d68;
+}
+
+.cocktail-recommend-page__rank-percent {
+  flex-shrink: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #ff613d;
+}
+
+.cocktail-recommend-page__match-wrap {
+  position: absolute;
+  left: 31.5px;
+  top: 712.5px;
+}
+
+.cocktail-recommend-page__share {
+  position: absolute;
+  left: 31.4px;
+  top: 913.4px;
+  width: 154px;
+  height: 52px;
+  border: 1.2px solid #ffe3d7;
+  border-radius: 26px;
+  background: #fff;
+  box-shadow: 0 4px 12px 0 rgba(255, 97, 61, 0.1);
+  color: #ff613d;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.cocktail-recommend-page__retry {
+  position: absolute;
+  left: 201.5px;
+  top: 913.5px;
+  width: 159px;
+  height: 52px;
+  border: none;
+  border-radius: 26px;
+  background: #ff6f4f;
+  box-shadow: 0 7px 16px 0 rgba(140, 56, 33, 0.13);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+}
+body.hide-bottom-nav .bottom-nav {
+  display: none !important;
+}
+.cocktail-recommend-page__top-image {
+  position: absolute;
+  left: 22px;
+  top: 35px;
+  width: 78px;
+  height: 125px;
+  object-fit: contain;
+  transform-origin: 50% 100%;
+  animation: cocktail-glass-landing 0.8s ease-out 1 both;
+}
+
+@keyframes cocktail-glass-landing {
+  /* 1. 위에서 살짝 내려와 바닥에 닿기 (0.0~0.25s) */
+  0% {
+    transform: translateY(-14px) scale(1, 1) rotate(0deg);
+  }
+  31.25% {
+    transform: translateY(0) scale(1, 1) rotate(0deg);
+  }
+
+  /* 2. 닿는 순간 살짝 눌리듯 정착 (0.25~0.45s) */
+  43.75% {
+    transform: translateY(0) scale(1.05, 0.9) rotate(0deg);
+  }
+  56.25% {
+    transform: translateY(0) scale(1, 1) rotate(0deg);
+  }
+
+  /* 3. 좌우로 까딱, -4~+3도 (0.45~0.65s) */
+  68.75% {
+    transform: translateY(0) scale(1, 1) rotate(-4deg);
+  }
+  81.25% {
+    transform: translateY(0) scale(1, 1) rotate(3deg);
+  }
+
+  /* 4. 원래 각도로 복귀 (0.65~0.8s) */
+  100% {
+    transform: translateY(0) scale(1, 1) rotate(0deg);
+  }
+}

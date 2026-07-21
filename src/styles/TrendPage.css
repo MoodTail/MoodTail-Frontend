@@ -1,6 +1,5 @@
 .trend-page {
   position: relative;
-  min-height: 100vh;
   overflow: hidden;
   background: linear-gradient(
     224.79deg,
@@ -12,16 +11,10 @@
   padding-bottom: 24px;
 }
 
-.trend-background {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 0;
+body.hide-bottom-nav .bottom-nav {
+  display: none !important;
 }
 
-.trend-page > *:not(.trend-background) {
-  position: relative;
-  z-index: 1;
+body.hide-bottom-nav .app-content {
+  padding-bottom: 0;
 }
