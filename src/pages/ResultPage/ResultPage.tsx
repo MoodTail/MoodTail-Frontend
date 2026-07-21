@@ -5,8 +5,8 @@ import RadarChart, { type RadarChartData } from '../../components/ResultPage/Rad
 import CocktailTopList, { type CocktailTopItem } from '../../components/ResultPage/CocktailTopList'
 import TypeMatchCard from '../../components/ResultPage/TypeMatchCard'
 import TwoButtonModal from '../../components/common/modal/TwoButtonModal'
-import ShareResultModal from '../../components/common/modal/ShareResultModal'
-import SnsShareModal from '../../components/common/modal/SnsShareModal'
+import ResultShareModal from '../../components/common/modal/ResultShareModal'
+import ResultSnsShareModal from '../../components/common/modal/ResultSnsShareModal'
 import SaveCompleteToast from '../../components/common/SaveCompleteToast'
 import romanticCharacterImg from '../../assets/images/character/character-12.png'
 import visionaryCharacterImg from '../../assets/images/character-crop/character-crop-11.svg'
@@ -235,7 +235,7 @@ function ResultPage({ onBack }: ResultPageProps) {
         onOverlayClick={closeModal}
       />
 
-      <ShareResultModal
+      <ResultShareModal
         isOpen={isShareModalOpen}
         shareCard={{
           characterImage: MOCK_RESULT.characterImage,
@@ -248,7 +248,7 @@ function ResultPage({ onBack }: ResultPageProps) {
         onImageSaved={handleImageSaved}
       />
 
-      <SnsShareModal
+      <ResultSnsShareModal
         isOpen={isSnsModalOpen}
         url="https://moodtail.app/share/mock-id"
         onClose={() => setIsSnsModalOpen(false)}
