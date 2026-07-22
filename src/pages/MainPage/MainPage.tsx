@@ -3,6 +3,7 @@ import "../../styles/MainPage.css";
 import Button from "../../components/Button/Button";
 import BackgroundBlur from "../../components/common/BackgroundBlur";
 import TrendPage from "../TrendPage/TrendPage";
+import ShareModal from "../../components/Modal/ShareModal";
 import TogetherPickPage from "../TogetherPickPage/TogetherPickPage";
 import CustomRecommend from "../CustomRecommend/CustomRecommend";
 import CustomRecommendResultPage from "../CustomRecommendResultPage/CustomRecommendResultPage";
@@ -27,13 +28,14 @@ type ViewState = "home" | "trend" | "together" | "custom" | "customResult";
 
 const MainPage: FC = () => {
   const [view, setView] = useState<ViewState>("home");
-
+  const [isShareOpen, setIsShareOpen] = useState(false); // TODO: 확인용 임시 코드, 삭제 예정
   const [myTasteValues, setMyTasteValues] = useState<TasteValues | null>(null);
 
   const menuItems: MenuItem[] = [
     { label: "트렌드집계 확인", onClick: () => setView("trend") },
     { label: "같이 고르기", onClick: () => setView("together") },
     { label: "커스텀 추천", onClick: () => setView("custom") },
+    { label: "공유 모달 미리보기 (임시)", onClick: () => setIsShareOpen(true) },
   ];
 
   if (view === "trend") {
@@ -150,6 +152,15 @@ const MainPage: FC = () => {
           </li>
         ))}
       </ul>
+
+      {isShareOpen && (
+        <ShareModal
+          onClose={() => setIsShareOpen(false)}
+          shareUrl="https://moodtail.app/share/example"
+          tipText="TIP: 캐릭터는 무료 12종이나 된답니다! 전부 해금할 수 있을까요?"
+          onKakaoShare={() => console.log("카카오톡 공유")}
+        />
+      )}
     </div>
   );
 };
