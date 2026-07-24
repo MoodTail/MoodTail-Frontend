@@ -2,7 +2,8 @@ import { useState } from "react";
 import chevronLeftIcon from "../../assets/icons/chevron-left.svg";
 import monthlyReportCharacter from "../../assets/images/history/monthly_report_character.png";
 import Button from "../../components/Button/Button";
-import SaveCompleteModal from "../../components/Modal/SaveCompleteModal";
+import ActionCompleteToast from "../../components/Modal/ActionCompleteToast";
+import SnsShareOptionsModal from "../../components/SnsShareOptionsModal";
 import MonthlyReportBackground from "../../components/common/MonthlyReportBackground";
 import "./MonthlyReportPage.css";
 
@@ -210,7 +211,8 @@ function ActivityCard() {
 
 function MonthlyReportPage({ onBack, reportMonth }: MonthlyReportPageProps) {
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
-  const [isSaveCompleteModalOpen, setIsSaveCompleteModalOpen] = useState(false);
+  const [isSnsShareModalOpen, setIsSnsShareModalOpen] = useState(false);
+  const [isSaveCompleteToastOpen, setIsSaveCompleteToastOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const hasSecondaryTypeData = SECONDARY_TYPES.length > 0;
 
@@ -242,8 +244,7 @@ function MonthlyReportPage({ onBack, reportMonth }: MonthlyReportPageProps) {
         window.setTimeout(() => URL.revokeObjectURL(downloadUrl), 1000);
       }
 
-      setIsShareModalOpen(false);
-      setIsSaveCompleteModalOpen(true);
+      setIsSaveCompleteToastOpen(true);
     } catch (error) {
       if (error instanceof DOMException && error.name === 'AbortError') return;
       console.error('월간 리포트 이미지 저장 실패', error);
@@ -405,11 +406,11 @@ function MonthlyReportPage({ onBack, reportMonth }: MonthlyReportPageProps) {
 
       {isShareModalOpen && (
         <div
-          className="share-modal-overlay"
+          className="monthly-report-share-modal__overlay"
           onClick={() => setIsShareModalOpen(false)}
         >
           <section
-            className="share-modal"
+            className="monthly-report-share-modal"
             role="dialog"
             aria-modal="true"
             aria-labelledby="share-modal-title"
@@ -417,29 +418,36 @@ function MonthlyReportPage({ onBack, reportMonth }: MonthlyReportPageProps) {
           >
             <button
               type="button"
-              className="share-modal__close"
+              className="monthly-report-share-modal__close"
               onClick={() => setIsShareModalOpen(false)}
               aria-label="공유 미리보기 닫기"
             >
               ×
             </button>
-            <h2 id="share-modal-title" className="share-modal__title">
+            <h2 id="share-modal-title" className="monthly-report-share-modal__title">
               MoodTail
             </h2>
 
-            <div className="share-modal__preview">
+            <div className="monthly-report-share-modal__preview">
               <SummaryCard />
               <CocktailsCard />
               <ActivityCard />
             </div>
 
-            <div className="share-modal__actions">
-              <Button variant="primary" className="share-modal__button">
+            <div className="monthly-report-share-modal__actions">
+              <Button
+                variant="primary"
+                className="monthly-report-share-modal__button"
+                onClick={() => {
+                  setIsShareModalOpen(false);
+                  setIsSnsShareModalOpen(true);
+                }}
+              >
                 SNS 공유하기
               </Button>
               <Button
                 variant="light"
-                className="share-modal__button share-modal__button--save"
+                className="monthly-report-share-modal__button monthly-report-share-modal__button--save"
                 onClick={handleSaveImage}
                 disabled={isSaving}
               >
@@ -450,11 +458,19 @@ function MonthlyReportPage({ onBack, reportMonth }: MonthlyReportPageProps) {
         </div>
       )}
 
-      {isSaveCompleteModalOpen && (
-        <SaveCompleteModal
-          title="저장 완료되었습니다"
-          onClose={() => setIsSaveCompleteModalOpen(false)}
+      {isSnsShareModalOpen && (
+        <SnsShareOptionsModal
+          onClose={() => setIsSnsShareModalOpen(false)}
         />
+      )}
+
+      {isSaveCompleteToastOpen && (
+        <div className="monthly-report-page__save-toast">
+          <ActionCompleteToast
+            action="저장"
+            onClose={() => setIsSaveCompleteToastOpen(false)}
+          />
+        </div>
       )}
     </div>
   );

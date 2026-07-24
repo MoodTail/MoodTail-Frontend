@@ -556,30 +556,34 @@
   cursor: pointer;
 }
 
-.share-modal-overlay {
+.monthly-report-share-modal__overlay {
   position: fixed;
   z-index: 1000;
   top: 0;
   left: 50%;
-  width: 393px;
-  height: 824px;
+  width: min(393px, 100vw);
+  height: min(824px, 100dvh);
   transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
   background: rgba(20, 20, 20, 0.34);
 }
 
-.share-modal {
-  position: absolute;
-  top: 46px;
-  left: 24px;
+.monthly-report-share-modal {
+  position: relative;
   width: 345px;
+  max-width: 100%;
   height: 770px;
+  max-height: calc(100dvh - 48px);
   overflow: hidden;
   border-radius: 23px;
   background: linear-gradient(180deg, #fff 0%, #fffaf8 58%, #f7fffc 100%);
   box-shadow: 0 18px 45px rgba(30, 24, 21, 0.18);
 }
 
-.share-modal__close {
+.monthly-report-share-modal__close {
   position: absolute;
   z-index: 2;
   top: 12px;
@@ -596,7 +600,7 @@
   cursor: pointer;
 }
 
-.share-modal__title {
+.monthly-report-share-modal__title {
   position: absolute;
   top: 40px;
   left: 50%;
@@ -611,7 +615,7 @@
   text-align: center;
 }
 
-.share-modal__preview {
+.monthly-report-share-modal__preview {
   position: absolute;
   top: 102px;
   left: 18px;
@@ -621,70 +625,70 @@
   gap: 16px;
 }
 
-.share-modal__preview .monthly-report-page__box {
+.monthly-report-share-modal__preview .monthly-report-page__box {
   width: 309px;
   margin-top: 0;
 }
 
-.share-modal__preview .monthly-report-page__summary {
+.monthly-report-share-modal__preview .monthly-report-page__summary {
   height: 184px;
 }
 
-.share-modal__preview .monthly-report-page__summary-character {
+.monthly-report-share-modal__preview .monthly-report-page__summary-character {
   top: 23px;
   left: 8px;
   width: 134px;
   height: 134px;
 }
 
-.share-modal__preview .monthly-report-page__summary-copy {
+.monthly-report-share-modal__preview .monthly-report-page__summary-copy {
   top: 33px;
   left: 150px;
   width: 145px;
 }
 
-.share-modal__preview .monthly-report-page__summary .monthly-report-page__summary-type {
+.monthly-report-share-modal__preview .monthly-report-page__summary .monthly-report-page__summary-type {
   font-size: 22px;
 }
 
-.share-modal__preview .monthly-report-page__summary-description {
+.monthly-report-share-modal__preview .monthly-report-page__summary-description {
   font-size: 10px;
 }
 
-.share-modal__preview .monthly-report-page__cocktails {
+.monthly-report-share-modal__preview .monthly-report-page__cocktails {
   height: 291px;
 }
 
-.share-modal__preview .monthly-report-page__cocktails > h2,
-.share-modal__preview .monthly-report-page__cocktails-description {
+.monthly-report-share-modal__preview .monthly-report-page__cocktails > h2,
+.monthly-report-share-modal__preview .monthly-report-page__cocktails-description {
   left: 18px;
 }
 
-.share-modal__preview .monthly-report-page__cocktail-list {
+.monthly-report-share-modal__preview .monthly-report-page__cocktail-list {
   left: 9px;
 }
 
-.share-modal__preview .monthly-report-page__cocktail-card {
+.monthly-report-share-modal__preview .monthly-report-page__cocktail-card {
   width: 289px;
 }
 
-.share-modal__preview .monthly-report-page__activity {
+.monthly-report-share-modal__preview .monthly-report-page__activity {
   height: 70px;
 }
 
-.share-modal__preview .monthly-report-page__activity > h2 {
+.monthly-report-share-modal__preview .monthly-report-page__activity > h2 {
   left: 18px;
 }
 
-.share-modal__preview .monthly-report-page__activity-count--test {
+.monthly-report-share-modal__preview .monthly-report-page__activity-count--test {
   left: 130px;
 }
 
-.share-modal__preview .monthly-report-page__activity-count--record {
+.monthly-report-share-modal__preview .monthly-report-page__activity-count--record {
   left: 235px;
 }
 
-.share-modal__actions {
+.monthly-report-share-modal__actions {
   position: absolute;
   top: 705px;
   left: 16px;
@@ -692,7 +696,7 @@
   gap: 14.26px;
 }
 
-.share-modal__actions .share-modal__button {
+.monthly-report-share-modal__actions .monthly-report-share-modal__button {
   width: 149.37px;
   height: 48.39px;
   padding: 0;
@@ -701,7 +705,7 @@
   font-weight: 700;
 }
 
-.share-modal__actions .share-modal__button--save {
+.monthly-report-share-modal__actions .monthly-report-share-modal__button--save {
   border: 1px solid #ffd9d1;
   background: #fff;
   color: #ff6f4f;
@@ -710,9 +714,30 @@
   font-weight: 700;
 }
 
-.share-modal__actions .share-modal__button:disabled {
+.monthly-report-share-modal__actions .monthly-report-share-modal__button:disabled {
   cursor: wait;
   opacity: 0.65;
+}
+
+.monthly-report-page__save-toast .action-complete-toast {
+  position: fixed;
+  top: min(749px, calc(100dvh - 75px));
+  right: auto;
+  bottom: auto;
+  left: 50%;
+  z-index: 1001;
+  width: min(359px, calc(100vw - 34px));
+  height: 56px;
+  border-radius: 28px;
+  transform: translateX(-50%);
+  animation-name: monthly-report-action-complete-toast;
+}
+
+@keyframes monthly-report-action-complete-toast {
+  0% { opacity: 0; transform: translate(-50%, 20px); }
+  12% { opacity: 1; transform: translate(-50%, 0); }
+  84% { opacity: 1; transform: translate(-50%, 0); }
+  100% { opacity: 0; transform: translate(-50%, 20px); }
 }
 
 @media (max-width: 392px) {
