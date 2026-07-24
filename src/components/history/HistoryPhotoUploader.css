@@ -190,9 +190,15 @@
   border-radius: 50%;
   background: #ff6f4f;
   color: #ffffff;
-  font-size: 30px;
+  font-size: 0;
   font-weight: 500;
-  line-height: 42px;
+}
+
+.history-photo-uploader__empty span::before {
+  content: '+';
+  font-size: 30px;
+  line-height: 1;
+  transform: translateY(1px);
 }
 
 .history-photo-uploader__empty strong {
@@ -246,9 +252,15 @@
   border-radius: 50%;
   background: #ff6f4f;
   color: #ffffff;
-  font-size: 30px;
+  font-size: 0;
   font-weight: 500;
-  line-height: 42px;
+}
+
+.history-photo-uploader__add-more span::before {
+  content: '+';
+  font-size: 30px;
+  line-height: 1;
+  transform: translateY(1px);
 }
 
 .history-photo-uploader__add-more strong {
