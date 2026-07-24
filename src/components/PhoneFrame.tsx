@@ -13,16 +13,25 @@ export default function PhoneFrame({
     <div
       style={{
         position: "relative",
-        maxWidth: 390,
+        width: "100%",
         margin: "0 auto",
         fontFamily: FONT_FAMILY,
         display: "flex",
         flexDirection: "column",
-        height: "100%",
+        minHeight: "100%",
       }}
     >
       {background ?? <GradientBackground colors={GRADIENTS.mint} />}
-      <div style={{ position: "relative", zIndex: 1, display: "flex", flexDirection: "column", flex: 1 }}>
+      <div
+        style={{
+          position: "relative",
+          zIndex: 1,
+          display: "flex",
+          flexDirection: "column",
+          flex: 1,
+          paddingTop: 44,
+        }}
+      >
         {children}
       </div>
     </div>

@@ -1,12 +1,12 @@
 export const COLORS = {
   cream: "#FFF7EC",
-  card: "#FFFFFF",
+  card: "#FFFAF9",
   ink: "#2B231C",
   inkSoft: "#8B8078",
   orange: "#FF6B35",
   orangeSoft: "#FFE3D1",
   lockedBg: "#E9E3DB",
-  lockedIcon: "#C7BEB2",
+  lockedIcon: "#CAB8B3",
   border: "#F0E6DA",
   chipBg: "#FFF1E6",
   good: "#7FB88A",
@@ -14,6 +14,8 @@ export const COLORS = {
   bad: "#D9705F",
   badBg: "#FBEAE6",
   overlay: "rgba(43, 35, 28, 0.55)",
+  progressTrack: "#FBD9C8",
+  disabled: "#E9E3DB",
 } as const;
 
 export const PALETTE = [

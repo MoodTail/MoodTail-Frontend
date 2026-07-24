@@ -1,20 +1,21 @@
-import { COLORS } from "../theme/colors";
-import type { PersonalityType } from "../data/types";
-import Header from "../components/Header";
-import PhoneFrame from "../components/PhoneFrame";
-import DexBackground from "../components/DexBackground";
-import DexBox1 from "../components/dexBoxes/DexBox1";
-import DexBox2 from "../components/dexBoxes/DexBox2";
-import DexBox3 from "../components/dexBoxes/DexBox3";
-import DexBox4 from "../components/dexBoxes/DexBox4";
-import DexBox5 from "../components/dexBoxes/DexBox5";
-import DexBox6 from "../components/dexBoxes/DexBox6";
-import DexBox7 from "../components/dexBoxes/DexBox7";
-import DexBox8 from "../components/dexBoxes/DexBox8";
-import DexBox9 from "../components/dexBoxes/DexBox9";
-import DexBox10 from "../components/dexBoxes/DexBox10";
-import DexBox11 from "../components/dexBoxes/DexBox11";
-import DexBox12 from "../components/dexBoxes/DexBox12";
+import drink0 from "../../assets/drinks/0.png";
+import { COLORS } from "../../theme/colors";
+import type { PersonalityType } from "../../data/types";
+import Header from "../../components/Header";
+import PhoneFrame from "../../components/PhoneFrame";
+import DexBackground from "../../components/DexBackground";
+import DexBox1 from "../../components/dexBoxes/DexBox1";
+import DexBox2 from "../../components/dexBoxes/DexBox2";
+import DexBox3 from "../../components/dexBoxes/DexBox3";
+import DexBox4 from "../../components/dexBoxes/DexBox4";
+import DexBox5 from "../../components/dexBoxes/DexBox5";
+import DexBox6 from "../../components/dexBoxes/DexBox6";
+import DexBox7 from "../../components/dexBoxes/DexBox7";
+import DexBox8 from "../../components/dexBoxes/DexBox8";
+import DexBox9 from "../../components/dexBoxes/DexBox9";
+import DexBox10 from "../../components/dexBoxes/DexBox10";
+import DexBox11 from "../../components/dexBoxes/DexBox11";
+import DexBox12 from "../../components/dexBoxes/DexBox12";
 
 export default function CharacterDexPage({
   type,
@@ -39,12 +40,13 @@ export default function CharacterDexPage({
             <button
               onClick={onShare}
               style={{
-                border: `1.3px solid ${COLORS.orange}`,
-                color: COLORS.orange,
-                background: "transparent",
+                height: 40,
+                border: "1px solid white,",
+                color: '#fff',
+                background: COLORS.orange,
                 fontSize: 11.5,
                 fontWeight: 600,
-                padding: "6px 10px",
+                padding: "10px 12px",
                 borderRadius: 20,
                 whiteSpace: "nowrap",
                 cursor: "pointer",
@@ -58,8 +60,8 @@ export default function CharacterDexPage({
         <button
           onClick={onOpenDetail}
           style={{
-            background: COLORS.card,
-            border: `1px solid ${COLORS.border}`,
+            background: '#FEFAF9',
+            border: "1px solid white",
             borderRadius: 20,
             padding: 18,
             display: "flex",
@@ -72,7 +74,8 @@ export default function CharacterDexPage({
             boxShadow: "0 8px 20px rgba(255, 107, 53, 0.16)",
           }}
         >
-          <div style={{ flex: 1 }}>
+          <img src={drink0} alt="" style={{ width: 44, height: 44, objectFit: "contain", flexShrink: 0 }} />
+          <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ fontSize: 12, color: COLORS.inkSoft, fontWeight: 600, marginBottom: 4 }}>
               대표 타입
             </div>
@@ -82,11 +85,12 @@ export default function CharacterDexPage({
             style={{
               background: COLORS.orangeSoft,
               color: COLORS.orange,
-              fontSize: 12,
+              fontSize: 11,
               fontWeight: 700,
-              padding: "6px 12px",
+              padding: "5px 9px",
               borderRadius: 14,
               whiteSpace: "nowrap",
+              flexShrink: 0,
             }}
           >
             수집률 {collectRate}%
@@ -102,10 +106,10 @@ export default function CharacterDexPage({
           }}
         >
           <DexBox1 onClick={() => onOpenTypeDetail("idealist")} />
-          <DexBox2 />
+          <DexBox2 onClick={() => onOpenTypeDetail("romantic")} />
           <DexBox3 />
           <DexBox4 />
-          <DexBox5 />
+          <DexBox5 onClick={() => onOpenTypeDetail("realist")} />
           <DexBox6 />
           <DexBox7 />
           <DexBox8 />

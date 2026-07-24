@@ -7,6 +7,8 @@ import ShareModal from "../../components/Modal/ShareModal";
 import TogetherPickPage from "../TogetherPickPage/TogetherPickPage";
 import CustomRecommend from "../CustomRecommend/CustomRecommend";
 import CustomRecommendResultPage from "../CustomRecommendResultPage/CustomRecommendResultPage";
+import QuizQuestionPage from "../QuizQuestionPage";
+import { QUIZ_QUESTIONS } from "../../data/quiz";
 
 // ui 구현용으로 잔 이미지 하나 무작위로 넣음
 import cocktail from "../../assets/images/glass/glass-1.png";
@@ -24,12 +26,21 @@ interface TasteValues {
   refreshing: number;
 }
 
-type ViewState = "home" | "trend" | "together" | "custom" | "customResult";
+type ViewState = "home" | "trend" | "together" | "custom" | "customResult" | "quiz";
 
 const MainPage: FC = () => {
   const [view, setView] = useState<ViewState>("home");
   const [isShareOpen, setIsShareOpen] = useState(false); // TODO: 확인용 임시 코드, 삭제 예정
   const [myTasteValues, setMyTasteValues] = useState<TasteValues | null>(null);
+
+  const [quizStep, setQuizStep] = useState(0);
+  const [quizAnswers, setQuizAnswers] = useState<Record<number, string>>({});
+
+  const exitQuiz = () => {
+    setView("home");
+    setQuizStep(0);
+    setQuizAnswers({});
+  };
 
   const menuItems: MenuItem[] = [
     { label: "트렌드집계 확인", onClick: () => setView("trend") },
@@ -37,6 +48,31 @@ const MainPage: FC = () => {
     { label: "커스텀 추천", onClick: () => setView("custom") },
     { label: "공유 모달 미리보기 (임시)", onClick: () => setIsShareOpen(true) },
   ];
+
+  if (view === "quiz") {
+    const question = QUIZ_QUESTIONS[quizStep];
+    const isLastStep = quizStep === QUIZ_QUESTIONS.length - 1;
+    return (
+      <QuizQuestionPage
+        step={quizStep}
+        totalSteps={QUIZ_QUESTIONS.length}
+        question={question}
+        selectedOptionId={quizAnswers[quizStep] ?? null}
+        onSelectOption={(id) =>
+          setQuizAnswers((prev) => ({ ...prev, [quizStep]: id }))
+        }
+        onPrevious={quizStep > 0 ? () => setQuizStep((s) => s - 1) : undefined}
+        onNext={() => {
+          if (isLastStep) {
+            exitQuiz();
+          } else {
+            setQuizStep((s) => s + 1);
+          }
+        }}
+        onExit={exitQuiz}
+      />
+    );
+  }
 
   if (view === "trend") {
     return <TrendPage onBack={() => setView("home")} />;
@@ -107,7 +143,11 @@ const MainPage: FC = () => {
         <p className="main-page__banner-subtitle">
           나에게 딱 맞는 칵테일을 찾아드릴게요
         </p>
-        <Button variant="light" className="main-page__banner-button">
+        <Button
+          variant="light"
+          className="main-page__banner-button"
+          onClick={() => setView("quiz")}
+        >
           무드 테스트 시작하기 →
         </Button>
       </div>
