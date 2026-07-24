@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { createPortal } from "react-dom";
 import chevronLeftIcon from "../../assets/icons/chevron-left.svg";
 import monthlyReportCharacter from "../../assets/images/history/monthly_report_character.png";
 import Button from "../../components/Button/Button";
@@ -215,6 +216,7 @@ function MonthlyReportPage({ onBack, reportMonth }: MonthlyReportPageProps) {
   const [isSaveCompleteToastOpen, setIsSaveCompleteToastOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const hasSecondaryTypeData = SECONDARY_TYPES.length > 0;
+  const mobileFrame = document.querySelector<HTMLElement>(".app");
 
   const handleSaveImage = async () => {
     if (isSaving) return;
@@ -404,7 +406,7 @@ function MonthlyReportPage({ onBack, reportMonth }: MonthlyReportPageProps) {
         </button>
       </main>
 
-      {isShareModalOpen && (
+      {isShareModalOpen && createPortal(
         <div
           className="monthly-report-share-modal__overlay"
           onClick={() => setIsShareModalOpen(false)}
@@ -437,11 +439,10 @@ function MonthlyReportPage({ onBack, reportMonth }: MonthlyReportPageProps) {
             <div className="monthly-report-share-modal__actions">
               <Button
                 variant="primary"
-                className="monthly-report-share-modal__button"
-                onClick={() => {
-                  setIsShareModalOpen(false);
-                  setIsSnsShareModalOpen(true);
-                }}
+                  className="monthly-report-share-modal__button"
+                  onClick={() => {
+                    setIsSnsShareModalOpen(true);
+                  }}
               >
                 SNS 공유하기
               </Button>
@@ -455,23 +456,42 @@ function MonthlyReportPage({ onBack, reportMonth }: MonthlyReportPageProps) {
               </Button>
             </div>
           </section>
-        </div>
+        </div>,
+        mobileFrame ?? document.body,
       )}
 
-      {isSnsShareModalOpen && (
-        <SnsShareOptionsModal
-          onClose={() => setIsSnsShareModalOpen(false)}
-        />
-      )}
+      {isSnsShareModalOpen &&
+        (mobileFrame
+          ? createPortal(
+              <div
+                style={{
+                  position: "absolute",
+                  inset: 0,
+                  zIndex: 1001,
+                }}
+              >
+                <SnsShareOptionsModal
+                  onClose={() => setIsSnsShareModalOpen(false)}
+                />
+              </div>,
+              mobileFrame,
+            )
+          : (
+              <SnsShareOptionsModal
+                onClose={() => setIsSnsShareModalOpen(false)}
+              />
+            ))}
 
-      {isSaveCompleteToastOpen && (
-        <div className="monthly-report-page__save-toast">
-          <ActionCompleteToast
-            action="저장"
-            onClose={() => setIsSaveCompleteToastOpen(false)}
-          />
-        </div>
-      )}
+      {isSaveCompleteToastOpen &&
+        createPortal(
+          <div className="monthly-report-page__save-toast">
+            <ActionCompleteToast
+              action="저장"
+              onClose={() => setIsSaveCompleteToastOpen(false)}
+            />
+          </div>,
+          mobileFrame ?? document.body,
+        )}
     </div>
   );
 }
