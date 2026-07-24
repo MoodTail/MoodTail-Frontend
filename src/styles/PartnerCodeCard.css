@@ -4,24 +4,29 @@
   flex-direction: column;
 }
 
-.partner-code-card__input {
+.partner-code-card__field {
   width: 100%;
   height: 74px;
   padding: 0 24px;
+  display: flex;
+  align-items: center;
   border-radius: 22px;
   border: 1px solid #efe4d9;
-  outline: none;
   background: rgba(255, 255, 255, 0.92);
   box-shadow: 0 8px 20px 0 rgba(140, 56, 33, 0.08);
+  cursor: pointer;
+}
+
+.partner-code-card__text {
   font-size: 16px;
-  font-family: inherit;
   color: #17182f;
 }
-.partner-code-card__input::placeholder {
+
+.partner-code-card__text--placeholder {
   color: #a7a29b;
 }
 
-.partner-code-card--error .partner-code-card__input {
+.partner-code-card--error .partner-code-card__field {
   border-color: #ff6f4f;
   box-shadow: none;
 }
@@ -31,4 +36,53 @@
   font-size: 12px;
   font-weight: 500;
   color: #ff4f58;
+}
+
+/* 새로 뜨는 모달 입력창 */
+.partner-code-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.41);
+  z-index: 100;
+}
+
+.partner-code-modal {
+  position: absolute;
+  box-sizing: border-box;
+  left: 31px;
+  top: 147px;
+  width: 329px;
+  height: 74px;
+  display: flex;
+  align-items: center;
+  padding: 0 21px 0 24px;
+  border-radius: 22px;
+  border: 1px solid #efe4d9;
+  background: #fff;
+  box-shadow: 0 8px 20px 0 rgba(140, 56, 33, 0.08);
+  z-index: 101;
+}
+
+.partner-code-modal__input {
+  flex: 1;
+  padding-right: 24px;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 16px;
+  font-family: inherit;
+  color: #17182f;
+}
+
+.partner-code-modal__clear {
+  position: absolute;
+  right: 21px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 12px;
+  height: 12px;
+  border: none;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
 }

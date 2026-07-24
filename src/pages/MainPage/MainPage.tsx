@@ -35,7 +35,6 @@ const MainPage: FC = () => {
     { label: "트렌드집계 확인", onClick: () => setView("trend") },
     { label: "같이 고르기", onClick: () => setView("together") },
     { label: "커스텀 추천", onClick: () => setView("custom") },
-    { label: "공유 모달 미리보기 (임시)", onClick: () => setIsShareOpen(true) },
   ];
 
   if (view === "trend") {

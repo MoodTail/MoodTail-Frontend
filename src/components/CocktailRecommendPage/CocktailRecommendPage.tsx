@@ -188,6 +188,7 @@ const CocktailRecommendPage: FC<CocktailRecommendPageProps> = ({
           onClose={() => setShowShareModal(false)}
           onShareSns={handleShareSns}
           onSaveImage={handleSaveImage}
+          shareUrl={window.location.href}
           topPick={topPick}
           ranking={ranking}
           matchPercent={matchPercent}
