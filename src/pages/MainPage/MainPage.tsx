@@ -8,6 +8,7 @@ import TogetherPickPage from "../TogetherPickPage/TogetherPickPage";
 import CustomRecommend from "../CustomRecommend/CustomRecommend";
 import CustomRecommendResultPage from "../CustomRecommendResultPage/CustomRecommendResultPage";
 import QuizQuestionPage from "../QuizQuestionPage";
+import LoadingPage from "../LoadingPage";
 import { QUIZ_QUESTIONS } from "../../data/quiz";
 
 // ui 구현용으로 잔 이미지 하나 무작위로 넣음
@@ -26,7 +27,7 @@ interface TasteValues {
   refreshing: number;
 }
 
-type ViewState = "home" | "trend" | "together" | "custom" | "customResult" | "quiz";
+type ViewState = "home" | "trend" | "together" | "custom" | "customResult" | "quiz" | "quizLoading";
 
 const MainPage: FC = () => {
   const [view, setView] = useState<ViewState>("home");
@@ -63,7 +64,7 @@ const MainPage: FC = () => {
         onPrevious={quizStep > 0 ? () => setQuizStep((s) => s - 1) : undefined}
         onNext={() => {
           if (isLastStep) {
-            exitQuiz();
+            setView("quizLoading");
           } else {
             setQuizStep((s) => s + 1);
           }
@@ -71,6 +72,10 @@ const MainPage: FC = () => {
         onExit={exitQuiz}
       />
     );
+  }
+
+  if (view === "quizLoading") {
+    return <LoadingPage onComplete={exitQuiz} />;
   }
 
   if (view === "trend") {

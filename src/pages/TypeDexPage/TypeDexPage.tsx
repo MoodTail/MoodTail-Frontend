@@ -1,36 +1,32 @@
 
+import { useState } from "react";
 import drink0 from "../../assets/drinks/0.png";
+import drinkImages from "../../assets/drinks";
 import { COLORS } from "../../theme/colors";
 import { TYPES } from "../../data/types";
+import { DEX_DATA } from "../../data/dexData";
 import Header from "../../components/Header";
 import PhoneFrame from "../../components/PhoneFrame";
 import DexBackground from "../../components/DexBackground";
-import DexBox1 from "../../components/dexBoxes/DexBox1";
-import DexBox2 from "../../components/dexBoxes/DexBox2";
-import DexBox3 from "../../components/dexBoxes/DexBox3";
-import DexBox4 from "../../components/dexBoxes/DexBox4";
-import DexBox5 from "../../components/dexBoxes/DexBox5";
-import DexBox6 from "../../components/dexBoxes/DexBox6";
-import DexBox7 from "../../components/dexBoxes/DexBox7";
-import DexBox8 from "../../components/dexBoxes/DexBox8";
-import DexBox9 from "../../components/dexBoxes/DexBox9";
-import DexBox10 from "../../components/dexBoxes/DexBox10";
-import DexBox11 from "../../components/dexBoxes/DexBox11";
-import DexBox12 from "../../components/dexBoxes/DexBox12";
+import LockedCocktailModal from "../../components/LockedCocktailModal";
+import DexBox from "../../components/DexBox";
 
 export default function TypeDexPage({
   repTypeId,
   onOpenTypeDetail,
   onShare,
   onBack,
+  onGoTest,
 }: {
   repTypeId: string;
   onOpenType: (typeId: string) => void;
   onOpenTypeDetail: (typeId: string) => void;
   onShare: () => void;
   onBack: () => void;
+  onGoTest: () => void;
 }) {
   const repType = TYPES.find((t) => t.id === repTypeId)!;
+  const [lockedName, setLockedName] = useState<string | null>(null);
 
   return (
     <PhoneFrame background={<DexBackground />}>
@@ -91,20 +87,35 @@ export default function TypeDexPage({
             paddingBottom: 20,
           }}
         >
-          <DexBox1 onClick={() => onOpenTypeDetail("idealist")} />
-          <DexBox2 onClick={() => onOpenTypeDetail("romantic")} />
-          <DexBox3 />
-          <DexBox4 />
-          <DexBox5 onClick={() => onOpenTypeDetail("realist")} />
-          <DexBox6 />
-          <DexBox7 />
-          <DexBox8 />
-          <DexBox9 />
-          <DexBox10 />
-          <DexBox11 />
-          <DexBox12 />
+          {DEX_DATA.map((dex) => (
+            <DexBox
+              key={dex.id}
+              drinkImg={drinkImages[dex.id]}
+              name={dex.name}
+              unlocked={dex.unlocked}
+              collectionRate={dex.collectionRate}
+              onClick={
+                dex.typeId
+                  ? () => onOpenTypeDetail(dex.typeId!)
+                  : dex.unlocked
+                    ? undefined
+                    : () => setLockedName(dex.name)
+              }
+            />
+          ))}
         </div>
       </div>
+
+      {lockedName && (
+        <LockedCocktailModal
+          name={lockedName}
+          onClose={() => setLockedName(null)}
+          onGoTest={() => {
+            setLockedName(null);
+            onGoTest();
+          }}
+        />
+      )}
     </PhoneFrame>
   );
 }

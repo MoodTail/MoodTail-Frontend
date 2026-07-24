@@ -12,7 +12,7 @@
 .save-complete-toast {
   position: absolute;
   left: 50%;
-  bottom: 32px;
+  bottom: 96px;
   z-index: 300;
   display: flex;
   align-items: center;

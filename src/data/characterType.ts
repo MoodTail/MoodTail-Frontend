@@ -4,17 +4,20 @@ export interface CharacterType {
   color: string;
   tagline: string;
   description: string;
+  number?: number;
 }
 
 export const CHARACTER_TYPES: CharacterType[] = [
-  {
+  { 
+    number: 0,
     id: "fantasist",
     name: "환상가",
     color: "#FDABAA",
     tagline: "다양하고 멋진 미래를 보는 사람",
     description: '"상상한 만큼 더 특별해질 수 있어!"',
   },
-  {
+  { 
+    number: 1,
     id: "idealist",
     name: "이상주의자",
     color: "#FECE3F",
@@ -22,6 +25,7 @@ export const CHARACTER_TYPES: CharacterType[] = [
     description: '"괜찮아, 생각보다 잘 풀릴지도 몰라!"',
   },
   {
+    number: 2,
     id: "romantic",
     name: "낭만주의자",
     color: "#FDAF7A",
@@ -29,6 +33,7 @@ export const CHARACTER_TYPES: CharacterType[] = [
     description: '"재밌으면 그걸로 충분한거 아닐까?"',
   },
   {
+    number: 3,
     id: "passionate",
     name: "열정가",
     color: "#F8490C",
@@ -36,6 +41,7 @@ export const CHARACTER_TYPES: CharacterType[] = [
     description: '"이것도 저것도 전부 다 할 수 있어!!"',
   },
   {
+    number: 4,
     id: "analyst",
     name: "분석가",
     color: "#FB8558",
@@ -43,6 +49,7 @@ export const CHARACTER_TYPES: CharacterType[] = [
     description: '"잠깐만!! 저거 조금 이상한데?"',
   },
   {
+    number: 5,
     id: "critic",
     name: "평론가",
     color: "#AC3E10",
@@ -50,6 +57,7 @@ export const CHARACTER_TYPES: CharacterType[] = [
     description: '"음... 이 부분은 확실히 코멘트가 필요하네"',
   },
   {
+    number: 6,    
     id: "cautious",
     name: "신중주의자",
     color: "#346A99",
@@ -57,6 +65,7 @@ export const CHARACTER_TYPES: CharacterType[] = [
     description: '"잠깐만, 한번 더 생각해보고 정하자"',
   },
   {
+    number: 7,
     id: "realist",
     name: "현실주의자",
     color: "#124480",
@@ -64,6 +73,7 @@ export const CHARACTER_TYPES: CharacterType[] = [
     description: '"우리 차근히 지금 이 상황을 정리해볼까?"',
   },
   {
+    number: 8,
     id: "straightforward",
     name: "직설가",
     color: "#1564FE",
@@ -71,6 +81,7 @@ export const CHARACTER_TYPES: CharacterType[] = [
     description: '"애매한 건 싫어, 딱 맞는거로 가자"',
   },
   {
+    number: 9,
     id: "peacemaker",
     name: "평화주의자",
     color: "#66BC88",
@@ -78,6 +89,7 @@ export const CHARACTER_TYPES: CharacterType[] = [
     description: '"모두 다같이 행복했으면 좋겠다"',
   },
   {
+    number: 10,
     id: "stable",
     name: "안정가",
     color: "#21A26A",
@@ -85,6 +97,7 @@ export const CHARACTER_TYPES: CharacterType[] = [
     description: '"우리 모두 잠시 심호흡해볼까요?"',
   },
   {
+    number: 11,
     id: "egalitarian",
     name: "평등주의자",
     color: "#6DCC9F",
