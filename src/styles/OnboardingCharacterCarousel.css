@@ -5,8 +5,12 @@
   object-fit: contain;
   transform-origin: bottom center;
   will-change: transform, opacity, left, bottom;
-  transition-property: left, transform, opacity, bottom;
-  transition-timing-function: ease-out;
+  transition:
+    left 800ms ease-out,
+    transform 800ms ease-out,
+    opacity 800ms ease-out,
+    bottom 800ms ease-out,
+    z-index 0s 700ms;
 }
 
 .character-carousel__item--center {
@@ -18,7 +22,7 @@
 }
 
 .character-carousel__item--right {
-  left: 100%;
+  left: 118%;
   bottom: 396px;
   opacity: 0.45;
   transform: translateX(-50%) scale(0.6);
@@ -26,7 +30,7 @@
 }
 
 .character-carousel__item--left {
-  left: 0%;
+  left: -18%;
   bottom: 396px;
   opacity: 0.12;
   transform: translateX(-50%) scale(0.5);
