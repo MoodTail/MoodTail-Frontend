@@ -1,7 +1,34 @@
 import drink0 from "../../assets/drinks/0.png";
 import { COLORS } from "../../theme/colors";
 
-export default function DexBox1({ onClick }: { onClick?: () => void }) {
+export default function DexBox1({
+  unlocked = true,
+  onClick,
+}: {
+  unlocked?: boolean;
+  onClick?: () => void;
+}) {
+  if (!unlocked) {
+    return (
+      <div
+        style={{
+          aspectRatio: "1 / 1",
+          borderRadius: 18,
+          background: COLORS.lockedBg,
+          boxShadow: "0 6px 14px rgba(43, 35, 28, 0.10)",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: 4,
+        }}
+      >
+        <div style={{ fontSize: 11.5, fontWeight: 700, color: COLORS.lockedIcon }}>타입명</div>
+        <div style={{ fontSize: 10, fontWeight: 600, color: COLORS.lockedIcon }}>수집률 56%</div>
+      </div>
+    );
+  }
+
   return (
     <button
       type="button"
@@ -23,7 +50,7 @@ export default function DexBox1({ onClick }: { onClick?: () => void }) {
       }}
     >
       <img src={drink0} alt="" style={{ width: "70%", height: "70%", objectFit: "contain" }} />
-      <span style={{ fontSize: 10.5, fontWeight: 700, color: COLORS.orange }}>이상주의자</span>
+      <span style={{ fontSize: 10.5, fontWeight: 700, color: '#F3b851' }}>이상주의자</span>
     </button>
   );
 }
