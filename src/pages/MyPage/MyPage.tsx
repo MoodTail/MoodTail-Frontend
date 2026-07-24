@@ -20,9 +20,8 @@ function MenuArrow() {
   );
 }
 
-// TODO: 로그인/유저 정보 API 연동 후 실제 응답으로 대체
+// TODO: 유저 정보 API 연동 후 실제 응답으로 대체
 const MOCK_USER = {
-  isLoggedIn: true,
   nickname: "무드테일 소다",
   characterType: "visionary" as CharacterType,
   testCount: 8,
@@ -44,24 +43,24 @@ type ModalStep =
   | "login-prompt";
 
 interface MyPageProps {
+  isLoggedIn?: boolean;
   // TODO: react-router-dom 도입되면 이 prop들 대신 라우팅으로 대체
   onEditProfile?: () => void;
   onInquiry?: () => void;
   onTerms?: () => void;
 }
 
-function MyPage({ onEditProfile, onInquiry, onTerms }: MyPageProps) {
+function MyPage({
+  isLoggedIn = true,
+  onEditProfile,
+  onInquiry,
+  onTerms,
+}: MyPageProps) {
   const [modalStep, setModalStep] = useState<ModalStep>("none");
   const [guestId] = useState(generateGuestId);
 
-  const {
-    isLoggedIn,
-    nickname,
-    characterType,
-    testCount,
-    monthlyCount,
-    collectedCount,
-  } = MOCK_USER;
+  const { nickname, characterType, testCount, monthlyCount, collectedCount } =
+    MOCK_USER;
 
   const closeModal = () => setModalStep("none");
 

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useEffect } from "react";
 import BackgroundBlur from "../../components/common/BackgroundBlur";
 import TrendHeader from "../../components/Trend/TrendHeader";
 import TopTypeCard from "../../components/Trend/TopTypeCard";
@@ -13,6 +14,13 @@ interface TrendPageProps {
 
 function TrendPage({ onBack }: TrendPageProps) {
   const [isCocktailExpanded, setIsCocktailExpanded] = useState(false);
+
+  useEffect(() => {
+    document.body.classList.add("hide-bottom-nav");
+    return () => {
+      document.body.classList.remove("hide-bottom-nav");
+    };
+  }, []);
 
   return (
     <div className="trend-page">

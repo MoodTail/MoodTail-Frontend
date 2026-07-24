@@ -42,7 +42,14 @@ function TwoButtonModal({
         aria-label={title}
         onClick={(event) => event.stopPropagation()}
       >
-        <p className="two-button-modal__title">{title}</p>
+        <p className="two-button-modal__title">
+          {title.split('\n').map((line, index, lines) => (
+            <span key={line}>
+              {line}
+              {index < lines.length - 1 && <br />}
+            </span>
+          ))}
+        </p>
         {description && (
           <p className="two-button-modal__description">
             {descriptionLines.map((line, index, lines) => (

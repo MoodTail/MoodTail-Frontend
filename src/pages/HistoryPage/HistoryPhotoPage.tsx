@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
 import chevronLeftIcon from '../../assets/icons/chevron-left.svg'
 import resultCharacter from '../../assets/images/history/detail_modal_character.png'
 import emptyResultCharacter from '../../assets/images/history/no_list_character.png'
@@ -11,6 +11,8 @@ import HistoryPhotoUploader, {
 } from '../../components/history/HistoryPhotoUploader'
 import HistoryPrimaryButton from '../../components/history/HistoryPrimaryButton'
 import TwoButtonModal from '../../components/common/modal/TwoButtonModal'
+import ActionCompleteToast from '../../components/Modal/ActionCompleteToast'
+import HistoryBackground from '../../components/common/HistoryBackground'
 import CocktailSearchOverlay, {
   type CocktailSelection,
 } from '../../components/history/CocktailSearchOverlay'
@@ -20,6 +22,7 @@ type HistoryRecordTab = 'photo' | 'cocktail' | 'result'
 
 interface HistoryPhotoPageProps {
   onBack: () => void
+  onOpenFullResult: () => void
   hasTestResult: boolean
   selectedDate: Date
   initialTab?: HistoryRecordTab
@@ -27,6 +30,7 @@ interface HistoryPhotoPageProps {
 
 function HistoryPhotoPage({
   onBack,
+  onOpenFullResult,
   hasTestResult,
   selectedDate,
   initialTab = 'photo',
@@ -38,19 +42,13 @@ function HistoryPhotoPage({
   const [deletingCocktail, setDeletingCocktail] = useState<CocktailSelection>()
   const [isDeleteToastVisible, setIsDeleteToastVisible] = useState(false)
   const photoUploaderRef = useRef<HistoryPhotoUploaderHandle>(null)
-  const deleteToastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const changeTab = (tab: HistoryRecordTab) => {
     photoUploaderRef.current?.collapseSheet()
     setActiveTab(tab)
   }
 
-  useEffect(
-    () => () => {
-      if (deleteToastTimerRef.current) clearTimeout(deleteToastTimerRef.current)
-    },
-    [],
-  )
+  const handleCloseDeleteToast = useCallback(() => setIsDeleteToastVisible(false), [])
 
   const handleDeleteCocktail = () => {
     if (!deletingCocktail) return
@@ -60,12 +58,11 @@ function HistoryPhotoPage({
     setDeletingCocktail(undefined)
     setIsCocktailEditMode(false)
     setIsDeleteToastVisible(true)
-    if (deleteToastTimerRef.current) clearTimeout(deleteToastTimerRef.current)
-    deleteToastTimerRef.current = setTimeout(() => setIsDeleteToastVisible(false), 2600)
   }
 
   return (
     <div className="history-photo-page">
+      <HistoryBackground />
       <header className="history-photo-page__header">
         <button
           type="button"
@@ -165,9 +162,7 @@ function HistoryPhotoPage({
             추가하기
           </HistoryPrimaryButton>
           {isDeleteToastVisible && (
-            <div className="history-cocktail-record__delete-toast" role="status">
-              삭제 완료되었습니다
-            </div>
+            <ActionCompleteToast action="삭제" onClose={handleCloseDeleteToast} />
           )}
         </section>
       )}
@@ -203,7 +198,10 @@ function HistoryPhotoPage({
                 </div>
               </section>
 
-              <HistoryPrimaryButton className="history-test-result__bottom-button">
+              <HistoryPrimaryButton
+                className="history-test-result__bottom-button"
+                onClick={onOpenFullResult}
+              >
                 전체 결과보기
               </HistoryPrimaryButton>
             </>

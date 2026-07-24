@@ -59,6 +59,22 @@
   text-align: center;
 }
 
+.modal-overlay.modal--saved.modal--dex {
+  align-items: flex-end;
+  padding-top: 0;
+  padding-bottom: 90px;
+}
+
+.modal.modal--saved.modal--dex {
+  background: #ff613d;
+  border-color: #ff613d;
+  border-radius: 46px;
+}
+
+.modal--saved.modal--dex .modal__title {
+  color: #ffffff;
+}
+
 .modal__buttons {
   display: flex;
   gap: 10px;

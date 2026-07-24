@@ -7,6 +7,7 @@ import MonthlyRecordCard, {
 import HistoryDetailBottomSheet from '../../components/history/HistoryDetailBottomSheet'
 import EmptyHistoryDateBottomSheet from '../../components/history/EmptyHistoryDateBottomSheet'
 import SaveCompleteModal from '../../components/Modal/SaveCompleteModal'
+import HistoryBackground from '../../components/common/HistoryBackground'
 import '../../styles/HistoryPage.css'
 
 const INITIAL_CALENDAR_DATE = new Date()
@@ -116,6 +117,7 @@ function HistoryPage({
 
   return (
     <div className="history-page">
+      <HistoryBackground />
       <h1 className="history-page__title">히스토리</h1>
 
       <HistoryCalendar

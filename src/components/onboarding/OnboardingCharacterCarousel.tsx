@@ -4,15 +4,16 @@ import "../../styles/OnboardingCharacterCarousel.css";
 
 interface OnboardingCharacterCarouselProps {
   characters: string[];
-  intervalMs?: number;
+  intervalMs?: number; // 진입(0.8s) + 유지(1.4s) 합산 값. 기본 2200ms
 }
 
-// 화면에 항상 보이는 3자리 (왼쪽 -1, 센터 0, 오른쪽 +1)
-const POSITION_OFFSETS = [-1, 0, 1];
+const OFFSETS = [-1, 0, 1] as const;
 
+const ENTER_DURATION = 800; // 오른쪽 → 중앙
+const EXIT_DURATION = 400; // 중앙 → 왼쪽
 const OnboardingCharacterCarousel: FC<OnboardingCharacterCarouselProps> = ({
   characters,
-  intervalMs = 1300,
+  intervalMs = 2200,
 }) => {
   const total = characters.length;
   const [centerIndex, setCenterIndex] = useState(0);
@@ -31,7 +32,7 @@ const OnboardingCharacterCarousel: FC<OnboardingCharacterCarouselProps> = ({
 
   return (
     <div className="character-carousel">
-      {POSITION_OFFSETS.map((offset) => {
+      {OFFSETS.map((offset) => {
         const characterIndex = (centerIndex + offset + total) % total;
         const src = characters[characterIndex];
 
@@ -42,12 +43,17 @@ const OnboardingCharacterCarousel: FC<OnboardingCharacterCarouselProps> = ({
               ? "character-carousel__item--left"
               : "character-carousel__item--right";
 
+        // 중앙으로 들어올 때는 0.8s(진입), 중앙에서 벗어날 때는 1s(퇴장)
+        const transitionDuration =
+          offset === 0 ? `${ENTER_DURATION}ms` : `${EXIT_DURATION}ms`;
+
         return (
           <img
-            key={`slot-${offset}`}
+            key={characterIndex}
             src={src}
             alt={offset === 0 ? "중앙 캐릭터" : "주변 캐릭터"}
             className={`character-carousel__item ${positionClass}`}
+            style={{ transitionDuration }}
           />
         );
       })}

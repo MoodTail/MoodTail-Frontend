@@ -13,16 +13,21 @@ interface CompleteModalProps {
   description?: string
   button?: CompleteModalButton
   className?: string
+  onOverlayClick?: () => void
 }
 
-function CompleteModal({ title, description, button, className }: CompleteModalProps) {
+function CompleteModal({ title, description, button, className, onOverlayClick }: CompleteModalProps) {
   return (
-    <div className={`modal-overlay${className ? ` ${className}` : ''}`}>
+    <div
+      className={`modal-overlay${className ? ` ${className}` : ''}`}
+      onClick={onOverlayClick}
+    >
       <div
         className={`modal${className ? ` ${className}` : ''}`}
         role="dialog"
         aria-modal="true"
         aria-label={title}
+        onClick={(e) => e.stopPropagation()}
       >
         <p className="modal__title">{title}</p>
         {description && (

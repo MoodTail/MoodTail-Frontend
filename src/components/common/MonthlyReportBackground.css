@@ -1,0 +1,50 @@
+.monthly-report-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: -1;
+  width: 100%;
+  min-width: 393px;
+  overflow: hidden;
+  background: linear-gradient(
+    193deg,
+    #fee5e5 -15.82%,
+    #ffffff 17.71%,
+    #ffffff 83.94%,
+    #c2ede9 117.68%
+  );
+  pointer-events: none;
+}
+
+.monthly-report-background--long {
+  height: max(1413px, 100%);
+}
+
+.monthly-report-background--short {
+  height: max(1257px, 100%);
+}
+
+.monthly-report-background__glow {
+  position: absolute;
+  border-radius: 50%;
+}
+
+.monthly-report-background__glow--top {
+  top: 87px;
+  left: 268px;
+  width: 178px;
+  height: 178px;
+  background: rgba(253, 228, 227, 0.33);
+  filter: blur(34px);
+  backdrop-filter: blur(34px);
+}
+
+.monthly-report-background__glow--middle {
+  top: 395px;
+  left: -39px;
+  width: 210px;
+  height: 210px;
+  background: rgba(255, 201, 44, 0.12);
+  filter: blur(34px);
+  backdrop-filter: blur(34px);
+}

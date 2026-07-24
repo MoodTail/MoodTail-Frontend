@@ -1,13 +1,20 @@
 .invite-code-card {
+  position: relative;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  margin: 23px 31px 0;
-  padding: 19px 24px;
+  margin: 23px 32px 0;
+  padding: 0 24px;
+  height: 107px;
   border-radius: 22px;
   background: #fff4f2;
   border: 1px solid #efe4d9;
   box-shadow: 0 8px 20px 0 rgba(140, 56, 33, 0.08);
+}
+
+.invite-code-card__copy-btn {
+  position: absolute;
+  top: 55px;
+  right: 18px;
 }
 
 .invite-code-card__label {
