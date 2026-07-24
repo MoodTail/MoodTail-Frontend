@@ -1,22 +1,22 @@
 
-import drink0 from "../assets/drinks/0.png";
-import { COLORS } from "../theme/colors";
-import { TYPES } from "../data/types";
-import Header from "../components/Header";
-import PhoneFrame from "../components/PhoneFrame";
-import DexBackground from "../components/DexBackground";
-import DexBox1 from "../components/dexBoxes/DexBox1";
-import DexBox2 from "../components/dexBoxes/DexBox2";
-import DexBox3 from "../components/dexBoxes/DexBox3";
-import DexBox4 from "../components/dexBoxes/DexBox4";
-import DexBox5 from "../components/dexBoxes/DexBox5";
-import DexBox6 from "../components/dexBoxes/DexBox6";
-import DexBox7 from "../components/dexBoxes/DexBox7";
-import DexBox8 from "../components/dexBoxes/DexBox8";
-import DexBox9 from "../components/dexBoxes/DexBox9";
-import DexBox10 from "../components/dexBoxes/DexBox10";
-import DexBox11 from "../components/dexBoxes/DexBox11";
-import DexBox12 from "../components/dexBoxes/DexBox12";
+import drink0 from "../../assets/drinks/0.png";
+import { COLORS } from "../../theme/colors";
+import { TYPES } from "../../data/types";
+import Header from "../../components/Header";
+import PhoneFrame from "../../components/PhoneFrame";
+import DexBackground from "../../components/DexBackground";
+import DexBox1 from "../../components/dexBoxes/DexBox1";
+import DexBox2 from "../../components/dexBoxes/DexBox2";
+import DexBox3 from "../../components/dexBoxes/DexBox3";
+import DexBox4 from "../../components/dexBoxes/DexBox4";
+import DexBox5 from "../../components/dexBoxes/DexBox5";
+import DexBox6 from "../../components/dexBoxes/DexBox6";
+import DexBox7 from "../../components/dexBoxes/DexBox7";
+import DexBox8 from "../../components/dexBoxes/DexBox8";
+import DexBox9 from "../../components/dexBoxes/DexBox9";
+import DexBox10 from "../../components/dexBoxes/DexBox10";
+import DexBox11 from "../../components/dexBoxes/DexBox11";
+import DexBox12 from "../../components/dexBoxes/DexBox12";
 
 export default function TypeDexPage({
   repTypeId,
@@ -92,10 +92,10 @@ export default function TypeDexPage({
           }}
         >
           <DexBox1 onClick={() => onOpenTypeDetail("idealist")} />
-          <DexBox2 />
+          <DexBox2 onClick={() => onOpenTypeDetail("romantic")} />
           <DexBox3 />
           <DexBox4 />
-          <DexBox5 />
+          <DexBox5 onClick={() => onOpenTypeDetail("realist")} />
           <DexBox6 />
           <DexBox7 />
           <DexBox8 />

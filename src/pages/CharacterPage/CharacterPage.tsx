@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { getType } from "../../data/types";
-import CharacterDexPage from "../CharacterDexPage";
-import RepresentativeTypeSettingPage from "../RepresentativeTypeSettingPage";
-import TypeDetailPage from "../TypeDetailPage";
-import TypeDexPage from "../TypeDexPage";
+import CharacterDexPage from "../CharacterDexPage/CharacterDexPage";
+import RepresentativeTypeSettingPage from "../RepresentativeTypeSettingPage/RepresentativeTypeSettingPage";
+import TypeDetailPage from "../TypeDetailPage/TypeDetailPage";
+import TypeDexPage from "../TypeDexPage/TypeDexPage";
 import DexShareModal from "../../components/DexShareModal";
 import SnsShareOptionsModal from "../../components/SnsShareOptionsModal";
 import CompleteModal from "../../components/CompleteModal";
