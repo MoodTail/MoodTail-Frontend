@@ -1,10 +1,10 @@
-import drink0 from "../assets/drinks/0.png";
-import { COLORS } from "../theme/colors";
-import type { PersonalityType } from "../data/types";
-import Header from "../components/Header";
-import PhoneFrame from "../components/PhoneFrame";
-import DexBackground from "../components/DexBackground";
-import { Mascot } from "../components/icons";
+import drink0 from "../../assets/drinks/0.png";
+import { COLORS } from "../../theme/colors";
+import type { PersonalityType } from "../../data/types";
+import Header from "../../components/Header";
+import PhoneFrame from "../../components/PhoneFrame";
+import DexBackground from "../../components/DexBackground";
+import { Mascot } from "../../components/icons";
 
 export default function RepresentativeTypeSettingPage({
   type,

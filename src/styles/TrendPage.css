@@ -1,6 +1,8 @@
 .trend-page {
   position: relative;
-  overflow: hidden;
+  overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
   background: linear-gradient(
     224.79deg,
     #fee5e5 -16.15%,
@@ -17,4 +19,8 @@ body.hide-bottom-nav .bottom-nav {
 
 body.hide-bottom-nav .app-content {
   padding-bottom: 0;
+}
+
+.container::-webkit-scrollbar {
+  display: none;
 }

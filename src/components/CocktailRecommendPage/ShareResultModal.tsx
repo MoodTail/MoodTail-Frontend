@@ -2,6 +2,7 @@ import { useState, type FC } from "react";
 import cocktail from "../../assets/images/glass/glass-1.png";
 import MatchSummaryCard from "./MatchSummaryCard";
 import SaveCompleteToast from "../common/SaveCompleteToast";
+import ResultSnsShareModal from "../common/modal/ResultSnsShareModal";
 import "../../styles/ShareResultModal.css";
 import Button from "../Button/Button";
 
@@ -15,8 +16,9 @@ interface RankEntry {
 
 interface ShareResultModalProps {
   onClose: () => void;
-  onShareSns: () => void;
+  onShareSns: () => void; // 카카오 공유 등 실제 공유 실행 콜백으로 사용
   onSaveImage: () => void;
+  shareUrl: string; // 추가: SNS 모달에서 복사/공유할 URL
   topPick: {
     tagline: string;
     name: string;
@@ -35,6 +37,7 @@ const ShareResultModal: FC<ShareResultModalProps> = ({
   onClose,
   onShareSns,
   onSaveImage,
+  shareUrl,
   topPick,
   ranking,
   matchPercent,
@@ -42,6 +45,7 @@ const ShareResultModal: FC<ShareResultModalProps> = ({
   partnerAvatarUrl,
 }) => {
   const [showSaveToast, setShowSaveToast] = useState(false);
+  const [isSnsModalOpen, setIsSnsModalOpen] = useState(false);
 
   const handleSaveImage = () => {
     onSaveImage();
@@ -128,7 +132,7 @@ const ShareResultModal: FC<ShareResultModalProps> = ({
           <Button
             variant="share"
             className="share-result-modal__sns"
-            onClick={onShareSns}
+            onClick={() => setIsSnsModalOpen(true)}
           >
             SNS 공유하기
           </Button>
@@ -145,6 +149,13 @@ const ShareResultModal: FC<ShareResultModalProps> = ({
           message="저장 완료되었습니다"
           isVisible={showSaveToast}
           onHide={() => setShowSaveToast(false)}
+        />
+
+        <ResultSnsShareModal
+          isOpen={isSnsModalOpen}
+          url={shareUrl}
+          onClose={() => setIsSnsModalOpen(false)}
+          onKakaoShare={onShareSns}
         />
       </div>
     </div>
