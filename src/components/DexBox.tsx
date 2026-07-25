@@ -1,11 +1,16 @@
-import drink6 from "../../assets/drinks/6.png";
-import { COLORS } from "../../theme/colors";
+import { COLORS } from "../theme/colors";
 
-export default function DexBox7({
-  unlocked = false,
+export default function DexBox({
+  drinkImg,
+  name,
+  collectionRate,
+  unlocked,
   onClick,
 }: {
-  unlocked?: boolean;
+  drinkImg: string;
+  name: string;
+  collectionRate?: number;
+  unlocked: boolean;
   onClick?: () => void;
 }) {
   if (unlocked) {
@@ -29,28 +34,35 @@ export default function DexBox7({
           cursor: onClick ? "pointer" : "default",
         }}
       >
-        <img src={drink6} alt="" style={{ width: "70%", height: "70%", objectFit: "contain" }} />
-        <span style={{ fontSize: 10.5, fontWeight: 700, color: COLORS.orange }}>열정가</span>
+        <img src={drinkImg} alt="" style={{ width: "70%", height: "70%", objectFit: "contain" }} />
+        <span style={{ fontSize: 10.5, fontWeight: 700, color: COLORS.orange }}>{name}</span>
       </button>
     );
   }
 
   return (
-    <div
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={!onClick}
       style={{
         aspectRatio: "1 / 1",
         borderRadius: 18,
-        background: COLORS.lockedBg,
+        background: "#CAB8B3",
+        border: "none",
         boxShadow: "0 6px 14px rgba(43, 35, 28, 0.10)",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
         gap: 4,
+        cursor: onClick ? "pointer" : "default",
       }}
     >
-      <div style={{ fontSize: 11.5, fontWeight: 700, color: COLORS.lockedIcon }}>타입명</div>
-      <div style={{ fontSize: 10, fontWeight: 600, color: COLORS.lockedIcon }}>수집률 56%</div>
-    </div>
+      <div style={{ fontSize: 11.5, fontWeight: 700, color: "#323232" }}>타입명</div>
+      <div style={{ fontSize: 10, fontWeight: 600, color: "#827F7F" }}>
+        수집률 {collectionRate ?? 0}%
+      </div>
+    </button>
   );
 }

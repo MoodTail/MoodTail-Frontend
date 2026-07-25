@@ -61,11 +61,14 @@ export default function QuizQuestionPage({
           </span>
         </div>
 
+        <br/>
+        <br/>
         <h1 style={{ fontSize: 25, fontWeight: 700, color: COLORS.ink, margin: "0 0 6px" }}>
           {question.title}
         </h1>
         <p style={{ fontSize: 12.5, color: COLORS.inkSoft, margin: "0 0 20px" }}>{question.subtitle}</p>
-
+        
+        <br/>
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           {question.options.map((option) => {
             const selected = option.id === selectedOptionId;
@@ -81,8 +84,8 @@ export default function QuizQuestionPage({
                   textAlign: "left",
                   padding: "14px 16px",
                   borderRadius: 14,
-                  border: `1.5px solid ${selected ? COLORS.orange : COLORS.border}`,
-                  background: selected ? COLORS.orangeSoft : '#FFFFFF',
+                  border: selected ? "2px solid #FF6F4F" : "1px solid #E8E0D8",
+                  background: selected ? "#FF9B842E" : "#FFFFFF",
                   cursor: "pointer",
                 }}
               >
@@ -124,14 +127,14 @@ export default function QuizQuestionPage({
               style={{
                 flex: 1,
                 border: `1.5px solid ${COLORS.border}`,
-                background: COLORS.card,
-                color: '#FF8165',
+                background: '#FFFFFF',
+                color: '#FF6F4F',
                 fontSize: 14,
                 fontWeight: 700,
                 padding: "14px 0",
                 borderRadius: 22,
                 cursor: "pointer",
-                boxShadow: "0 6px 14px rgba(255, 129, 101, 0.05)",
+                boxShadow: "2px 2px 5.2px 0px #FF6F4FB2",
               }}
             >
               뒤로가기
@@ -143,7 +146,7 @@ export default function QuizQuestionPage({
             style={{
               flex: 1,
               border: "none",
-              background: selectedOptionId ? COLORS.orange : COLORS.disabled,
+              background: selectedOptionId ? COLORS.orange : '#C5BFBE',
               color: "#fff",
               fontSize: 14,
               fontWeight: 700,
@@ -157,7 +160,7 @@ export default function QuizQuestionPage({
           </button>
         </div>
         <p style={{ fontSize: 10.5, color: COLORS.inkSoft, textAlign: "center", margin: "8px 0 0" }}>
-          선택시 해당 답변이 5가지 맛 지표에 반영됩니다
+          선택 시 해당 답변이 5가지 맛 지표에 반영됩니다
         </p>
       </div>
 
