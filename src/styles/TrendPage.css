@@ -1,5 +1,9 @@
 .trend-page {
   position: relative;
+  width: 100%;
+  max-width: 393px;
+  max-height: 1233px;
+  margin: 0 auto;
   overflow-y: auto;
   scrollbar-width: none;
   -ms-overflow-style: none;

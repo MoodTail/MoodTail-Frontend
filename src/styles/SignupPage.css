@@ -192,7 +192,7 @@
   left: 39px;
   top: 539px;
   width: 310px;
-  height: 115px;
+  height: 142px;
   box-sizing: border-box;
   border-radius: 18px;
   background: #fff;
@@ -221,13 +221,17 @@
   left: 19.75px;
   top: 12.75px;
 }
-.signup-page__checkbox--service {
+.signup-page__checkbox--terms1 {
   left: 19.75px;
   top: 56.75px;
 }
-.signup-page__checkbox--privacy {
+.signup-page__checkbox--terms2 {
   left: 19.75px;
   top: 82.75px;
+}
+.signup-page__checkbox--privacy {
+  left: 19.75px;
+  top: 108.75px;
 }
 
 .signup-page__terms-all-label {
@@ -256,11 +260,14 @@
   font-size: 12.5px;
   color: #73737a;
 }
-.signup-page__terms-label--service {
+.signup-page__terms-label--terms1 {
   top: 61px;
 }
-.signup-page__terms-label--privacy {
+.signup-page__terms-label--terms2 {
   top: 86px;
+}
+.signup-page__terms-label--privacy {
+  top: 112px;
 }
 
 .signup-page__terms-view {
@@ -274,11 +281,11 @@
   color: #ff6f4f;
   cursor: pointer;
 }
-.signup-page__terms-view--service {
-  top: 61px;
+.signup-page__terms-view--terms2 {
+  top: 86px;
 }
 .signup-page__terms-view--privacy {
-  top: 86px;
+  top: 112px;
 }
 
 .signup-page__submit {
