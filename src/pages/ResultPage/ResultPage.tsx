@@ -6,7 +6,7 @@ import CocktailTopList, { type CocktailTopItem } from '../../components/ResultPa
 import TypeMatchCard from '../../components/ResultPage/TypeMatchCard'
 import TwoButtonModal from '../../components/common/modal/TwoButtonModal'
 import ResultShareModal from '../../components/common/modal/ResultShareModal'
-import ResultSnsShareModal from '../../components/common/modal/ResultSnsShareModal'
+import ShareModal from '../../components/Modal/ShareModal'
 import SaveCompleteToast from '../../components/common/SaveCompleteToast'
 import romanticCharacterImg from '../../assets/images/character/character-12.png'
 import visionaryCharacterImg from '../../assets/images/character-crop/character-crop-11.svg'
@@ -20,10 +20,14 @@ import '../../styles/ResultPage.css'
 // TODO: 실제 테스트 결과 API 연동 후 실제 응답으로 대체
 const MOCK_RESULT = {
   characterImage: romanticCharacterImg,
-  typeName: '낭만주의자',
+  typeName: '자유로운 탐험가',
   typeDescription: '작은 순간도 특별한 추억으로 만드는 타입',
   shareDescription: '작은 순간도 특별한 추억으로', // 공유 카드용 축약 문구
-  quote: '재밌으면 그걸로 충분한거 아닐까?!',
+  quote: "안 마셔본거? 그걸로!!",
+  // TODO: 실제 카피 확정되면 교체
+  detailDescription:
+    '자유로운 탐험가 오늘은 상그리아, 내일은 모스코 뮬. 탄산처럼 톡 튀는 취향이라 메뉴판을 다 읽어봐야 직성이 풀려요. 우산 꽂힌 트로피컬 잔처럼 어디서든 분위기를 만들어내고, 정해진 루트 없이 흘러가는 게 오히려 제일 자연스러운 타입이에요. 예측이 안 되는 게 매력이라는 걸 본인도 알고 있어요.',
+  matchPercent: 68,
 }
 
 // TODO: glass-*.png 파일명이 번호로만 되어 있어 모양으로 임의 매핑함. 실제 칵테일-잔 매핑 확정되면 교체
@@ -151,6 +155,14 @@ function ResultPage({ onBack }: ResultPageProps) {
           <p className="result-page__type-name">{MOCK_RESULT.typeName}</p>
           <p className="result-page__type-description">{MOCK_RESULT.typeDescription}</p>
           <p className="result-page__quote">&ldquo;{MOCK_RESULT.quote}&rdquo;</p>
+
+          <div className="result-page__detail-card">
+            <p className="result-page__detail-title">{MOCK_RESULT.typeName}</p>
+            <p className="result-page__detail-body">{MOCK_RESULT.detailDescription}</p>
+            <p className="result-page__detail-percent">
+              사용자의 {MOCK_RESULT.matchPercent}%가 이 타입이 나왔어요
+            </p>
+          </div>
         </header>
 
         <div className="result-page__sheet">
@@ -248,12 +260,14 @@ function ResultPage({ onBack }: ResultPageProps) {
         onImageSaved={handleImageSaved}
       />
 
-      <ResultSnsShareModal
-        isOpen={isSnsModalOpen}
-        url="https://moodtail.app/share/mock-id"
-        onClose={() => setIsSnsModalOpen(false)}
-        onKakaoShare={handleKakaoShare}
-      />
+      {isSnsModalOpen && (
+        <ShareModal
+          shareUrl="https://moodtail.app/share/mock-id"
+          tipText="TIP: 캐릭터는 무료 12종이나 된답니다! 전부 해금할 수 있을까요?"
+          onClose={() => setIsSnsModalOpen(false)}
+          onKakaoShare={handleKakaoShare}
+        />
+      )}
 
       <SaveCompleteToast
         message="저장 완료되었습니다"
