@@ -29,7 +29,11 @@ interface TasteValues {
 
 type ViewState = "home" | "trend" | "together" | "custom" | "customResult" | "quiz" | "quizLoading";
 
-const MainPage: FC = () => {
+interface MainPageProps {
+  onQuizComplete?: () => void;
+}
+
+const MainPage: FC<MainPageProps> = ({ onQuizComplete }) => {
   const [view, setView] = useState<ViewState>("home");
   const [isShareOpen, setIsShareOpen] = useState(false); // TODO: 확인용 임시 코드, 삭제 예정
   const [myTasteValues, setMyTasteValues] = useState<TasteValues | null>(null);
@@ -75,7 +79,14 @@ const MainPage: FC = () => {
   }
 
   if (view === "quizLoading") {
-    return <LoadingPage onComplete={exitQuiz} />;
+    return (
+      <LoadingPage
+        onComplete={() => {
+          exitQuiz();
+          onQuizComplete?.();
+        }}
+      />
+    );
   }
 
   if (view === "trend") {

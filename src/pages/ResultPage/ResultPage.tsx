@@ -20,10 +20,14 @@ import '../../styles/ResultPage.css'
 // TODO: 실제 테스트 결과 API 연동 후 실제 응답으로 대체
 const MOCK_RESULT = {
   characterImage: romanticCharacterImg,
-  typeName: '낭만주의자',
+  typeName: '자유로운 탐험가',
   typeDescription: '작은 순간도 특별한 추억으로 만드는 타입',
   shareDescription: '작은 순간도 특별한 추억으로', // 공유 카드용 축약 문구
-  quote: '재밌으면 그걸로 충분한거 아닐까?!',
+  quote: "안 마셔본거? 그걸로!!",
+  // TODO: 실제 카피 확정되면 교체
+  detailDescription:
+    '자유로운 탐험가 오늘은 상그리아, 내일은 모스코 뮬. 탄산처럼 톡 튀는 취향이라 메뉴판을 다 읽어봐야 직성이 풀려요. 우산 꽂힌 트로피컬 잔처럼 어디서든 분위기를 만들어내고, 정해진 루트 없이 흘러가는 게 오히려 제일 자연스러운 타입이에요. 예측이 안 되는 게 매력이라는 걸 본인도 알고 있어요.',
+  matchPercent: 68,
 }
 
 // TODO: glass-*.png 파일명이 번호로만 되어 있어 모양으로 임의 매핑함. 실제 칵테일-잔 매핑 확정되면 교체
@@ -49,14 +53,20 @@ const TASTE_CHIP_ORDER: { key: keyof RadarChartData; label: string; active: bool
 type ModalStep = 'none' | 'save-overwrite-warning' | 'login-required' | 'back-confirm'
 
 interface ResultPageProps {
+  isLoggedIn?: boolean
   // TODO: react-router-dom 도입되면 이 prop 대신 라우팅으로 대체
   onBack?: () => void
+  onRetest?: () => void
+  onGoToLogin?: () => void
 }
 
-function ResultPage({ onBack }: ResultPageProps) {
-  // TODO: 실제 저장/로그인 상태 API 연동 후 아래 mock state를 실제 값으로 교체
-  const [hasStoredResult, setHasStoredResult] = useState(false) // 오늘 이미 저장된 결과가 있는지
-  const [isLoggedIn, setIsLoggedIn] = useState(false) // 로그인 여부
+function ResultPage({
+  isLoggedIn = true,
+  onBack,
+  onRetest,
+  onGoToLogin,
+}: ResultPageProps) {
+  // TODO: 실제 저장 상태 API 연동 후 아래 mock state를 실제 값으로 교체
   const [isResultSaved, setIsResultSaved] = useState(false) // 지금 보고 있는 결과를 저장했는지
 
   const [modalStep, setModalStep] = useState<ModalStep>('none')
@@ -84,7 +94,11 @@ function ResultPage({ onBack }: ResultPageProps) {
   }
 
   const handleRetest = () => {
-    // TODO: 테스트 다시 시작 라우팅 연결
+    if (onRetest) {
+      onRetest()
+      return
+    }
+    // TODO: react-router-dom 도입 후 테스트 화면으로 라우팅 연결
     console.log('TODO: 테스트 다시 시작')
   }
 
@@ -92,7 +106,6 @@ function ResultPage({ onBack }: ResultPageProps) {
     // TODO: 테스트 결과 저장 API 연동
     console.log('TODO: 테스트 결과 저장')
     setIsResultSaved(true)
-    setHasStoredResult(true)
     setModalStep('none')
   }
 
@@ -101,18 +114,17 @@ function ResultPage({ onBack }: ResultPageProps) {
       setModalStep('login-required')
       return
     }
-    if (hasStoredResult) {
-      setModalStep('save-overwrite-warning')
-      return
-    }
-    performSave()
+    setModalStep('save-overwrite-warning')
   }
 
   const handleGoToLogin = () => {
     closeModal()
-    // TODO: react-router-dom 도입 후 로그인 페이지로 라우팅 연결. 지금은 라우팅이 없어 로그인 성공 상태만 mock으로 반영
+    if (onGoToLogin) {
+      onGoToLogin()
+      return
+    }
+    // TODO: react-router-dom 도입 후 로그인 페이지로 라우팅 연결
     console.log('TODO: 로그인 페이지로 이동')
-    setIsLoggedIn(true)
   }
 
   const handleShare = () => {
@@ -151,6 +163,14 @@ function ResultPage({ onBack }: ResultPageProps) {
           <p className="result-page__type-name">{MOCK_RESULT.typeName}</p>
           <p className="result-page__type-description">{MOCK_RESULT.typeDescription}</p>
           <p className="result-page__quote">&ldquo;{MOCK_RESULT.quote}&rdquo;</p>
+
+          <div className="result-page__detail-card">
+            <p className="result-page__detail-title">{MOCK_RESULT.typeName}</p>
+            <p className="result-page__detail-body">{MOCK_RESULT.detailDescription}</p>
+            <p className="result-page__detail-percent">
+              사용자의 {MOCK_RESULT.matchPercent}%가 이 타입이 나왔어요
+            </p>
+          </div>
         </header>
 
         <div className="result-page__sheet">

@@ -13,6 +13,9 @@ import ProfileEdit from "./pages/MyPage/ProfileEdit";
 import Inquiry from "./pages/MyPage/Inquiry";
 import Terms from "./pages/MyPage/Terms";
 import LoginPage from "./pages/LoginPage/LoginPage";
+import ResultPage from "./pages/ResultPage/ResultPage";
+import QuizQuestionPage from "./pages/QuizQuestionPage";
+import { QUIZ_QUESTIONS } from "./data/quiz";
 import "./App.css";
 
 export type NavKey = "history" | "dictionary" | "home" | "recipe" | "mypage";
@@ -31,6 +34,31 @@ function App() {
     useState<HistoryRecordTab>("photo");
   const [monthlyReportMonth, setMonthlyReportMonth] = useState(new Date());
   const [mypageView, setMypageView] = useState<MyPageView>("main");
+  const [isTestResultOpen, setIsTestResultOpen] = useState(false);
+  const [isRetestOpen, setIsRetestOpen] = useState(false);
+  const [retestStep, setRetestStep] = useState(0);
+  const [retestAnswers, setRetestAnswers] = useState<Record<number, string>>(
+    {},
+  );
+
+  const startRetest = () => {
+    setIsTestResultOpen(false);
+    setRetestStep(0);
+    setRetestAnswers({});
+    setIsRetestOpen(true);
+  };
+
+  const exitRetest = () => {
+    setIsRetestOpen(false);
+    setRetestStep(0);
+    setRetestAnswers({});
+  };
+
+  const handleGoToLoginScreen = () => {
+    setIsLoggedIn(false);
+    setIsGuest(false);
+    setMypageView("main");
+  };
 
   const openHistoryRecordPage = (
     hasTestResult: boolean,
@@ -68,7 +96,7 @@ function App() {
       case "dictionary":
         return <CharacterPage />;
       case "home":
-        return <MainPage />;
+        return <MainPage onQuizComplete={() => setIsTestResultOpen(true)} />;
       case "recipe":
         return <RecipePage />;
       case "mypage":
@@ -78,6 +106,8 @@ function App() {
             onEditProfile={() => setMypageView("profile-edit")}
             onInquiry={() => setMypageView("inquiry")}
             onTerms={() => setMypageView("terms")}
+            onLoggedOut={handleGoToLoginScreen}
+            onGoToLogin={handleGoToLoginScreen}
           />
         );
       default:
@@ -121,6 +151,57 @@ function App() {
         <main className="app">
           <section className="app-content app-content--full">
             {historyDetailPage}
+          </section>
+        </main>
+      </div>
+    );
+  }
+
+  if (isRetestOpen) {
+    const question = QUIZ_QUESTIONS[retestStep];
+    const isLastStep = retestStep === QUIZ_QUESTIONS.length - 1;
+    return (
+      <div className="app-shell">
+        <main className="app">
+          <section className="app-content app-content--full">
+            <QuizQuestionPage
+              step={retestStep}
+              totalSteps={QUIZ_QUESTIONS.length}
+              question={question}
+              selectedOptionId={retestAnswers[retestStep] ?? null}
+              onSelectOption={(id) =>
+                setRetestAnswers((prev) => ({ ...prev, [retestStep]: id }))
+              }
+              onPrevious={
+                retestStep > 0 ? () => setRetestStep((s) => s - 1) : undefined
+              }
+              onNext={() => {
+                if (isLastStep) {
+                  exitRetest();
+                  setIsTestResultOpen(true);
+                } else {
+                  setRetestStep((s) => s + 1);
+                }
+              }}
+              onExit={exitRetest}
+            />
+          </section>
+        </main>
+      </div>
+    );
+  }
+
+  if (isTestResultOpen) {
+    return (
+      <div className="app-shell">
+        <main className="app">
+          <section className="app-content app-content--full">
+            <ResultPage
+              isLoggedIn={!isGuest}
+              onBack={() => setIsTestResultOpen(false)}
+              onRetest={startRetest}
+              onGoToLogin={handleGoToLoginScreen}
+            />
           </section>
         </main>
       </div>
