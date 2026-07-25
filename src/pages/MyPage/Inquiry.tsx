@@ -5,6 +5,7 @@ import '../../styles/Inquiry.css'
 
 const MAX_LENGTH = 500
 const SAVED_MODAL_DURATION_MS = 1200
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 interface InquiryProps {
   // TODO: react-router-dom 도입되면 이 prop 대신 라우팅으로 대체
@@ -15,6 +16,7 @@ function Inquiry({ onBack }: InquiryProps) {
   const [email, setEmail] = useState('')
   const [content, setContent] = useState('')
   const [showSavedModal, setShowSavedModal] = useState(false)
+  const [isEmailInvalid, setIsEmailInvalid] = useState(false)
 
   const handleBack = () => {
     if (onBack) {
@@ -26,9 +28,19 @@ function Inquiry({ onBack }: InquiryProps) {
   }
 
   const handleSubmit = () => {
+    if (!EMAIL_REGEX.test(email)) {
+      setIsEmailInvalid(true)
+      return
+    }
+
     // TODO: 실제 문의 접수 연동 (외부 링크 연결 또는 API 전송)
     console.log('TODO: 문의 접수', { email, content })
     setShowSavedModal(true)
+  }
+
+  const handleEmailChange = (event: { target: { value: string } }) => {
+    setEmail(event.target.value)
+    if (isEmailInvalid) setIsEmailInvalid(false)
   }
 
   useEffect(() => {
@@ -59,11 +71,12 @@ function Inquiry({ onBack }: InquiryProps) {
 
       <input
         type="email"
-        className="inquiry__email"
+        className={`inquiry__email${isEmailInvalid ? ' inquiry__email--error' : ''}`}
         value={email}
-        onChange={(event) => setEmail(event.target.value)}
+        onChange={handleEmailChange}
         placeholder="example@moodtail.com"
       />
+      {isEmailInvalid && <p className="inquiry__email-error">이메일 형식에 맞지 않습니다</p>}
 
       <div className="inquiry__textarea-wrap">
         <textarea
