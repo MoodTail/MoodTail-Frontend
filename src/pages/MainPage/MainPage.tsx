@@ -28,7 +28,11 @@ interface TasteValues {
 
 type ViewState = "home" | "trend" | "together" | "custom" | "customResult" | "quiz";
 
-const MainPage: FC = () => {
+interface MainPageProps {
+  onQuizComplete?: () => void;
+}
+
+const MainPage: FC<MainPageProps> = ({ onQuizComplete }) => {
   const [view, setView] = useState<ViewState>("home");
   const [isShareOpen, setIsShareOpen] = useState(false); // TODO: 확인용 임시 코드, 삭제 예정
   const [myTasteValues, setMyTasteValues] = useState<TasteValues | null>(null);
@@ -64,6 +68,7 @@ const MainPage: FC = () => {
         onNext={() => {
           if (isLastStep) {
             exitQuiz();
+            onQuizComplete?.();
           } else {
             setQuizStep((s) => s + 1);
           }

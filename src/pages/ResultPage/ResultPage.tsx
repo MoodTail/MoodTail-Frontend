@@ -6,7 +6,7 @@ import CocktailTopList, { type CocktailTopItem } from '../../components/ResultPa
 import TypeMatchCard from '../../components/ResultPage/TypeMatchCard'
 import TwoButtonModal from '../../components/common/modal/TwoButtonModal'
 import ResultShareModal from '../../components/common/modal/ResultShareModal'
-import ShareModal from '../../components/Modal/ShareModal'
+import ResultSnsShareModal from '../../components/common/modal/ResultSnsShareModal'
 import SaveCompleteToast from '../../components/common/SaveCompleteToast'
 import romanticCharacterImg from '../../assets/images/character/character-12.png'
 import visionaryCharacterImg from '../../assets/images/character-crop/character-crop-11.svg'
@@ -53,14 +53,20 @@ const TASTE_CHIP_ORDER: { key: keyof RadarChartData; label: string; active: bool
 type ModalStep = 'none' | 'save-overwrite-warning' | 'login-required' | 'back-confirm'
 
 interface ResultPageProps {
+  isLoggedIn?: boolean
   // TODO: react-router-dom 도입되면 이 prop 대신 라우팅으로 대체
   onBack?: () => void
+  onRetest?: () => void
+  onGoToLogin?: () => void
 }
 
-function ResultPage({ onBack }: ResultPageProps) {
-  // TODO: 실제 저장/로그인 상태 API 연동 후 아래 mock state를 실제 값으로 교체
-  const [hasStoredResult, setHasStoredResult] = useState(false) // 오늘 이미 저장된 결과가 있는지
-  const [isLoggedIn, setIsLoggedIn] = useState(false) // 로그인 여부
+function ResultPage({
+  isLoggedIn = true,
+  onBack,
+  onRetest,
+  onGoToLogin,
+}: ResultPageProps) {
+  // TODO: 실제 저장 상태 API 연동 후 아래 mock state를 실제 값으로 교체
   const [isResultSaved, setIsResultSaved] = useState(false) // 지금 보고 있는 결과를 저장했는지
 
   const [modalStep, setModalStep] = useState<ModalStep>('none')
@@ -88,7 +94,11 @@ function ResultPage({ onBack }: ResultPageProps) {
   }
 
   const handleRetest = () => {
-    // TODO: 테스트 다시 시작 라우팅 연결
+    if (onRetest) {
+      onRetest()
+      return
+    }
+    // TODO: react-router-dom 도입 후 테스트 화면으로 라우팅 연결
     console.log('TODO: 테스트 다시 시작')
   }
 
@@ -96,7 +106,6 @@ function ResultPage({ onBack }: ResultPageProps) {
     // TODO: 테스트 결과 저장 API 연동
     console.log('TODO: 테스트 결과 저장')
     setIsResultSaved(true)
-    setHasStoredResult(true)
     setModalStep('none')
   }
 
@@ -105,18 +114,17 @@ function ResultPage({ onBack }: ResultPageProps) {
       setModalStep('login-required')
       return
     }
-    if (hasStoredResult) {
-      setModalStep('save-overwrite-warning')
-      return
-    }
-    performSave()
+    setModalStep('save-overwrite-warning')
   }
 
   const handleGoToLogin = () => {
     closeModal()
-    // TODO: react-router-dom 도입 후 로그인 페이지로 라우팅 연결. 지금은 라우팅이 없어 로그인 성공 상태만 mock으로 반영
+    if (onGoToLogin) {
+      onGoToLogin()
+      return
+    }
+    // TODO: react-router-dom 도입 후 로그인 페이지로 라우팅 연결
     console.log('TODO: 로그인 페이지로 이동')
-    setIsLoggedIn(true)
   }
 
   const handleShare = () => {
@@ -260,14 +268,12 @@ function ResultPage({ onBack }: ResultPageProps) {
         onImageSaved={handleImageSaved}
       />
 
-      {isSnsModalOpen && (
-        <ShareModal
-          shareUrl="https://moodtail.app/share/mock-id"
-          tipText="TIP: 캐릭터는 무료 12종이나 된답니다! 전부 해금할 수 있을까요?"
-          onClose={() => setIsSnsModalOpen(false)}
-          onKakaoShare={handleKakaoShare}
-        />
-      )}
+      <ResultSnsShareModal
+        isOpen={isSnsModalOpen}
+        url="https://moodtail.app/share/mock-id"
+        onClose={() => setIsSnsModalOpen(false)}
+        onKakaoShare={handleKakaoShare}
+      />
 
       <SaveCompleteToast
         message="저장 완료되었습니다"
