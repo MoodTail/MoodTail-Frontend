@@ -1,5 +1,5 @@
-import { useState } from "react";
-import type { Recipe } from "./recipeData";
+import { Fragment, useState } from "react";
+import { splitDescriptionLines, type Recipe } from "./recipeData";
 import "../../styles/SavedRecipesView.css";
 
 type CardPhase = "visible" | "exiting" | "collapsing";
@@ -12,14 +12,16 @@ interface SavedItem {
 interface SavedRecipesViewProps {
   recipes: Recipe[];
   onBack: () => void;
+  onUnsave: (id: string) => void;
 }
 
-function SavedRecipesView({ recipes, onBack }: SavedRecipesViewProps) {
+function SavedRecipesView({ recipes, onBack, onUnsave }: SavedRecipesViewProps) {
   const [items, setItems] = useState<SavedItem[]>(
     recipes.map((recipe) => ({ recipe, phase: "visible" }))
   );
 
   function handleUnsave(id: string) {
+    onUnsave(id);
     setItems((prev) => prev.map((it) => (it.recipe.id === id ? { ...it, phase: "exiting" } : it)));
     setTimeout(() => {
       setItems((prev) => prev.map((it) => (it.recipe.id === id ? { ...it, phase: "collapsing" } : it)));
@@ -41,7 +43,9 @@ function SavedRecipesView({ recipes, onBack }: SavedRecipesViewProps) {
       </div>
 
       <div className="saved-recipes__list">
-        {items.map(({ recipe, phase }) => (
+        {items.map(({ recipe, phase }) => {
+          const descLines = splitDescriptionLines(recipe.description);
+          return (
           <div
             key={recipe.id}
             className={`saved-recipe-card ${phase === "collapsing" ? "saved-recipe-card--collapsing" : ""} ${
@@ -53,28 +57,40 @@ function SavedRecipesView({ recipes, onBack }: SavedRecipesViewProps) {
                 <img src={recipe.glassImage} alt={recipe.name} />
               </div>
               <div className="saved-recipe-card__body">
-                <div className="saved-recipe-card__name">{recipe.name}</div>
-                <div className="saved-recipe-card__desc">{recipe.description}</div>
+                <div className="saved-recipe-card__row">
+                  <span className="saved-recipe-card__name">{recipe.name}</span>
+                  <button
+                    type="button"
+                    className="saved-recipe-card__unsave"
+                    onClick={() => handleUnsave(recipe.id)}
+                    aria-label="저장 해제"
+                  >
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                      <path
+                        d="M6 3.5 h12 a1 1 0 0 1 1 1 V21 l-7 -4.5 L5 21 V4.5 a1 1 0 0 1 1 -1 z"
+                        fill="#ff6f4f"
+                        stroke="#ff6f4f"
+                        strokeWidth="2"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  </button>
+                </div>
+                <div className="saved-recipe-card__row">
+                  <span className="saved-recipe-card__desc">
+                    {descLines.map((line, i) => (
+                      <Fragment key={i}>
+                        {line}
+                        {i < descLines.length - 1 && <br />}
+                      </Fragment>
+                    ))}
+                  </span>
+                </div>
               </div>
-              <button
-                type="button"
-                className="saved-recipe-card__unsave"
-                onClick={() => handleUnsave(recipe.id)}
-                aria-label="저장 해제"
-              >
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                  <path
-                    d="M6 3.5 h12 a1 1 0 0 1 1 1 V21 l-7 -4.5 L5 21 V4.5 a1 1 0 0 1 1 -1 z"
-                    fill="#ff6f4f"
-                    stroke="#ff6f4f"
-                    strokeWidth="2"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </button>
             </div>
           </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );

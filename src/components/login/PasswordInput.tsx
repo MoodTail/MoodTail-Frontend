@@ -3,10 +3,10 @@ import type { InputHTMLAttributes } from "react";
 import Input from "../Input/Input";
 import "../../styles/PasswordInput.css";
 
-interface PasswordInputProps extends Omit<
+type PasswordInputProps = Omit<
   InputHTMLAttributes<HTMLInputElement>,
   "type"
-> {}
+>;
 
 function PasswordInput(props: PasswordInputProps) {
   const [showPassword, setShowPassword] = useState<boolean>(false);
