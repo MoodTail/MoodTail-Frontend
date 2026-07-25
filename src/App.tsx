@@ -54,6 +54,13 @@ function App() {
     setRetestAnswers({});
   };
 
+  const startTestFromHistory = () => {
+    setHistoryView("calendar");
+    setRetestStep(0);
+    setRetestAnswers({});
+    setIsRetestOpen(true);
+  };
+
   const handleGoToLoginScreen = () => {
     setIsLoggedIn(false);
     setIsGuest(false);
@@ -91,6 +98,7 @@ function App() {
               openHistoryRecordPage(hasTestResult, date, "result")
             }
             onOpenMonthlyReport={openMonthlyReportPage}
+            onStartTest={startTestFromHistory}
           />
         );
       case "dictionary":
@@ -135,6 +143,7 @@ function App() {
           initialTab={historyRecordTab}
           onBack={() => setHistoryView("calendar")}
           onOpenFullResult={() => setHistoryView("test-result")}
+          onStartTest={startTestFromHistory}
         />
       ),
       "test-result": <TestResultPage onBack={() => setHistoryView("photo")} />,
