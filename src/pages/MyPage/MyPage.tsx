@@ -48,6 +48,8 @@ interface MyPageProps {
   onEditProfile?: () => void;
   onInquiry?: () => void;
   onTerms?: () => void;
+  onLoggedOut?: () => void;
+  onGoToLogin?: () => void;
 }
 
 function MyPage({
@@ -55,6 +57,8 @@ function MyPage({
   onEditProfile,
   onInquiry,
   onTerms,
+  onLoggedOut,
+  onGoToLogin,
 }: MyPageProps) {
   const [modalStep, setModalStep] = useState<ModalStep>("none");
   const [guestId] = useState(generateGuestId);
@@ -92,6 +96,11 @@ function MyPage({
   };
 
   const handleGoToLogin = () => {
+    closeModal();
+    if (onGoToLogin) {
+      onGoToLogin();
+      return;
+    }
     // TODO: react-router-dom 도입 후 로그인 페이지로 라우팅 연결
     console.log("TODO: 로그인 페이지로 이동");
   };
@@ -104,6 +113,16 @@ function MyPage({
   const handleWithdraw = () => {
     // TODO: 회원 탈퇴 API 연동
     setModalStep("withdraw-done");
+  };
+
+  const handleLoggedOutDone = () => {
+    closeModal();
+    if (onLoggedOut) {
+      onLoggedOut();
+      return;
+    }
+    // TODO: react-router-dom 도입 후 로그인 화면으로 라우팅 연결
+    console.log("TODO: 로그인 화면으로 이동");
   };
 
   return (
@@ -234,7 +253,7 @@ function MyPage({
       {modalStep === "logout-done" && (
         <CompleteModal
           title="로그아웃 되었습니다"
-          button={{ label: "닫기", onClick: closeModal, variant: "primary" }}
+          button={{ label: "닫기", onClick: handleLoggedOutDone, variant: "primary" }}
         />
       )}
 
@@ -254,7 +273,7 @@ function MyPage({
       {modalStep === "withdraw-done" && (
         <CompleteModal
           title="탈퇴가 완료되었습니다"
-          button={{ label: "닫기", onClick: closeModal, variant: "primary" }}
+          button={{ label: "닫기", onClick: handleLoggedOutDone, variant: "primary" }}
         />
       )}
 

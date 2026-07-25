@@ -32,6 +32,12 @@ function App() {
   const [monthlyReportMonth, setMonthlyReportMonth] = useState(new Date());
   const [mypageView, setMypageView] = useState<MyPageView>("main");
 
+  const handleGoToLoginScreen = () => {
+    setIsLoggedIn(false);
+    setIsGuest(false);
+    setMypageView("main");
+  };
+
   const openHistoryRecordPage = (
     hasTestResult: boolean,
     date: Date,
@@ -78,6 +84,8 @@ function App() {
             onEditProfile={() => setMypageView("profile-edit")}
             onInquiry={() => setMypageView("inquiry")}
             onTerms={() => setMypageView("terms")}
+            onLoggedOut={handleGoToLoginScreen}
+            onGoToLogin={handleGoToLoginScreen}
           />
         );
       default:
