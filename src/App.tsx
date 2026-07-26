@@ -16,7 +16,7 @@ import Terms from "./pages/MyPage/Terms";
 import LoginPage from "./pages/LoginPage/LoginPage";
 import ResultPage from "./pages/ResultPage/ResultPage";
 import QuizQuestionPage from "./pages/QuizQuestionPage";
-import { QUIZ_QUESTIONS } from "./data/quiz";
+import { buildQuizQuestions, type QuizQuestion } from "./data/quiz";
 import "./App.css";
 
 export type NavKey = "history" | "dictionary" | "home" | "recipe" | "mypage";
@@ -43,11 +43,13 @@ function App() {
   const [retestAnswers, setRetestAnswers] = useState<Record<number, string>>(
     {},
   );
+  const [retestQuestions, setRetestQuestions] = useState<QuizQuestion[]>(() => buildQuizQuestions());
 
   const startRetest = () => {
     setIsTestResultOpen(false);
     setRetestStep(0);
     setRetestAnswers({});
+    setRetestQuestions(buildQuizQuestions());
     setIsRetestOpen(true);
   };
 
@@ -172,15 +174,15 @@ function App() {
   }
 
   if (isRetestOpen) {
-    const question = QUIZ_QUESTIONS[retestStep];
-    const isLastStep = retestStep === QUIZ_QUESTIONS.length - 1;
+    const question = retestQuestions[retestStep];
+    const isLastStep = retestStep === retestQuestions.length - 1;
     return (
       <div className="app-shell">
         <main className="app">
           <section className="app-content app-content--full">
             <QuizQuestionPage
               step={retestStep}
-              totalSteps={QUIZ_QUESTIONS.length}
+              totalSteps={retestQuestions.length}
               question={question}
               selectedOptionId={retestAnswers[retestStep] ?? null}
               onSelectOption={(id) =>
