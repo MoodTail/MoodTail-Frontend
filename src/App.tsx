@@ -1,5 +1,6 @@
 import { useState } from "react";
 import BottomNav from "./components/common/BottomNav";
+import DexBackground from "./components/DexBackground";
 import HistoryPage from "./pages/HistoryPage/HistoryPage";
 import HistoryPhotoPage from "./pages/HistoryPage/HistoryPhotoPage";
 import type { HistoryRecordTab } from "./pages/HistoryPage/HistoryPhotoPage";
@@ -34,6 +35,8 @@ function App() {
     useState<HistoryRecordTab>("photo");
   const [monthlyReportMonth, setMonthlyReportMonth] = useState(new Date());
   const [mypageView, setMypageView] = useState<MyPageView>("main");
+  const [recipeNavVisible, setRecipeNavVisible] = useState(true);
+  const [goToQuizOnHome, setGoToQuizOnHome] = useState(false);
   const [isTestResultOpen, setIsTestResultOpen] = useState(false);
   const [isRetestOpen, setIsRetestOpen] = useState(false);
   const [retestStep, setRetestStep] = useState(0);
@@ -52,6 +55,11 @@ function App() {
     setIsRetestOpen(false);
     setRetestStep(0);
     setRetestAnswers({});
+  };
+
+  const handleGoToTest = () => {
+    setGoToQuizOnHome(true);
+    setActiveMenu("home");
   };
 
   const handleGoToLoginScreen = () => {
@@ -94,11 +102,17 @@ function App() {
           />
         );
       case "dictionary":
-        return <CharacterPage />;
+        return <CharacterPage onGoTest={handleGoToTest} />;
       case "home":
-        return <MainPage onQuizComplete={() => setIsTestResultOpen(true)} />;
+        return (
+          <MainPage
+            onQuizComplete={() => setIsTestResultOpen(true)}
+            initialView={goToQuizOnHome ? "quiz" : undefined}
+            onInitialViewConsumed={() => setGoToQuizOnHome(false)}
+          />
+        );
       case "recipe":
-        return <RecipePage />;
+        return <RecipePage onNavVisibilityChange={setRecipeNavVisible} />;
       case "mypage":
         return (
           <MyPage
@@ -229,9 +243,12 @@ function App() {
   return (
     <div className="app-shell">
       <main className="app">
+        {activeMenu === "recipe" && <DexBackground />}
         <section className="app-content">{renderPage()}</section>
 
-        <BottomNav activeMenu={activeMenu} onChangeMenu={setActiveMenu} />
+        {(activeMenu !== "recipe" || recipeNavVisible) && (
+          <BottomNav activeMenu={activeMenu} onChangeMenu={setActiveMenu} />
+        )}
       </main>
     </div>
   );

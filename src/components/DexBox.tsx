@@ -1,19 +1,22 @@
 import { COLORS } from "../theme/colors";
+import { CHARACTER_TYPES } from "../data/characterType";
 
 export default function DexBox({
   drinkImg,
-  name,
+  type,
   collectionRate,
   unlocked,
   onClick,
 }: {
   drinkImg: string;
-  name: string;
+  type: number;
   collectionRate?: number;
   unlocked: boolean;
   onClick?: () => void;
 }) {
   if (unlocked) {
+    const characterType = CHARACTER_TYPES.find((t) => t.number === type);
+
     return (
       <button
         type="button"
@@ -22,9 +25,9 @@ export default function DexBox({
         style={{
           aspectRatio: "1 / 1",
           borderRadius: 18,
-          background: COLORS.card,
-          border: `1px solid ${COLORS.border}`,
-          boxShadow: "0 8px 18px rgba(43, 35, 28, 0.14)",
+          background: '#FFFAF9',
+          border: "none",
+          boxShadow: "0 6px 20px rgba(255, 111, 79, 0.12), 0 2px 6px rgba(43, 35, 28, 0.06)",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
@@ -34,8 +37,10 @@ export default function DexBox({
           cursor: onClick ? "pointer" : "default",
         }}
       >
-        <img src={drinkImg} alt="" style={{ width: "70%", height: "70%", objectFit: "contain" }} />
-        <span style={{ fontSize: 10.5, fontWeight: 700, color: COLORS.orange }}>{name}</span>
+        <img src={drinkImg} alt="" style={{ width: "90%", height: "70%", objectFit: "contain" }} />
+        <span style={{ fontSize: 12, fontWeight: 700, color: characterType?.color }}>
+          {characterType?.name}
+        </span>
       </button>
     );
   }
@@ -50,7 +55,7 @@ export default function DexBox({
         borderRadius: 18,
         background: "#CAB8B3",
         border: "none",
-        boxShadow: "0 6px 14px rgba(43, 35, 28, 0.10)",
+        boxShadow: "inset 0 1px 2px rgba(43, 35, 28, 0.06)",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
@@ -59,10 +64,8 @@ export default function DexBox({
         cursor: onClick ? "pointer" : "default",
       }}
     >
-      <div style={{ fontSize: 11.5, fontWeight: 700, color: "#323232" }}>타입명</div>
-      <div style={{ fontSize: 10, fontWeight: 600, color: "#827F7F" }}>
-        수집률 {collectionRate ?? 0}%
-      </div>
+      <div style={{ fontSize: 18, fontWeight: 700, color: "#323232" }}>타입명</div>
+      <div style={{ fontSize: 11, fontWeight: 600, color: "#8E8A88" }}>수집률 {collectionRate}%</div>
     </button>
   );
 }
