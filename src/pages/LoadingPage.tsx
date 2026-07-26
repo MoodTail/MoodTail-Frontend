@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { COLORS } from "../theme/colors";
 import PhoneFrame from "../components/PhoneFrame";
 import TypeDetailBackground from "../components/TypeDetailBackground";
+import ellipseGlow from "../assets/images/ellipse/Ellipse.png";
 
 const LOADING_DURATION_MS = 5000;
 
@@ -20,7 +21,7 @@ export default function LoadingPage({ onComplete }: { onComplete: () => void }) 
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
-          justifyContent: "flex-start",
+          justifyContent: "center",
           padding: "20px 20px 0",
         }}
       >
@@ -35,6 +36,20 @@ export default function LoadingPage({ onComplete }: { onComplete: () => void }) 
             justifyContent: "center",
           }}
         >
+          {/* 가장 바깥 (첨부 이미지) */}
+          <img
+            src={ellipseGlow}
+            alt=""
+            style={{
+              position: "absolute",
+              zIndex: 1,
+              width: 480,
+              height: 532,
+              objectFit: "contain",
+              animation: "breathe-0 3s ease-in-out infinite",
+            }}
+          />
+
           {/* 가장 큰 원 */}
           <div
             style={{
@@ -43,7 +58,7 @@ export default function LoadingPage({ onComplete }: { onComplete: () => void }) 
               height: 436,
               borderRadius: "50%",
               background:
-                "radial-gradient(50% 50% at 50% 50%, #FFF0E9 0%, #FFF0E9 92%, rgba(255,255,255,0) 100%)",
+                "radial-gradient(50% 50% at 50% 50%, #FFF0E9 0%, rgba(255, 255, 255, 0) 100%)",
               animation: "breathe-1 3s ease-in-out infinite",
             }}
           />
@@ -52,11 +67,11 @@ export default function LoadingPage({ onComplete }: { onComplete: () => void }) 
           <div
             style={{
               position: "absolute",
-              width: 340,
-              height: 340,
+              width: 333,
+              height: 333,
               borderRadius: "50%",
               background:
-                "radial-gradient(50% 50% at 50% 50%, #FFE8DC 0%, #FFE8DC 92%, rgba(255,255,255,0) 100%)",
+                "radial-gradient(50% 50% at 50% 50%, #FFE8DC 0%, rgba(255, 255, 255, 0) 100%)",
               animation: "breathe-2 3s ease-in-out infinite",
             }}
           />
@@ -65,16 +80,20 @@ export default function LoadingPage({ onComplete }: { onComplete: () => void }) 
           <div
             style={{
               position: "absolute",
-              width: 264,
-              height: 254,
+              width: 209,
+              height: 209,
               borderRadius: "50%",
               background:
-                "radial-gradient(50% 50% at 50% 50%, #FFD3BF 0%, #FFD3BF 92%, rgba(255,255,255,0) 100%)",
+                "radial-gradient(50% 50% at 50% 50%, #FFD3BF 0%, rgba(255, 255, 255, 0) 100%)",
               animation: "breathe-3 3s ease-in-out infinite",
             }}
           />
 
           <style>{`
+            @keyframes breathe-0 {
+              0%, 100% { transform: scale(0.97); opacity: 0.9; }
+              50% { transform: scale(1.05); opacity: 1; }
+            }
             @keyframes breathe-1 {
               0%, 100% { transform: scale(0.96); opacity: 0.9; }
               50% { transform: scale(1.06); opacity: 1; }
@@ -90,16 +109,16 @@ export default function LoadingPage({ onComplete }: { onComplete: () => void }) 
           `}</style>
         </div>
 
-        <br/>
-        <br/>
-        <br/>
-        <br/>
-        <br/>
-        
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+
         <p
           style={{
-            fontSize: 21,
-            fontWeight: 800,
+            fontSize: 23,
+            fontWeight: 700,
             color: COLORS.ink,
             margin: "-40px 0 0",
             textAlign: "center",
