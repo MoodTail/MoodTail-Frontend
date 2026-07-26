@@ -36,6 +36,7 @@ function App() {
   const [monthlyReportMonth, setMonthlyReportMonth] = useState(new Date());
   const [mypageView, setMypageView] = useState<MyPageView>("main");
   const [recipeNavVisible, setRecipeNavVisible] = useState(true);
+  const [goToQuizOnHome, setGoToQuizOnHome] = useState(false);
   const [isTestResultOpen, setIsTestResultOpen] = useState(false);
   const [isRetestOpen, setIsRetestOpen] = useState(false);
   const [retestStep, setRetestStep] = useState(0);
@@ -54,6 +55,11 @@ function App() {
     setIsRetestOpen(false);
     setRetestStep(0);
     setRetestAnswers({});
+  };
+
+  const handleGoToTest = () => {
+    setGoToQuizOnHome(true);
+    setActiveMenu("home");
   };
 
   const handleGoToLoginScreen = () => {
@@ -96,9 +102,15 @@ function App() {
           />
         );
       case "dictionary":
-        return <CharacterPage />;
+        return <CharacterPage onGoTest={handleGoToTest} />;
       case "home":
-        return <MainPage onQuizComplete={() => setIsTestResultOpen(true)} />;
+        return (
+          <MainPage
+            onQuizComplete={() => setIsTestResultOpen(true)}
+            initialView={goToQuizOnHome ? "quiz" : undefined}
+            onInitialViewConsumed={() => setGoToQuizOnHome(false)}
+          />
+        );
       case "recipe":
         return <RecipePage onNavVisibilityChange={setRecipeNavVisible} />;
       case "mypage":

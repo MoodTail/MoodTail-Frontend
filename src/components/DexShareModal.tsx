@@ -90,7 +90,7 @@ export default function DexShareModal({
           <DexBox
             key={dex.id}
             drinkImg={drinkImages[dex.id]}
-            name={dex.name}
+            type={dex.typeNumber}
             unlocked={dex.unlocked}
             collectionRate={dex.collectionRate}
           />

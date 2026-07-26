@@ -6,29 +6,31 @@ import TypeDetailPage from "../TypeDetailPage/TypeDetailPage";
 import TypeDexPage from "../TypeDexPage/TypeDexPage";
 import DexShareModal from "../../components/DexShareModal";
 import ResultSnsShareModal from "../../components/common/modal/ResultSnsShareModal";
-import CompleteModal from "../../components/CompleteModal";
 import SaveCompleteToast from "../../components/common/SaveCompleteToast";
+
+type DexOrigin = "typeDex" | "characterDex";
 
 type Screen =
   | { name: "typeDex" }
   | { name: "characterDex"; typeId: string }
-  | { name: "typeDetail"; typeId: string }
-  | { name: "repSetting"; typeId: string };
+  | { name: "typeDetail"; typeId: string; from: DexOrigin }
+  | { name: "repSetting"; typeId: string; from: DexOrigin };
 
-function CharacterPage() {
+interface CharacterPageProps {
+  onGoTest: () => void;
+}
+
+function CharacterPage({ onGoTest }: CharacterPageProps) {
   const [screen, setScreen] = useState<Screen>({ name: "typeDex" });
   const [repTypeId, setRepTypeId] = useState("idealist");
   const [shareTypeId, setShareTypeId] = useState<string | null>(null);
   const [snsModalOpen, setSnsModalOpen] = useState(false);
-  const [completeMessage, setCompleteMessage] = useState<string | null>(null);
   const [showSavedToast, setShowSavedToast] = useState(false);
 
   const goTypeDex = () => setScreen({ name: "typeDex" });
   const openCharacterDex = (typeId: string) => setScreen({ name: "characterDex", typeId });
-  const openTypeDetail = (typeId: string) => setScreen({ name: "typeDetail", typeId });
-  const openRepSetting = (typeId: string) => setScreen({ name: "repSetting", typeId });
-
-  const handleGoTest = () => setCompleteMessage("취향 테스트 페이지는 준비 중이에요");
+  const openTypeDetail = (typeId: string, from: DexOrigin) => setScreen({ name: "typeDetail", typeId, from });
+  const openRepSetting = (typeId: string, from: DexOrigin) => setScreen({ name: "repSetting", typeId, from });
 
   const handleKakaoShare = () => {
     // TODO: 카카오 SDK 연동
@@ -46,10 +48,9 @@ function CharacterPage() {
         <TypeDexPage
           repTypeId={repTypeId}
           onOpenType={openCharacterDex}
-          onOpenTypeDetail={openTypeDetail}
+          onOpenTypeDetail={(typeId) => openTypeDetail(typeId, "typeDex")}
           onShare={() => setShareTypeId(repTypeId)}
-          onBack={() => window.history.back()}
-          onGoTest={handleGoTest}
+          onGoTest={onGoTest}
         />
       )}
 
@@ -57,25 +58,27 @@ function CharacterPage() {
         <CharacterDexPage
           type={getType(screen.typeId)}
           onShare={() => setShareTypeId(screen.typeId)}
-          onOpenDetail={() => openTypeDetail(screen.typeId)}
-          onOpenTypeDetail={openTypeDetail}
-          onGoTest={handleGoTest}
+          onOpenDetail={() => openTypeDetail(screen.typeId, "characterDex")}
+          onOpenTypeDetail={(typeId) => openTypeDetail(typeId, "characterDex")}
+          onGoTest={onGoTest}
         />
       )}
 
       {screen.name === "typeDetail" && (
         <TypeDetailPage
           type={getType(screen.typeId)}
-          onBack={() => openCharacterDex(screen.typeId)}
-          onSetRepresentative={() => openRepSetting(screen.typeId)}
-          onGoTest={handleGoTest}
+          onBack={() =>
+            screen.from === "typeDex" ? goTypeDex() : openCharacterDex(screen.typeId)
+          }
+          onSetRepresentative={() => openRepSetting(screen.typeId, screen.from)}
+          onGoTest={onGoTest}
         />
       )}
 
       {screen.name === "repSetting" && (
         <RepresentativeTypeSettingPage
           type={getType(screen.typeId)}
-          onBack={() => openTypeDetail(screen.typeId)}
+          onBack={() => openTypeDetail(screen.typeId, screen.from)}
           onConfirm={() => {
             setRepTypeId(screen.typeId);
             setShowSavedToast(true);
@@ -108,16 +111,6 @@ function CharacterPage() {
         onHide={dismissSavedToast}
         duration={1200}
       />
-
-      {completeMessage && (
-        <CompleteModal
-          message={completeMessage}
-          onClose={() => {
-            setCompleteMessage(null);
-            if (screen.name === "repSetting") goTypeDex();
-          }}
-        />
-      )}
     </>
   );
 }

@@ -1,4 +1,4 @@
-import { useState, type FC } from "react";
+import { useEffect, useState, type FC } from "react";
 import "../../styles/MainPage.css";
 import Button from "../../components/Button/Button";
 import BackgroundBlur from "../../components/common/BackgroundBlur";
@@ -31,15 +31,22 @@ type ViewState = "home" | "trend" | "together" | "custom" | "customResult" | "qu
 
 interface MainPageProps {
   onQuizComplete?: () => void;
+  initialView?: "quiz";
+  onInitialViewConsumed?: () => void;
 }
 
-const MainPage: FC<MainPageProps> = ({ onQuizComplete }) => {
-  const [view, setView] = useState<ViewState>("home");
+const MainPage: FC<MainPageProps> = ({ onQuizComplete, initialView, onInitialViewConsumed }) => {
+  const [view, setView] = useState<ViewState>(initialView === "quiz" ? "quiz" : "home");
   const [isShareOpen, setIsShareOpen] = useState(false); // TODO: 확인용 임시 코드, 삭제 예정
   const [myTasteValues, setMyTasteValues] = useState<TasteValues | null>(null);
 
   const [quizStep, setQuizStep] = useState(0);
   const [quizAnswers, setQuizAnswers] = useState<Record<number, string>>({});
+
+  useEffect(() => {
+    if (initialView === "quiz") onInitialViewConsumed?.();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const exitQuiz = () => {
     setView("home");

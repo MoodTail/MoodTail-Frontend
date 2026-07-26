@@ -6,10 +6,12 @@ export default function Header({
   title,
   onBack,
   right,
+  titleSize = 17,
 }: {
   title: string;
   onBack?: () => void;
   right?: ReactNode;
+  titleSize?: number;
 }) {
   return (
     <div
@@ -29,7 +31,7 @@ export default function Header({
             <ChevronLeft />
           </button>
         )}
-        <span style={{ fontSize: 17, fontWeight: 700, color: COLORS.ink }}>{title}</span>
+        <span style={{ fontSize: titleSize, fontWeight: 700, color: COLORS.ink }}>{title}</span>
       </div>
       {right}
     </div>
