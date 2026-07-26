@@ -46,6 +46,7 @@ interface HistoryPageProps {
   onOpenCocktailRecord: (hasTestResult: boolean, date: Date) => void
   onOpenTestResult: (hasTestResult: boolean, date: Date) => void
   onOpenMonthlyReport: (month: Date) => void
+  onGoTest: () => void
 }
 
 function HistoryPage({
@@ -53,6 +54,7 @@ function HistoryPage({
   onOpenCocktailRecord,
   onOpenTestResult,
   onOpenMonthlyReport,
+  onGoTest,
 }: HistoryPageProps) {
   const [activeMonth, setActiveMonth] = useState(INITIAL_CALENDAR_DATE)
   const [selectedDate, setSelectedDate] = useState<Date>()
@@ -98,7 +100,7 @@ function HistoryPage({
 
   const handleGoToTest = () => {
     setIsMonthlyReportModalOpen(false)
-    // TODO: 테스트 화면 구현 후 이동 연결
+    onGoTest()
   }
 
   const monthlyReportNotice = monthlyRecords.length >= 5

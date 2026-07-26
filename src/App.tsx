@@ -101,6 +101,7 @@ function App() {
               openHistoryRecordPage(hasTestResult, date, "result")
             }
             onOpenMonthlyReport={openMonthlyReportPage}
+            onGoTest={handleGoToTest}
           />
         );
       case "dictionary":
