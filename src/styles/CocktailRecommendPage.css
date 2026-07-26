@@ -363,3 +363,12 @@ body.hide-bottom-nav .bottom-nav {
     transform: translateY(0) scale(1, 1) rotate(0deg);
   }
 }
+
+* {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+*::-webkit-scrollbar {
+  display: none;
+}

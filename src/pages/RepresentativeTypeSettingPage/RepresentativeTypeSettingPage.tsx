@@ -1,10 +1,16 @@
-import drink0 from "../assets/drinks/0.png";
-import { COLORS } from "../theme/colors";
-import type { PersonalityType } from "../data/types";
-import Header from "../components/Header";
-import PhoneFrame from "../components/PhoneFrame";
-import DexBackground from "../components/DexBackground";
-import { Mascot } from "../components/icons";
+import drinkImages from "../../assets/drinks";
+import { COLORS } from "../../theme/colors";
+import Header from "../../components/Header";
+import PhoneFrame from "../../components/PhoneFrame";
+import DexBackground from "../../components/DexBackground";
+import { Mascot } from "../../components/icons";
+import type { PersonalityType } from "../../data/types";
+
+const PERSONALITY_DRINK_IMAGES: Record<string, string> = {
+  idealist: drinkImages[0],
+  romantic: drinkImages[1],
+  realist: drinkImages[4],
+};
 
 export default function RepresentativeTypeSettingPage({
   type,
@@ -51,8 +57,12 @@ export default function RepresentativeTypeSettingPage({
               boxShadow: "0 8px 24px rgba(255,107,53,0.12)",
             }}
           >
-            {type.id === "idealist" ? (
-              <img src={drink0} alt="" style={{ width: 200, height: 250, objectFit: "contain" }} />
+            {PERSONALITY_DRINK_IMAGES[type.id] ? (
+              <img
+                src={PERSONALITY_DRINK_IMAGES[type.id]}
+                alt=""
+                style={{ width: 200, height: 250, objectFit: "contain" }}
+              />
             ) : (
               <Mascot size={120} color={type.color} />
             )}

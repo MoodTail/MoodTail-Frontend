@@ -1,21 +1,12 @@
 import drink0 from "../assets/drinks/0.png";
+import drinkImages from "../assets/drinks";
 import { COLORS } from "../theme/colors";
 import type { PersonalityType } from "../data/types";
+import { DEX_DATA } from "../data/dexData";
 import Modal from "./Modal";
 import DexBackground from "./DexBackground";
 import { CloseIcon } from "./icons";
-import DexBox1 from "./dexBoxes/DexBox1";
-import DexBox2 from "./dexBoxes/DexBox2";
-import DexBox3 from "./dexBoxes/DexBox3";
-import DexBox4 from "./dexBoxes/DexBox4";
-import DexBox5 from "./dexBoxes/DexBox5";
-import DexBox6 from "./dexBoxes/DexBox6";
-import DexBox7 from "./dexBoxes/DexBox7";
-import DexBox8 from "./dexBoxes/DexBox8";
-import DexBox9 from "./dexBoxes/DexBox9";
-import DexBox10 from "./dexBoxes/DexBox10";
-import DexBox11 from "./dexBoxes/DexBox11";
-import DexBox12 from "./dexBoxes/DexBox12";
+import DexBox from "./DexBox";
 
 export default function DexShareModal({
   type,
@@ -95,18 +86,15 @@ export default function DexShareModal({
           marginBottom: 20,
         }}
       >
-        <DexBox1 />
-        <DexBox2 />
-        <DexBox3 />
-        <DexBox4 />
-        <DexBox5 />
-        <DexBox6 />
-        <DexBox7 />
-        <DexBox8 />
-        <DexBox9 />
-        <DexBox10 />
-        <DexBox11 />
-        <DexBox12 />
+        {DEX_DATA.map((dex) => (
+          <DexBox
+            key={dex.id}
+            drinkImg={drinkImages[dex.id]}
+            name={dex.name}
+            unlocked={dex.unlocked}
+            collectionRate={dex.collectionRate}
+          />
+        ))}
       </div>
 
       <div style={{ display: "flex", gap: 8 }}>

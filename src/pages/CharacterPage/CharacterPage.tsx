@@ -1,15 +1,13 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { getType } from "../../data/types";
-import CharacterDexPage from "../CharacterDexPage";
-import RepresentativeTypeSettingPage from "../RepresentativeTypeSettingPage";
-import TypeDetailPage from "../TypeDetailPage";
-import TypeDexPage from "../TypeDexPage";
+import CharacterDexPage from "../CharacterDexPage/CharacterDexPage";
+import RepresentativeTypeSettingPage from "../RepresentativeTypeSettingPage/RepresentativeTypeSettingPage";
+import TypeDetailPage from "../TypeDetailPage/TypeDetailPage";
+import TypeDexPage from "../TypeDexPage/TypeDexPage";
 import DexShareModal from "../../components/DexShareModal";
-import SnsShareOptionsModal from "../../components/SnsShareOptionsModal";
+import ResultSnsShareModal from "../../components/common/modal/ResultSnsShareModal";
 import CompleteModal from "../../components/CompleteModal";
-import SavedToast from "../../components/MyPage/CompleteModal";
-
-const SAVED_TOAST_DURATION_MS = 1200;
+import SaveCompleteToast from "../../components/common/SaveCompleteToast";
 
 type Screen =
   | { name: "typeDex" }
@@ -32,17 +30,15 @@ function CharacterPage() {
 
   const handleGoTest = () => setCompleteMessage("취향 테스트 페이지는 준비 중이에요");
 
+  const handleKakaoShare = () => {
+    // TODO: 카카오 SDK 연동
+    console.log("TODO: 카카오톡 공유 SDK 연동");
+  };
+
   const dismissSavedToast = () => {
     setShowSavedToast(false);
     if (screen.name === "repSetting") goTypeDex();
   };
-
-  useEffect(() => {
-    if (!showSavedToast) return;
-    const timer = setTimeout(dismissSavedToast, SAVED_TOAST_DURATION_MS);
-    return () => clearTimeout(timer);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [showSavedToast]);
 
   return (
     <>
@@ -53,6 +49,7 @@ function CharacterPage() {
           onOpenTypeDetail={openTypeDetail}
           onShare={() => setShareTypeId(repTypeId)}
           onBack={() => window.history.back()}
+          onGoTest={handleGoTest}
         />
       )}
 
@@ -62,6 +59,7 @@ function CharacterPage() {
           onShare={() => setShareTypeId(screen.typeId)}
           onOpenDetail={() => openTypeDetail(screen.typeId)}
           onOpenTypeDetail={openTypeDetail}
+          onGoTest={handleGoTest}
         />
       )}
 
@@ -97,15 +95,19 @@ function CharacterPage() {
         />
       )}
 
-      {snsModalOpen && <SnsShareOptionsModal onClose={() => setSnsModalOpen(false)} />}
+      <ResultSnsShareModal
+        isOpen={snsModalOpen}
+        url="https://moodtail.app/share/mock-id"
+        onClose={() => setSnsModalOpen(false)}
+        onKakaoShare={handleKakaoShare}
+      />
 
-      {showSavedToast && (
-        <SavedToast
-          className="modal--saved modal--dex"
-          title="저장 완료되었습니다"
-          onOverlayClick={dismissSavedToast}
-        />
-      )}
+      <SaveCompleteToast
+        message="저장 완료되었습니다"
+        isVisible={showSavedToast}
+        onHide={dismissSavedToast}
+        duration={1200}
+      />
 
       {completeMessage && (
         <CompleteModal

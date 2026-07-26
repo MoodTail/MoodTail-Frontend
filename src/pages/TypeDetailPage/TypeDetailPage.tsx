@@ -1,12 +1,20 @@
-import drink0 from "../assets/drinks/0.png";
-import drink2 from "../assets/drinks/2.png";
-import drink3 from "../assets/drinks/3.png";
-import { COLORS } from "../theme/colors";
-import { type PersonalityType } from "../data/types";
-import Header from "../components/Header";
-import PhoneFrame from "../components/PhoneFrame";
-import DexBackground from "../components/DexBackground";
-import { Mascot } from "../components/icons";
+import { useState } from "react";
+import drink2 from "../../assets/drinks/2.png";
+import drink3 from "../../assets/drinks/3.png";
+import drinkImages from "../../assets/drinks";
+import { COLORS } from "../../theme/colors";
+import { getType, type Cocktail, type PersonalityType } from "../../data/types";
+import Header from "../../components/Header";
+import PhoneFrame from "../../components/PhoneFrame";
+import TypeDetailBackground from "../../components/TypeDetailBackground";
+import { LockIcon, Mascot, UnlockedIcon } from "../../components/icons";
+import LockedCocktailModal from "../../components/LockedCocktailModal";
+
+const PERSONALITY_DRINK_IMAGES: Record<string, string> = {
+  idealist: drinkImages[0],
+  romantic: drinkImages[1],
+  realist: drinkImages[4],
+};
 
 const TASTE_LABELS: { key: keyof PersonalityType["taste"]; label: string }[] = [
   { key: "alcohol", label: "도수" },
@@ -20,14 +28,19 @@ export default function TypeDetailPage({
   type,
   onBack,
   onSetRepresentative,
+  onGoTest,
 }: {
   type: PersonalityType;
   onBack: () => void;
   onSetRepresentative: () => void;
   onGoTest: () => void;
 }) {
+  const [lockedCocktail, setLockedCocktail] = useState<Cocktail | null>(null);
+  const goodMatch = getType(type.goodMatchId);
+  const badMatch = getType(type.badMatchId);
+
   return (
-    <PhoneFrame background={<DexBackground />}>
+    <PhoneFrame background={<TypeDetailBackground />}>
       <div style={{ padding: "18px 20px 0", flex: 1, overflowY: "auto" }}>
         <Header
           title="타입 상세"
@@ -53,25 +66,29 @@ export default function TypeDetailPage({
         />
 
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", marginBottom: 18 }}>
-          {type.id === "idealist" ? (
-            <img src={drink0} alt="" style={{ width: 250, height: 250, objectFit: "contain" }} />
-          ) : (
-            <Mascot size={88} color={type.color} />
-          )}
-          <div style={{ fontSize: 25, fontWeight: 700, color: "#FD881C", marginTop: 18 }}>{type.name}</div>
-          <p
-            style={{
-              fontSize: 12.5,
-              color: "#FD881C",
-              textAlign: "center",
-              lineHeight: 1.6,
-              margin: "6px 0 0",
-              maxWidth: 280,
-            }}
-          >
-            {type.description}
-          </p>
-        </div>
+  {PERSONALITY_DRINK_IMAGES[type.id] ? (
+    <img
+      src={PERSONALITY_DRINK_IMAGES[type.id]}
+      alt={type.name}
+      style={{ width: 250, height: 250, objectFit: "contain" }}
+    />
+  ) : (
+    <Mascot size={88} color={type.color} />
+  )}
+  <div style={{ fontSize: 25, fontWeight: 700, color: "#FD881C", marginTop: 18 }}>{type.name}</div>
+  <p
+    style={{
+      fontSize: 12.5,
+      color: "#FD881C",
+      textAlign: "center",
+      lineHeight: 1.6,
+      margin: "6px 0 0",
+      maxWidth: 280,
+    }}
+  >
+    {type.description}
+  </p>
+</div>
 
         <div
           style={{
@@ -176,7 +193,7 @@ export default function TypeDetailPage({
               textAlign: "center",
             }}
           >
-            <span style={{ fontSize: 14, fontWeight: 800, color: "#FDE2B4" }}>환상가</span>
+            <span style={{ fontSize: 14, fontWeight: 800, color: "#FDE2B4" }}>{goodMatch.name}</span>
           </div>
           <div
             style={{
@@ -187,7 +204,7 @@ export default function TypeDetailPage({
               textAlign: "center",
             }}
           >
-            <span style={{ fontSize: 14, fontWeight: 800, color: "#1564FE" }}>직설가</span>
+            <span style={{ fontSize: 14, fontWeight: 800, color: "#1564FE" }}>{badMatch.name}</span>
           </div>
         </div>
 
@@ -202,19 +219,66 @@ export default function TypeDetailPage({
             paddingBottom: 20,
           }}
         >
-          {type.cocktails.map((cocktail) => (
-            <div
-              key={cocktail.id}
-              style={{
-                aspectRatio: "1 / 1",
-                borderRadius: 20,
-                background: "#FFFFFF",
-                border: "1.5px solid #F6C9C2",
-              }}
-            />
-          ))}
+          {type.cocktails.map((cocktail) =>
+            cocktail.unlocked ? (
+              <div
+                key={cocktail.id}
+                style={{
+                  aspectRatio: "1 / 1",
+                  borderRadius: 20,
+                  background: "#FFFFFF",
+                  border: "1.5px solid #F6C9C2",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: 6,
+                }}
+              >
+                <UnlockedIcon color={type.color} />
+                <span style={{ fontSize: 12, fontWeight: 700, color: COLORS.ink }}>
+                  {cocktail.name}
+                </span>
+              </div>
+            ) : (
+              <button
+                key={cocktail.id}
+                type="button"
+                onClick={() => setLockedCocktail(cocktail)}
+                style={{
+                  aspectRatio: "1 / 1",
+                  borderRadius: 20,
+                  background: COLORS.lockedBg,
+                  border: "none",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: 6,
+                  cursor: "pointer",
+                }}
+              >
+                <LockIcon />
+                <span style={{ fontSize: 12, fontWeight: 700, color: COLORS.lockedIcon }}>
+                  ???
+                </span>
+              </button>
+            ),
+          )}
         </div>
       </div>
+
+      {lockedCocktail && (
+        <LockedCocktailModal
+          name={lockedCocktail.name}
+          hint={lockedCocktail.hint}
+          onClose={() => setLockedCocktail(null)}
+          onGoTest={() => {
+            setLockedCocktail(null);
+            onGoTest();
+          }}
+        />
+      )}
     </PhoneFrame>
   );
 }

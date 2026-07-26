@@ -74,6 +74,16 @@
   border-color: var(--color-primary, #ff6f4f);
 }
 
+.inquiry__email--error {
+  border-color: #ff4d4f;
+}
+
+.inquiry__email-error {
+  margin: -8px 0 12px 4px;
+  font-size: 12px;
+  color: #ff4d4f;
+}
+
 .inquiry__textarea-wrap {
   position: relative;
   display: flex;

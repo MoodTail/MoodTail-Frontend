@@ -44,10 +44,11 @@ const SignupPage: FC<SignupPageProps> = ({ onSignupComplete }) => {
   const [nickname, setNickname] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
-  const [agreeService, setAgreeService] = useState(false);
-  const [agreePrivacy, setAgreePrivacy] = useState(false);
+  const [agreeTerms1, setAgreeTerms1] = useState(false); // [필수] 서비스 이용약관 동의 (보기 없음)
+  const [agreeTerms2, setAgreeTerms2] = useState(false); // [필수] 서비스 이용약관 동의 (보기 있음) - 실제 문구 확인 필요
+  const [agreePrivacy, setAgreePrivacy] = useState(false); // [필수] 개인정보 수집 및 이용 동의
 
-  const agreeAll = agreeService && agreePrivacy;
+  const agreeAll = agreeTerms1 && agreeTerms2 && agreePrivacy;
   const passwordMismatch =
     passwordConfirm.length > 0 && password !== passwordConfirm;
 
@@ -58,7 +59,8 @@ const SignupPage: FC<SignupPageProps> = ({ onSignupComplete }) => {
     nickname.trim().length > 0 &&
     !isEmailDuplicate &&
     !passwordMismatch &&
-    agreeService &&
+    agreeTerms1 &&
+    agreeTerms2 &&
     agreePrivacy;
 
   const handleEmailChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -73,7 +75,8 @@ const SignupPage: FC<SignupPageProps> = ({ onSignupComplete }) => {
 
   const handleToggleAgreeAll = () => {
     const next = !agreeAll;
-    setAgreeService(next);
+    setAgreeTerms1(next);
+    setAgreeTerms2(next);
     setAgreePrivacy(next);
   };
 
@@ -188,18 +191,30 @@ const SignupPage: FC<SignupPageProps> = ({ onSignupComplete }) => {
 
         <button
           type="button"
-          className={`signup-page__checkbox signup-page__checkbox--service ${agreeService ? "signup-page__checkbox--checked" : ""}`}
-          onClick={() => setAgreeService((v) => !v)}
+          className={`signup-page__checkbox signup-page__checkbox--terms1 ${agreeTerms1 ? "signup-page__checkbox--checked" : ""}`}
+          onClick={() => setAgreeTerms1((v) => !v)}
+          aria-label="만 14세 이상"
+        >
+          {agreeTerms1 && "✓"}
+        </button>
+        <p className="signup-page__terms-label signup-page__terms-label--terms1">
+          [필수] 만 14세 이상입니다
+        </p>
+
+        <button
+          type="button"
+          className={`signup-page__checkbox signup-page__checkbox--terms2 ${agreeTerms2 ? "signup-page__checkbox--checked" : ""}`}
+          onClick={() => setAgreeTerms2((v) => !v)}
           aria-label="서비스 이용약관 동의"
         >
-          {agreeService && "✓"}
+          {agreeTerms2 && "✓"}
         </button>
-        <p className="signup-page__terms-label signup-page__terms-label--service">
+        <p className="signup-page__terms-label signup-page__terms-label--terms2">
           [필수] 서비스 이용약관 동의
         </p>
         <button
           type="button"
-          className="signup-page__terms-view signup-page__terms-view--service"
+          className="signup-page__terms-view signup-page__terms-view--terms2"
         >
           보기
         </button>
