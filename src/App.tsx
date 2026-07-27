@@ -57,6 +57,15 @@ function App() {
     setIsRetestOpen(false);
     setRetestStep(0);
     setRetestAnswers({});
+    setRetestQuestions(buildQuizQuestions());
+    setIsRetestOpen(true);
+  };
+
+  const startTestFromHistory = () => {
+    setHistoryView("calendar");
+    setRetestStep(0);
+    setRetestAnswers({});
+    setIsRetestOpen(true);
   };
 
   const handleGoToTest = () => {
@@ -101,7 +110,7 @@ function App() {
               openHistoryRecordPage(hasTestResult, date, "result")
             }
             onOpenMonthlyReport={openMonthlyReportPage}
-            onGoTest={handleGoToTest}
+            onStartTest={startTestFromHistory}
           />
         );
       case "dictionary":
@@ -152,6 +161,7 @@ function App() {
           initialTab={historyRecordTab}
           onBack={() => setHistoryView("calendar")}
           onOpenFullResult={() => setHistoryView("test-result")}
+          onStartTest={startTestFromHistory}
         />
       ),
       "test-result": <TestResultPage onBack={() => setHistoryView("photo")} />,
