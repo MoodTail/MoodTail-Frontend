@@ -1,20 +1,27 @@
 import { useState } from "react";
-import drink2 from "../../assets/drinks/2.png";
-import drink3 from "../../assets/drinks/3.png";
+import drink0 from "../../assets/drinks/0.png";
+import drink1 from "../../assets/drinks/1.png";
+import drink4 from "../../assets/drinks/4.png";
+import drink5 from "../../assets/drinks/5.png";
+import drink6 from "../../assets/drinks/6.png";
+import drink7 from "../../assets/drinks/7.png";
+import drink8 from "../../assets/drinks/8.png";
+import drink9 from "../../assets/drinks/9.png";
+import drink10 from "../../assets/drinks/10.png";
+import drink11 from "../../assets/drinks/11.png";
 import drinkImages from "../../assets/drinks";
+import fitFan from "../../assets/match/fit_fan.png";
+import unfitStr from "../../assets/match/unfit_str.png";
 import { COLORS } from "../../theme/colors";
 import { getType, type Cocktail, type PersonalityType } from "../../data/types";
+import { getCharacterType } from "../../data/characterType";
+import { DEX_DATA } from "../../data/dexData";
+import { getCocktailsByType, getGlassImage } from "../../data/cocktailGlasses";
 import Header from "../../components/Header";
 import PhoneFrame from "../../components/PhoneFrame";
 import TypeDetailBackground from "../../components/TypeDetailBackground";
-import { LockIcon, Mascot, UnlockedIcon } from "../../components/icons";
+import { LockIcon, Mascot } from "../../components/icons";
 import LockedCocktailModal from "../../components/LockedCocktailModal";
-
-const PERSONALITY_DRINK_IMAGES: Record<string, string> = {
-  idealist: drinkImages[0],
-  romantic: drinkImages[1],
-  realist: drinkImages[4],
-};
 
 const TASTE_LABELS: { key: keyof PersonalityType["taste"]; label: string }[] = [
   { key: "alcohol", label: "도수" },
@@ -38,6 +45,10 @@ export default function TypeDetailPage({
   const [lockedCocktail, setLockedCocktail] = useState<Cocktail | null>(null);
   const goodMatch = getType(type.goodMatchId);
   const badMatch = getType(type.badMatchId);
+  const dexEntry = DEX_DATA.find((d) => d.typeId === type.id);
+  const characterImg = dexEntry ? drinkImages[dexEntry.id] : undefined;
+  const characterType = getCharacterType(type.id);
+  const realCocktails = dexEntry ? getCocktailsByType(dexEntry.typeNumber) : [];
 
   return (
     <PhoneFrame background={<TypeDetailBackground />}>
@@ -45,6 +56,7 @@ export default function TypeDetailPage({
         <Header
           title="타입 상세"
           onBack={onBack}
+          titleSize={20}
           right={
             <button
               onClick={onSetRepresentative}
@@ -52,7 +64,7 @@ export default function TypeDetailPage({
                 border: "none",
                 color: "#fff",
                 background: COLORS.orange,
-                fontSize: 11,
+                fontSize: 15,
                 fontWeight: 600,
                 padding: "6px 10px",
                 borderRadius: 20,
@@ -66,34 +78,34 @@ export default function TypeDetailPage({
         />
 
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", marginBottom: 18 }}>
-  {PERSONALITY_DRINK_IMAGES[type.id] ? (
+  {characterImg ? (
     <img
-      src={PERSONALITY_DRINK_IMAGES[type.id]}
-      alt={type.name}
+      src={characterImg}
+      alt={characterType.name}
       style={{ width: 250, height: 250, objectFit: "contain" }}
     />
   ) : (
-    <Mascot size={88} color={type.color} />
+    <Mascot size={88} color={characterType.color} />
   )}
-  <div style={{ fontSize: 25, fontWeight: 700, color: "#FD881C", marginTop: 18 }}>{type.name}</div>
+  <div style={{ fontSize: 27, fontWeight: 700, color: characterType.color, marginTop: 18 }}>{characterType.name}</div>
   <p
     style={{
-      fontSize: 12.5,
-      color: "#FD881C",
+      fontSize: 14,
+      color: characterType.color,
       textAlign: "center",
       lineHeight: 1.6,
       margin: "6px 0 0",
       maxWidth: 280,
     }}
   >
-    {type.description}
+    {characterType.description}
   </p>
 </div>
 
         <div
           style={{
             width: "100%",
-            background: COLORS.orange,
+            background: characterType.color,
             color: "#fff",
             borderRadius: 22,
             padding: "14px 0",
@@ -102,7 +114,7 @@ export default function TypeDetailPage({
             justifyContent: "center",
           }}
         >
-          <span style={{ fontSize: 14.5, fontWeight: 400 }}>"{type.agreeLine}"</span>
+          <span style={{ fontSize: 15, fontWeight: 400 }}>"{type.agreeLine}"</span>
         </div>
         <div
           style={{
@@ -148,65 +160,59 @@ export default function TypeDetailPage({
           })}
         </div>
 
-        <div style={{ display: "flex", gap: 10, marginBottom: 10 }}>
+        <div style={{ display: "flex", gap: 2, marginBottom: 2 }}>
           <div
             style={{
               flex: 1,
-              background: COLORS.card,
-              border: `1px solid ${COLORS.border}`,
-              borderRadius: 20,
-              padding: "16px 8px 10px",
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
               gap: 8,
             }}
           >
-            <span style={{ fontSize: 14, fontWeight: 800, color: COLORS.ink }}>잘 맞는 타입</span>
-            <img src={drink2} alt="" style={{ width: 92, height: 92, objectFit: "contain" }} />
+
+            <img src={fitFan} alt="" style={{ width: "125%", height: "auto", objectFit: "contain" }} />
           </div>
           <div
             style={{
               flex: 1,
-              background: COLORS.card,
-              border: `1px solid ${COLORS.border}`,
-              borderRadius: 20,
-              padding: "16px 8px 10px",
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
               gap: 8,
             }}
           >
-            <span style={{ fontSize: 14, fontWeight: 800, color: COLORS.ink }}>안 맞는 타입</span>
-            <img src={drink3} alt="" style={{ width: 92, height: 92, objectFit: "contain" }} />
+
+            <img src={unfitStr} alt="" style={{ width: "125%", height: "auto", objectFit: "contain" }} />
           </div>
         </div>
 
-        <div style={{ display: "flex", gap: 10, marginBottom: 22 }}>
-          <div
-            style={{
-              flex: 1,
-              background: "#F9B8AE",
-              borderRadius: 20,
-              padding: "12px 0",
-              textAlign: "center",
-            }}
-          >
-            <span style={{ fontSize: 14, fontWeight: 800, color: "#FDE2B4" }}>{goodMatch.name}</span>
-          </div>
-          <div
-            style={{
-              flex: 1,
-              background: "#D6EAF8",
-              borderRadius: 20,
-              padding: "12px 0",
-              textAlign: "center",
-            }}
-          >
-            <span style={{ fontSize: 14, fontWeight: 800, color: "#1564FE" }}>{badMatch.name}</span>
-          </div>
-        </div>
+        <div style={{ display: "flex", gap: 10, marginBottom: 22, marginTop: 0 }}>
+  <div
+    style={{
+      flex: 1,
+      background: "#F9B8AE",
+      borderRadius: 20,
+      padding: "8px 0",
+      textAlign: "center",
+      boxShadow: "0 4px 10px #D0D0D0",
+    }}
+  >
+    <span style={{ fontSize: 14, fontWeight: 800, color: "#FDE2B4" }}>{goodMatch.name}</span>
+  </div>
+  <div
+    style={{
+      flex: 1,
+      background: "#D6EAF8",
+      borderRadius: 20,
+      padding: "8px 0",
+      textAlign: "center",
+      boxShadow: "0 4px 10px #D0D0D0",
+    }}
+  >
+    <span style={{ fontSize: 14, fontWeight: 800, color: "#1564FE" }}>{badMatch.name}</span>
+  </div>
+</div>
 
         <div style={{ fontSize: 18, fontWeight: 700, color: '#10161F', marginBottom: 10 }}>
           해당 타입 칵테일 {type.cocktails.length}종
@@ -219,8 +225,9 @@ export default function TypeDetailPage({
             paddingBottom: 20,
           }}
         >
-          {type.cocktails.map((cocktail) =>
-            cocktail.unlocked ? (
+          {type.cocktails.map((cocktail, index) => {
+            const realCocktail = realCocktails[index];
+            return cocktail.unlocked ? (
               <div
                 key={cocktail.id}
                 style={{
@@ -228,6 +235,7 @@ export default function TypeDetailPage({
                   borderRadius: 20,
                   background: "#FFFFFF",
                   border: "1.5px solid #F6C9C2",
+                  boxShadow: "3px 4px 4px 0px rgba(255, 111, 79, 0.16), 0px 0px 1.9px 0px rgba(255, 111, 79, 1) inset",
                   display: "flex",
                   flexDirection: "column",
                   alignItems: "center",
@@ -235,9 +243,13 @@ export default function TypeDetailPage({
                   gap: 6,
                 }}
               >
-                <UnlockedIcon color={type.color} />
+                <img
+                  src={getGlassImage(realCocktail?.glassNumber)}
+                  alt=""
+                  style={{ width: 90, height: 90, objectFit: "contain" }}
+                />
                 <span style={{ fontSize: 12, fontWeight: 700, color: COLORS.ink }}>
-                  {cocktail.name}
+                  {realCocktail?.nameKo ?? cocktail.name}
                 </span>
               </div>
             ) : (
@@ -263,8 +275,8 @@ export default function TypeDetailPage({
                   ???
                 </span>
               </button>
-            ),
-          )}
+            );
+          })}
         </div>
       </div>
 

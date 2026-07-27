@@ -1,4 +1,4 @@
-import { useState, type FC } from "react";
+import { useEffect, useState, type FC } from "react";
 import "../../styles/MainPage.css";
 import Button from "../../components/Button/Button";
 import BackgroundBlur from "../../components/common/BackgroundBlur";
@@ -9,7 +9,7 @@ import CustomRecommend from "../CustomRecommend/CustomRecommend";
 import CustomRecommendResultPage from "../CustomRecommendResultPage/CustomRecommendResultPage";
 import QuizQuestionPage from "../QuizQuestionPage";
 import LoadingPage from "../LoadingPage";
-import { QUIZ_QUESTIONS } from "../../data/quiz";
+import { buildQuizQuestions, type QuizQuestion } from "../../data/quiz";
 
 // ui 구현용으로 잔 이미지 하나 무작위로 넣음
 import cocktail from "../../assets/images/glass/glass-1.png";
@@ -31,20 +31,33 @@ type ViewState = "home" | "trend" | "together" | "custom" | "customResult" | "qu
 
 interface MainPageProps {
   onQuizComplete?: () => void;
+  initialView?: "quiz";
+  onInitialViewConsumed?: () => void;
 }
 
-const MainPage: FC<MainPageProps> = ({ onQuizComplete }) => {
-  const [view, setView] = useState<ViewState>("home");
+const MainPage: FC<MainPageProps> = ({ onQuizComplete, initialView, onInitialViewConsumed }) => {
+  const [view, setView] = useState<ViewState>(initialView === "quiz" ? "quiz" : "home");
   const [isShareOpen, setIsShareOpen] = useState(false); // TODO: 확인용 임시 코드, 삭제 예정
   const [myTasteValues, setMyTasteValues] = useState<TasteValues | null>(null);
 
   const [quizStep, setQuizStep] = useState(0);
   const [quizAnswers, setQuizAnswers] = useState<Record<number, string>>({});
+  const [quizQuestions, setQuizQuestions] = useState<QuizQuestion[]>(() => buildQuizQuestions());
+
+  useEffect(() => {
+    if (initialView === "quiz") onInitialViewConsumed?.();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const exitQuiz = () => {
     setView("home");
     setQuizStep(0);
     setQuizAnswers({});
+  };
+
+  const startQuiz = () => {
+    setQuizQuestions(buildQuizQuestions());
+    setView("quiz");
   };
 
   const menuItems: MenuItem[] = [
@@ -54,12 +67,12 @@ const MainPage: FC<MainPageProps> = ({ onQuizComplete }) => {
   ];
 
   if (view === "quiz") {
-    const question = QUIZ_QUESTIONS[quizStep];
-    const isLastStep = quizStep === QUIZ_QUESTIONS.length - 1;
+    const question = quizQuestions[quizStep];
+    const isLastStep = quizStep === quizQuestions.length - 1;
     return (
       <QuizQuestionPage
         step={quizStep}
-        totalSteps={QUIZ_QUESTIONS.length}
+        totalSteps={quizQuestions.length}
         question={question}
         selectedOptionId={quizAnswers[quizStep] ?? null}
         onSelectOption={(id) =>
@@ -161,7 +174,7 @@ const MainPage: FC<MainPageProps> = ({ onQuizComplete }) => {
         <Button
           variant="light"
           className="main-page__banner-button"
-          onClick={() => setView("quiz")}
+          onClick={startQuiz}
         >
           무드 테스트 시작하기 →
         </Button>

@@ -32,6 +32,7 @@ export default function CharacterDexPage({
       <div style={{ padding: "18px 20px 0", flex: 1 }}>
         <Header
           title="캐릭터 도감"
+          titleSize={20}
           right={
             <button
               onClick={onShare}
@@ -105,15 +106,13 @@ export default function CharacterDexPage({
             <DexBox
               key={dex.id}
               drinkImg={drinkImages[dex.id]}
-              name={dex.name}
+              type={dex.typeNumber}
               unlocked={dex.unlocked}
               collectionRate={dex.collectionRate}
               onClick={
-                dex.typeId
-                  ? () => onOpenTypeDetail(dex.typeId!)
-                  : dex.unlocked
-                    ? undefined
-                    : () => setLockedName(dex.name)
+                dex.unlocked
+                  ? () => onOpenTypeDetail(dex.typeId)
+                  : () => setLockedName(dex.name)
               }
             />
           ))}
