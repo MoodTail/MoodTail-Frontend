@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import chevronLeftIcon from '../../assets/icons/chevron-left-white.svg'
 import shareIcon from '../../assets/icons/share.svg'
 import RadarChart, { type RadarChartData } from '../../components/ResultPage/RadarChart'
@@ -75,6 +75,13 @@ function ResultPage({
   const [isShareModalOpen, setIsShareModalOpen] = useState(false)
   const [isSnsModalOpen, setIsSnsModalOpen] = useState(false)
   const [isSaveToastVisible, setIsSaveToastVisible] = useState(false)
+  const [isSaveResultToastVisible, setIsSaveResultToastVisible] = useState(false)
+
+  useEffect(() => {
+    if (!isSaveResultToastVisible) return
+    const timer = setTimeout(() => setIsSaveResultToastVisible(false), 2500)
+    return () => clearTimeout(timer)
+  }, [isSaveResultToastVisible])
 
   const goBack = () => {
     if (onBack) {
@@ -107,6 +114,7 @@ function ResultPage({
     console.log('TODO: 테스트 결과 저장')
     setIsResultSaved(true)
     setModalStep('none')
+    setIsSaveResultToastVisible(true)
   }
 
   const handleSaveResult = () => {
@@ -213,9 +221,15 @@ function ResultPage({
           </section>
 
           <div className="result-page__actions">
-            <button type="button" className="result-page__retest" onClick={handleRetest}>
-              다시 테스트하기
-            </button>
+            {isSaveResultToastVisible ? (
+              <div className="result-page__save-toast" role="status" aria-live="polite">
+                저장 완료되었습니다
+              </div>
+            ) : (
+              <button type="button" className="result-page__retest" onClick={handleRetest}>
+                다시 테스트하기
+              </button>
+            )}
             <button type="button" className="result-page__save" onClick={handleSaveResult}>
               테스트 결과 저장
             </button>
