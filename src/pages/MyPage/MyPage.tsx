@@ -164,22 +164,22 @@ function MyPage({
       </section>
 
       <div className="mypage__panel">
-        <section className="mypage__stats">
-          <div className="mypage__stat-card">
-            <p className="mypage__stat-value">{testCount}회</p>
-            <p className="mypage__stat-label">총 테스트</p>
-          </div>
-          <div className="mypage__stat-card">
-            <p className="mypage__stat-value">{monthlyCount}회</p>
-            <p className="mypage__stat-label">이번달 기록</p>
-          </div>
-          {isLoggedIn && (
+        {isLoggedIn && (
+          <section className="mypage__stats">
+            <div className="mypage__stat-card">
+              <p className="mypage__stat-value">{testCount}회</p>
+              <p className="mypage__stat-label">총 테스트</p>
+            </div>
+            <div className="mypage__stat-card">
+              <p className="mypage__stat-value">{monthlyCount}회</p>
+              <p className="mypage__stat-label">이번달 기록</p>
+            </div>
             <div className="mypage__stat-card">
               <p className="mypage__stat-value">{collectedCount}개</p>
               <p className="mypage__stat-label">수집 캐릭터</p>
             </div>
-          )}
-        </section>
+          </section>
+        )}
 
         <nav className="mypage__menu" aria-label="마이페이지 메뉴">
           {isLoggedIn && (
