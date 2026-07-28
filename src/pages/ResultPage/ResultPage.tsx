@@ -79,7 +79,7 @@ function ResultPage({
 
   useEffect(() => {
     if (!isSaveResultToastVisible) return
-    const timer = setTimeout(() => setIsSaveResultToastVisible(false), 2500)
+    const timer = setTimeout(() => setIsSaveResultToastVisible(false), 1500)
     return () => clearTimeout(timer)
   }, [isSaveResultToastVisible])
 
