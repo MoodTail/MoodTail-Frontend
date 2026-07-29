@@ -39,8 +39,7 @@ type ModalStep =
   | "logout-confirm"
   | "logout-done"
   | "withdraw-confirm"
-  | "withdraw-done"
-  | "login-prompt";
+  | "withdraw-done";
 
 interface MyPageProps {
   isLoggedIn?: boolean;
@@ -96,7 +95,6 @@ function MyPage({
   };
 
   const handleGoToLogin = () => {
-    closeModal();
     if (onGoToLogin) {
       onGoToLogin();
       return;
@@ -151,11 +149,7 @@ function MyPage({
             <p className="mypage__nickname">{nickname}</p>
           </>
         ) : (
-          <button
-            type="button"
-            className="mypage__profile-trigger"
-            onClick={() => setModalStep("login-prompt")}
-          >
+          <div className="mypage__profile-trigger">
             <div
               className="mypage__avatar mypage__avatar--empty"
               aria-hidden="true"
@@ -165,37 +159,39 @@ function MyPage({
               </span>
             </div>
             <p className="mypage__guest-id">user: {guestId}</p>
-          </button>
+          </div>
         )}
       </section>
 
       <div className="mypage__panel">
-        <section className="mypage__stats">
-          <div className="mypage__stat-card">
-            <p className="mypage__stat-value">{testCount}회</p>
-            <p className="mypage__stat-label">총 테스트</p>
-          </div>
-          <div className="mypage__stat-card">
-            <p className="mypage__stat-value">{monthlyCount}회</p>
-            <p className="mypage__stat-label">이번달 기록</p>
-          </div>
-          {isLoggedIn && (
+        {isLoggedIn && (
+          <section className="mypage__stats">
+            <div className="mypage__stat-card">
+              <p className="mypage__stat-value">{testCount}회</p>
+              <p className="mypage__stat-label">총 테스트</p>
+            </div>
+            <div className="mypage__stat-card">
+              <p className="mypage__stat-value">{monthlyCount}회</p>
+              <p className="mypage__stat-label">이번달 기록</p>
+            </div>
             <div className="mypage__stat-card">
               <p className="mypage__stat-value">{collectedCount}개</p>
               <p className="mypage__stat-label">수집 캐릭터</p>
             </div>
-          )}
-        </section>
+          </section>
+        )}
 
         <nav className="mypage__menu" aria-label="마이페이지 메뉴">
-          <button
-            type="button"
-            className="mypage__menu-item mypage__menu-item--highlight"
-            onClick={handleEditProfile}
-          >
-            <span>프로필 수정</span>
-            <MenuArrow />
-          </button>
+          {isLoggedIn && (
+            <button
+              type="button"
+              className="mypage__menu-item mypage__menu-item--highlight"
+              onClick={handleEditProfile}
+            >
+              <span>프로필 수정</span>
+              <MenuArrow />
+            </button>
+          )}
 
           <button
             type="button"
@@ -215,7 +211,7 @@ function MyPage({
             <MenuArrow />
           </button>
 
-          {isLoggedIn && (
+          {isLoggedIn ? (
             <>
               <button
                 type="button"
@@ -234,6 +230,15 @@ function MyPage({
                 <MenuArrow />
               </button>
             </>
+          ) : (
+            <button
+              type="button"
+              className="mypage__menu-item mypage__menu-item--highlight"
+              onClick={handleGoToLogin}
+            >
+              <span>로그인하러가기</span>
+              <MenuArrow />
+            </button>
           )}
         </nav>
       </div>
@@ -276,19 +281,6 @@ function MyPage({
           button={{ label: "닫기", onClick: handleLoggedOutDone, variant: "primary" }}
         />
       )}
-
-      <TwoButtonModal
-        isOpen={modalStep === "login-prompt"}
-        title="로그인하고 기록을 저장해요"
-        description={"테스트 결과, 도감, 즐겨찾기를\n이어서 사용할 수 있어요."}
-        leftButton={{
-          label: "로그인하기",
-          onClick: handleGoToLogin,
-          variant: "primary",
-        }}
-        rightButton={{ label: "닫기", onClick: closeModal, variant: "secondary" }}
-        onOverlayClick={closeModal}
-      />
     </div>
   );
 }
