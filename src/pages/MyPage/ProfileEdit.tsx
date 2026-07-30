@@ -1,13 +1,14 @@
 import { useEffect, useState } from 'react'
 import CompleteModal from '../../components/MyPage/CompleteModal'
 import NicknameEditOverlay from './NicknameEditOverlay'
+import { getMyPage, updateProfile } from '../../api/users/users.api'
 import { CHARACTER_IMAGES, CHARACTER_LABELS, type CharacterType } from '../../constants/characters'
 import chevronLeftIcon from '../../assets/icons/chevron-left.svg'
 import '../../styles/ProfileEdit.css'
 
 const SAVED_MODAL_DURATION_MS = 1200
 
-// TODO: 실제 유저 정보 API 연동 후 실제 응답으로 대체
+// TODO: 프로필 조회 실패(로그인 미연동 등) 시 폴백으로 사용
 const MOCK_PROFILE = {
   nickname: '임시 닉네임',
   characterType: 'romantic' as CharacterType,
@@ -24,6 +25,25 @@ function ProfileEdit({ onBack }: ProfileEditProps) {
   const characterType = MOCK_PROFILE.characterType
   const [showSavedModal, setShowSavedModal] = useState(false)
   const [isEditingNickname, setIsEditingNickname] = useState(false)
+  const [saveError, setSaveError] = useState('')
+  const [isSaving, setIsSaving] = useState(false)
+
+  useEffect(() => {
+    let cancelled = false
+
+    getMyPage()
+      .then((result) => {
+        if (cancelled) return
+        setNickname(result.nickname)
+      })
+      .catch(() => {
+        // TODO: 실제 로그인 연동 전까지는 401이 정상이라 조용히 mock으로 폴백
+      })
+
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   const handleBack = () => {
     if (onBack) {
@@ -39,10 +59,18 @@ function ProfileEdit({ onBack }: ProfileEditProps) {
     console.log('TODO: 캐릭터 선택 화면으로 이동')
   }
 
-  const handleSave = () => {
-    // TODO: 프로필 저장 API 연동
-    console.log('TODO: 프로필 저장', { nickname, characterType })
-    setShowSavedModal(true)
+  const handleSave = async () => {
+    setSaveError('')
+    setIsSaving(true)
+    try {
+      const result = await updateProfile({ nickname })
+      setNickname(result.nickname)
+      setShowSavedModal(true)
+    } catch {
+      setSaveError('프로필 저장에 실패했습니다. 잠시 후 다시 시도해주세요')
+    } finally {
+      setIsSaving(false)
+    }
   }
 
   useEffect(() => {
@@ -90,8 +118,15 @@ function ProfileEdit({ onBack }: ProfileEditProps) {
         </button>
       </section>
 
-      <button type="button" className="profile-edit__save" onClick={handleSave}>
-        저장하기
+      {saveError && <p className="profile-edit__error">{saveError}</p>}
+
+      <button
+        type="button"
+        className="profile-edit__save"
+        onClick={handleSave}
+        disabled={isSaving}
+      >
+        {isSaving ? '저장 중...' : '저장하기'}
       </button>
 
       {showSavedModal && <CompleteModal className="modal--saved" title="저장 완료되었습니다" />}

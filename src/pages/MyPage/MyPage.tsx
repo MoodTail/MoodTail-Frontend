@@ -1,7 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import CompleteModal from "../../components/MyPage/CompleteModal";
 import TwoButtonModal from "../../components/common/modal/TwoButtonModal";
 import { logout, withdraw } from "../../api/auth/auth.api";
+import { getMyPage } from "../../api/users/users.api";
+import type { MyPageResult } from "../../api/users/users.types";
 import {
   CHARACTER_GRADIENTS,
   CHARACTER_IMAGES,
@@ -9,6 +11,15 @@ import {
 } from "../../constants/characters";
 import chevronRightIcon from "../../assets/icons/chevron-right.svg";
 import "../../styles/MyPage.css";
+
+// typeCode(백엔드) -> CharacterType(프론트) 매핑. 서로 다른 표기일 수 있어 소문자로 비교
+function resolveCharacterType(typeCode?: string | null): CharacterType | null {
+  if (!typeCode) return null
+  const normalized = typeCode.toLowerCase()
+  return (normalized in CHARACTER_GRADIENTS
+    ? (normalized as CharacterType)
+    : null)
+}
 
 function MenuArrow() {
   return (
@@ -64,9 +75,34 @@ function MyPage({
 }: MyPageProps) {
   const [modalStep, setModalStep] = useState<ModalStep>("none");
   const [guestId] = useState(generateGuestId);
+  const [profile, setProfile] = useState<MyPageResult | null>(null);
 
-  const { nickname, characterType, testCount, monthlyCount, collectedCount } =
-    MOCK_USER;
+  useEffect(() => {
+    // profile은 isLoggedIn일 때만 화면에 쓰이므로, 로그아웃 상태에서는 그냥 조회하지 않음
+    if (!isLoggedIn) return;
+
+    let cancelled = false;
+    getMyPage()
+      .then((result) => {
+        if (!cancelled) setProfile(result);
+      })
+      .catch(() => {
+        // TODO: 실제 로그인 연동 전까지는 401이 정상이라 조용히 mock으로 폴백
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [isLoggedIn]);
+
+  const nickname = profile?.nickname ?? MOCK_USER.nickname;
+  const characterType =
+    resolveCharacterType(profile?.representativeMoodType?.typeCode) ??
+    MOCK_USER.characterType;
+  const testCount = profile?.totalTestCount ?? MOCK_USER.testCount;
+  const monthlyCount = profile?.monthlyRecordCount ?? MOCK_USER.monthlyCount;
+  const collectedCount =
+    profile?.unlockedMoodTypeCount ?? MOCK_USER.collectedCount;
 
   const closeModal = () => setModalStep("none");
 
