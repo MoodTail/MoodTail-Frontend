@@ -1,6 +1,7 @@
 import { useState } from "react";
 import CompleteModal from "../../components/MyPage/CompleteModal";
 import TwoButtonModal from "../../components/common/modal/TwoButtonModal";
+import { logout, withdraw } from "../../api/auth/auth.api";
 import {
   CHARACTER_GRADIENTS,
   CHARACTER_IMAGES,
@@ -38,8 +39,10 @@ type ModalStep =
   | "none"
   | "logout-confirm"
   | "logout-done"
+  | "logout-error"
   | "withdraw-confirm"
-  | "withdraw-done";
+  | "withdraw-done"
+  | "withdraw-error";
 
 interface MyPageProps {
   isLoggedIn?: boolean;
@@ -103,14 +106,22 @@ function MyPage({
     console.log("TODO: 로그인 페이지로 이동");
   };
 
-  const handleLogout = () => {
-    // TODO: 로그아웃 API 연동
-    setModalStep("logout-done");
+  const handleLogout = async () => {
+    try {
+      await logout();
+      setModalStep("logout-done");
+    } catch {
+      setModalStep("logout-error");
+    }
   };
 
-  const handleWithdraw = () => {
-    // TODO: 회원 탈퇴 API 연동
-    setModalStep("withdraw-done");
+  const handleWithdraw = async () => {
+    try {
+      await withdraw();
+      setModalStep("withdraw-done");
+    } catch {
+      setModalStep("withdraw-error");
+    }
   };
 
   const handleLoggedOutDone = () => {
@@ -262,6 +273,14 @@ function MyPage({
         />
       )}
 
+      {modalStep === "logout-error" && (
+        <CompleteModal
+          title="로그아웃에 실패했습니다"
+          description="잠시 후 다시 시도해주세요"
+          button={{ label: "닫기", onClick: closeModal, variant: "primary" }}
+        />
+      )}
+
       <TwoButtonModal
         isOpen={modalStep === "withdraw-confirm"}
         title="정말 탈퇴하시겠어요?"
@@ -279,6 +298,14 @@ function MyPage({
         <CompleteModal
           title="탈퇴가 완료되었습니다"
           button={{ label: "닫기", onClick: handleLoggedOutDone, variant: "primary" }}
+        />
+      )}
+
+      {modalStep === "withdraw-error" && (
+        <CompleteModal
+          title="탈퇴에 실패했습니다"
+          description="잠시 후 다시 시도해주세요"
+          button={{ label: "닫기", onClick: closeModal, variant: "primary" }}
         />
       )}
     </div>
