@@ -9,8 +9,6 @@ if (!baseURL) {
 export const apiClient = axios.create({
   baseURL,
   timeout: 10_000,
-  // 로그인 시 발급되는 refresh token이 httpOnly 쿠키로 내려오므로 필요 (로그아웃/재발급 등에서 사용)
-  withCredentials: true,
   headers: {
     "Content-Type": "application/json",
   },
