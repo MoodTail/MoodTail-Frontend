@@ -10,6 +10,7 @@ import OnboardingPage from "../OnboardingPage/OnboardingPage";
 import FindPasswordPage from "../../components/login/FindPasswordPage";
 import SignupPage from "../SignupPage/SignupPage";
 import PostLoginScreen from "../PostLoginScreen/PostLoginScreen";
+import { postGuestLogin } from "../../api/auth/auth.api";
 
 interface LoginPageProps {
   onLogin: () => void;
@@ -50,9 +51,22 @@ const LoginPage: FC<LoginPageProps> = ({ onLogin }) => {
     setStep("postLogin");
   };
 
-  const handleSkipLogin = (): void => {
-    localStorage.setItem("isGuest", "true");
-    setStep("postLogin");
+  const handleSkipLogin = async (): Promise<void> => {
+    try {
+      let guestUuid = localStorage.getItem("guestUuid");
+      if (!guestUuid) {
+        guestUuid = crypto.randomUUID();
+        localStorage.setItem("guestUuid", guestUuid);
+      }
+
+      const result = await postGuestLogin({ guestUuid });
+
+      localStorage.setItem("accessToken", result.accessToken);
+      localStorage.setItem("isGuest", "true");
+      setStep("postLogin");
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (
@@ -116,7 +130,7 @@ const LoginPage: FC<LoginPageProps> = ({ onLogin }) => {
       <button
         type="button"
         className="login-page__skip-link"
-        onClick={handleSkipLogin}
+        onClick={() => void handleSkipLogin()}
       >
         로그인 없이 이용하기
       </button>
