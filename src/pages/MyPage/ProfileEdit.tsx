@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import CompleteModal from '../../components/MyPage/CompleteModal'
 import NicknameEditOverlay from './NicknameEditOverlay'
 import { getMyPage, updateProfile } from '../../api/users/users.api'
+import type { RepresentativeMoodType } from '../../api/users/users.types'
 import { CHARACTER_IMAGES, CHARACTER_LABELS, type CharacterType } from '../../constants/characters'
 import chevronLeftIcon from '../../assets/icons/chevron-left.svg'
 import '../../styles/ProfileEdit.css'
@@ -14,6 +15,14 @@ const MOCK_PROFILE = {
   characterType: 'romantic' as CharacterType,
 }
 
+// typeCode(백엔드) -> CharacterType(프론트) 매핑. 대표 캐릭터 "선택"은 다른 화면(도감 등) 담당,
+// 여기서는 API로 받은 값을 그대로 표시만 함
+function resolveCharacterType(typeCode?: string | null): CharacterType | null {
+  if (!typeCode) return null
+  const normalized = typeCode.toLowerCase()
+  return normalized in CHARACTER_IMAGES ? (normalized as CharacterType) : null
+}
+
 interface ProfileEditProps {
   // TODO: react-router-dom 도입되면 이 prop 대신 라우팅으로 대체
   onBack?: () => void
@@ -21,8 +30,12 @@ interface ProfileEditProps {
 
 function ProfileEdit({ onBack }: ProfileEditProps) {
   const [nickname, setNickname] = useState(MOCK_PROFILE.nickname)
-  // TODO: 캐릭터 선택 화면 나오면 state로 변경
-  const characterType = MOCK_PROFILE.characterType
+  const [representativeMoodType, setRepresentativeMoodType] = useState<RepresentativeMoodType | null>(null)
+  const characterType =
+    resolveCharacterType(representativeMoodType?.typeCode) ?? MOCK_PROFILE.characterType
+  // API가 실제 캐릭터 이미지/이름을 내려주면 그걸 우선 사용, 없으면 로컬 mock으로 폴백
+  const avatarImageSrc = representativeMoodType?.characterImageUrl ?? CHARACTER_IMAGES[characterType]
+  const characterLabel = representativeMoodType?.name ?? CHARACTER_LABELS[characterType]
   const [showSavedModal, setShowSavedModal] = useState(false)
   const [isEditingNickname, setIsEditingNickname] = useState(false)
   const [saveError, setSaveError] = useState('')
@@ -35,6 +48,7 @@ function ProfileEdit({ onBack }: ProfileEditProps) {
       .then((result) => {
         if (cancelled) return
         setNickname(result.nickname)
+        setRepresentativeMoodType(result.representativeMoodType)
       })
       .catch(() => {
         // TODO: 실제 로그인 연동 전까지는 401이 정상이라 조용히 mock으로 폴백
@@ -65,6 +79,7 @@ function ProfileEdit({ onBack }: ProfileEditProps) {
     try {
       const result = await updateProfile({ nickname })
       setNickname(result.nickname)
+      setRepresentativeMoodType(result.representativeMoodType)
       setShowSavedModal(true)
     } catch {
       setSaveError('프로필 저장에 실패했습니다. 잠시 후 다시 시도해주세요')
@@ -95,7 +110,7 @@ function ProfileEdit({ onBack }: ProfileEditProps) {
 
       <section className="profile-edit__card profile-edit__avatar-card">
         <button type="button" className="profile-edit__avatar" onClick={handleSelectCharacter}>
-          <img className="profile-edit__avatar-image" src={CHARACTER_IMAGES[characterType]} alt="" />
+          <img className="profile-edit__avatar-image" src={avatarImageSrc} alt="" />
         </button>
         <p className="profile-edit__avatar-hint">프로필 이미지는 기본 또는 해금 캐릭터 중 선택</p>
       </section>
@@ -114,7 +129,7 @@ function ProfileEdit({ onBack }: ProfileEditProps) {
 
         <p className="profile-edit__label profile-edit__label--character">대표 캐릭터</p>
         <button type="button" className="profile-edit__character-chip" onClick={handleSelectCharacter}>
-          {CHARACTER_LABELS[characterType]}
+          {characterLabel}
         </button>
       </section>
 

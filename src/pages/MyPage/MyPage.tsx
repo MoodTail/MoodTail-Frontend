@@ -32,10 +32,10 @@ function MenuArrow() {
   );
 }
 
-// TODO: 유저 정보 API 연동 후 실제 응답으로 대체
+// TODO: 조회 실패(로그인 미연동 등) 시 폴백으로 사용
 const MOCK_USER = {
   nickname: "무드테일 소다",
-  characterType: "visionary" as CharacterType,
+  characterType: "refreshing-explorer" as CharacterType,
   testCount: 8,
   monthlyCount: 3,
   collectedCount: 4,
@@ -99,6 +99,10 @@ function MyPage({
   const characterType =
     resolveCharacterType(profile?.representativeMoodType?.typeCode) ??
     MOCK_USER.characterType;
+  // API가 실제 캐릭터 이미지 URL을 내려주면 그걸 우선 사용, 없으면 로컬 mock 이미지로 폴백
+  const avatarImageSrc =
+    profile?.representativeMoodType?.characterImageUrl ??
+    CHARACTER_IMAGES[characterType];
   const testCount = profile?.totalTestCount ?? MOCK_USER.testCount;
   const monthlyCount = profile?.monthlyRecordCount ?? MOCK_USER.monthlyCount;
   const collectedCount =
@@ -183,10 +187,10 @@ function MyPage({
         {isLoggedIn ? (
           <>
             <div className="mypage__avatar" aria-hidden="true">
-              {CHARACTER_IMAGES[characterType] ? (
+              {avatarImageSrc ? (
                 <img
                   className="mypage__avatar-image"
-                  src={CHARACTER_IMAGES[characterType]}
+                  src={avatarImageSrc}
                   alt=""
                 />
               ) : (
