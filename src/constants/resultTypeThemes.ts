@@ -11,6 +11,8 @@ import shard9584Shape from "../assets/images/result-shapes/shard-9584.svg";
 import meticulousCriticCharacter from "../assets/images/character/character-5.png";
 import sparkles9585MainShape from "../assets/images/result-shapes/sparkles-9585-main.svg";
 import sparkles9585AccentShape from "../assets/images/result-shapes/sparkles-9585-accent.svg";
+import emotionalThinkerCharacter from "../assets/images/character/character-10.png";
+import wave9586Shape from "../assets/images/result-shapes/wave-9586.svg";
 
 // 백엔드 실제 typeCode(GET /api/v1/mood-types) 기준 키.
 // 캐릭터 이미지/이름/설명/문구는 원래 API가 내려주지만, 결과화면 배경색·포인트컬러·배경 무늬는
@@ -173,5 +175,21 @@ export const RESULT_TYPE_THEMES: Record<string, ResultTypeTheme> = {
     accentShapeHeight: 113,
     accentShapeTop: 301,
     accentShapeLeft: 72,
+  },
+  "emotional-thinker": {
+    name: "감성적인 사색가",
+    description: "상황을 먼저 살피고, 가장 무리 없는 선택을 찾는 타입",
+    quote: "기분을 이 잔에 담아둘래",
+    detailDescription:
+      "감성적인 사색가 아이리시 커피처럼 따뜻한데 씁쓸한, 복잡한 맛이 오히려 편한 타입이에요. 혼자 브라운 쿠페를 들고 턱을 괴고 생각에 잠기는 게 가장 자연스러운 모습이죠. 말은 아껴도 감정은 깊고, 분위기를 읽는 능력이 탁월해요. 가끔 너무 많이 생각해서 스스로 지치기도 하지만, 그 깊이가 결국 이 사람의 가장 큰 매력이에요.",
+    backgroundColor: "#346A99",
+    accentColor: "#4E75A4",
+    characterImage: emotionalThinkerCharacter,
+    characterWidth: 275,
+    backgroundShape: wave9586Shape,
+    backgroundShapeWidth: 393,
+    backgroundShapeHeight: 455,
+    contentOffsetY: 80,
+    characterOffsetY: 10,
   },
 };
