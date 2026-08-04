@@ -1,6 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import CompleteModal from "../../components/MyPage/CompleteModal";
 import TwoButtonModal from "../../components/common/modal/TwoButtonModal";
+import { logout, withdraw } from "../../api/auth/auth.api";
+import { getMyPage } from "../../api/users/users.api";
+import type { MyPageResult } from "../../api/users/users.types";
 import {
   CHARACTER_GRADIENTS,
   CHARACTER_IMAGES,
@@ -8,6 +11,15 @@ import {
 } from "../../constants/characters";
 import chevronRightIcon from "../../assets/icons/chevron-right.svg";
 import "../../styles/MyPage.css";
+
+// typeCode(백엔드) -> CharacterType(프론트) 매핑. 서로 다른 표기일 수 있어 소문자로 비교
+function resolveCharacterType(typeCode?: string | null): CharacterType | null {
+  if (!typeCode) return null
+  const normalized = typeCode.toLowerCase()
+  return (normalized in CHARACTER_GRADIENTS
+    ? (normalized as CharacterType)
+    : null)
+}
 
 function MenuArrow() {
   return (
@@ -20,10 +32,10 @@ function MenuArrow() {
   );
 }
 
-// TODO: 유저 정보 API 연동 후 실제 응답으로 대체
+// TODO: 조회 실패(로그인 미연동 등) 시 폴백으로 사용
 const MOCK_USER = {
   nickname: "무드테일 소다",
-  characterType: "visionary" as CharacterType,
+  characterType: "refreshing-explorer" as CharacterType,
   testCount: 8,
   monthlyCount: 3,
   collectedCount: 4,
@@ -38,8 +50,10 @@ type ModalStep =
   | "none"
   | "logout-confirm"
   | "logout-done"
+  | "logout-error"
   | "withdraw-confirm"
-  | "withdraw-done";
+  | "withdraw-done"
+  | "withdraw-error";
 
 interface MyPageProps {
   isLoggedIn?: boolean;
@@ -61,9 +75,38 @@ function MyPage({
 }: MyPageProps) {
   const [modalStep, setModalStep] = useState<ModalStep>("none");
   const [guestId] = useState(generateGuestId);
+  const [profile, setProfile] = useState<MyPageResult | null>(null);
 
-  const { nickname, characterType, testCount, monthlyCount, collectedCount } =
-    MOCK_USER;
+  useEffect(() => {
+    // profile은 isLoggedIn일 때만 화면에 쓰이므로, 로그아웃 상태에서는 그냥 조회하지 않음
+    if (!isLoggedIn) return;
+
+    let cancelled = false;
+    getMyPage()
+      .then((result) => {
+        if (!cancelled) setProfile(result);
+      })
+      .catch(() => {
+        // TODO: 실제 로그인 연동 전까지는 401이 정상이라 조용히 mock으로 폴백
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [isLoggedIn]);
+
+  const nickname = profile?.nickname ?? MOCK_USER.nickname;
+  const characterType =
+    resolveCharacterType(profile?.representativeMoodType?.typeCode) ??
+    MOCK_USER.characterType;
+  // API가 실제 캐릭터 이미지 URL을 내려주면 그걸 우선 사용, 없으면 로컬 mock 이미지로 폴백
+  const avatarImageSrc =
+    profile?.representativeMoodType?.characterImageUrl ??
+    CHARACTER_IMAGES[characterType];
+  const testCount = profile?.totalTestCount ?? MOCK_USER.testCount;
+  const monthlyCount = profile?.monthlyRecordCount ?? MOCK_USER.monthlyCount;
+  const collectedCount =
+    profile?.unlockedMoodTypeCount ?? MOCK_USER.collectedCount;
 
   const closeModal = () => setModalStep("none");
 
@@ -103,14 +146,22 @@ function MyPage({
     console.log("TODO: 로그인 페이지로 이동");
   };
 
-  const handleLogout = () => {
-    // TODO: 로그아웃 API 연동
-    setModalStep("logout-done");
+  const handleLogout = async () => {
+    try {
+      await logout();
+      setModalStep("logout-done");
+    } catch {
+      setModalStep("logout-error");
+    }
   };
 
-  const handleWithdraw = () => {
-    // TODO: 회원 탈퇴 API 연동
-    setModalStep("withdraw-done");
+  const handleWithdraw = async () => {
+    try {
+      await withdraw();
+      setModalStep("withdraw-done");
+    } catch {
+      setModalStep("withdraw-error");
+    }
   };
 
   const handleLoggedOutDone = () => {
@@ -136,10 +187,10 @@ function MyPage({
         {isLoggedIn ? (
           <>
             <div className="mypage__avatar" aria-hidden="true">
-              {CHARACTER_IMAGES[characterType] ? (
+              {avatarImageSrc ? (
                 <img
                   className="mypage__avatar-image"
-                  src={CHARACTER_IMAGES[characterType]}
+                  src={avatarImageSrc}
                   alt=""
                 />
               ) : (
@@ -262,6 +313,14 @@ function MyPage({
         />
       )}
 
+      {modalStep === "logout-error" && (
+        <CompleteModal
+          title="로그아웃에 실패했습니다"
+          description="잠시 후 다시 시도해주세요"
+          button={{ label: "닫기", onClick: closeModal, variant: "primary" }}
+        />
+      )}
+
       <TwoButtonModal
         isOpen={modalStep === "withdraw-confirm"}
         title="정말 탈퇴하시겠어요?"
@@ -279,6 +338,14 @@ function MyPage({
         <CompleteModal
           title="탈퇴가 완료되었습니다"
           button={{ label: "닫기", onClick: handleLoggedOutDone, variant: "primary" }}
+        />
+      )}
+
+      {modalStep === "withdraw-error" && (
+        <CompleteModal
+          title="탈퇴에 실패했습니다"
+          description="잠시 후 다시 시도해주세요"
+          button={{ label: "닫기", onClick: closeModal, variant: "primary" }}
         />
       )}
     </div>

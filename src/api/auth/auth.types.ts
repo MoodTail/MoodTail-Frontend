@@ -1,3 +1,10 @@
+export interface BaseVoidResponse {
+  timestamp: string;
+  code: string;
+  message: string;
+  result: null;
+}
+
 export interface PostGuestLoginRequest {
   guestUuid: string;
 }
