@@ -46,6 +46,9 @@
 
 .result-page__character-wrap {
   position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 355px;
   height: 355px;
   margin: 12px auto 0;
@@ -59,15 +62,38 @@
   height: 355px;
 }
 
-/* Figma 기준 별(무늬) top:72 left:19 355x355, 캐릭터 top:112.43 left:60 288.27x301.66 —
-   캐릭터 위치는 별 기준 상대 오프셋(top +40px, left +41px)으로 환산 */
+/* 무늬 SVG가 없는 타입(원형 배경)용 기본 흰 원. Figma 기준 340x340 */
+.result-page__background-circle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 340px;
+  height: 340px;
+  border-radius: 50%;
+  background: #ffffff;
+}
+
+/* 기본: 원형 배경 위에 캐릭터를 가운데 정렬. Figma 기준 190.7x302 */
 .result-page__character {
+  position: relative;
+  z-index: 1;
+  width: 190.7px;
+  height: auto;
+  max-height: 302px;
+  object-fit: contain;
+  filter: drop-shadow(8px 4px 13.3px rgba(254, 164, 144, 0.25));
+}
+
+/* Figma 기준 별(무늬) top:72 left:19 355x355, 캐릭터 top:112.43 left:60 288.27x301.66 —
+   캐릭터 위치는 별 기준 상대 오프셋(top +40px, left +41px)으로 환산. 별 무늬가 있는 타입 전용 */
+.result-page__character--positioned {
   position: absolute;
   top: 40px;
   left: 41px;
   width: 288px;
   height: 302px;
-  object-fit: contain;
+  max-height: none;
   filter: drop-shadow(9px 6px 6.5px rgba(0, 0, 0, 0.25));
 }
 
@@ -113,17 +139,15 @@
   position: relative;
   width: 317px;
   max-width: 100%;
-  height: 207px;
   margin: 13px auto 0;
+  padding: 22px 23px 24px;
   border-radius: 24px;
   border: 1px solid #f0ddd4;
   background: #fff9f5;
+  box-shadow: 0 10px 22px rgba(255, 111, 79, 0.12);
 }
 
 .result-page__detail-title {
-  position: absolute;
-  top: 22px;
-  left: 22px;
   margin: 0;
   font-family: "Pretendard", sans-serif;
   font-size: 18px;
@@ -131,14 +155,11 @@
   line-height: 1;
   letter-spacing: 0;
   color: #1a1a2e;
+  text-align: left;
 }
 
 .result-page__detail-body {
-  position: absolute;
-  top: 59px;
-  left: 23px;
-  width: 271px;
-  margin: 0;
+  margin: 16px 0 0;
   font-family: "Pretendard", sans-serif;
   font-size: 11.5px;
   font-weight: 400;
@@ -151,11 +172,7 @@
 }
 
 .result-page__detail-percent {
-  position: absolute;
-  top: 168px;
-  left: 42px;
-  width: 231px;
-  margin: 0;
+  margin: 14px 0 0;
   font-family: "Pretendard", sans-serif;
   font-size: 16px;
   font-weight: 700;

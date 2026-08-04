@@ -33,7 +33,7 @@ const MOCK_RESULT = {
 
 // TODO: 실제 API 연동 전까지, 타입별 배경색/포인트컬러/카피를 디자인팀에게 하나씩 전달받아
 // resultTypeThemes.ts에 채워넣고 여기서 미리보기로 확인하는 용도. 다 모이면 실제 결과의 typeCode로 대체
-const PREVIEW_TYPE_CODE = 'passionate-challenger'
+const PREVIEW_TYPE_CODE = 'free-spirited-romantic'
 const previewTheme = RESULT_TYPE_THEMES[PREVIEW_TYPE_CODE]
 
 const displayResult = previewTheme
@@ -194,15 +194,23 @@ function ResultPage({
           </button>
 
           <div className="result-page__character-wrap">
-            {previewTheme?.backgroundShape && (
+            {previewTheme?.backgroundShape ? (
               <img
                 className="result-page__background-shape"
                 src={previewTheme.backgroundShape}
                 alt=""
                 aria-hidden="true"
               />
+            ) : (
+              <div className="result-page__background-circle" aria-hidden="true" />
             )}
-            <img className="result-page__character" src={displayResult.characterImage} alt="" />
+            <img
+              className={`result-page__character${
+                previewTheme?.backgroundShape ? ' result-page__character--positioned' : ''
+              }`}
+              src={displayResult.characterImage}
+              alt=""
+            />
           </div>
           <p className="result-page__type-name">{displayResult.typeName}</p>
           <p className="result-page__type-description">{displayResult.typeDescription}</p>

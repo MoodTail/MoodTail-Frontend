@@ -1,5 +1,6 @@
 import passionateChallengerCharacter from "../assets/images/character/character-4.png";
 import star21Shape from "../assets/images/result-shapes/star-21.svg";
+import freeSpiritedRomanticCharacter from "../assets/images/character/character-12.png";
 
 // 백엔드 실제 typeCode(GET /api/v1/mood-types) 기준 키.
 // 캐릭터 이미지/이름/설명/문구는 원래 API가 내려주지만, 결과화면 배경색·포인트컬러·배경 무늬는
@@ -27,5 +28,15 @@ export const RESULT_TYPE_THEMES: Record<string, ResultTypeTheme> = {
     accentColor: "#FEBC39",
     characterImage: passionateChallengerCharacter,
     backgroundShape: star21Shape,
+  },
+  "free-spirited-romantic": {
+    name: "자유로운 탐험가",
+    description: "작은 순간도 특별한 추억으로 만드는 타입",
+    quote: "안 마셔본거? 그걸로!!",
+    detailDescription:
+      '자유로운 탐험가 오늘은 상그리아, 내일은 모스코 뮬. 탄산처럼 톡 튀는 취향이라 메뉴판을 다 읽어봐야 직성이 풀려요. 우산 꽂힌 트로피컬 잔처럼 어디서든 분위기를 만들어내고, 정해진 루트 없이 흘러가는 게 오히려 제일 자연스러운 타입이에요. 예측이 안 되는 게 매력이라는 걸 본인도 알고 있어요.',
+    backgroundColor: "#FDAF7A",
+    accentColor: "#FF6F4F",
+    characterImage: freeSpiritedRomanticCharacter,
   },
 };
