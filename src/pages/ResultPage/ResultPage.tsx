@@ -33,7 +33,7 @@ const MOCK_RESULT = {
 
 // TODO: 실제 API 연동 전까지, 타입별 배경색/포인트컬러/카피를 디자인팀에게 하나씩 전달받아
 // resultTypeThemes.ts에 채워넣고 여기서 미리보기로 확인하는 용도. 다 모이면 실제 결과의 typeCode로 대체
-const PREVIEW_TYPE_CODE = 'sensitive-perfectionist'
+const PREVIEW_TYPE_CODE = 'meticulous-critic'
 const previewTheme = RESULT_TYPE_THEMES[PREVIEW_TYPE_CODE]
 
 // wrap 안에서는 무늬(backgroundShape) 하나만 가운데 정렬하는 게 아니라, 캐릭터/보조무늬까지

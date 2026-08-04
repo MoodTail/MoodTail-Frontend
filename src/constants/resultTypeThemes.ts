@@ -8,6 +8,9 @@ import star22Shape from "../assets/images/result-shapes/star-22.svg";
 import star23Shape from "../assets/images/result-shapes/star-23.svg";
 import sensitivePerfectionistCharacter from "../assets/images/character/character-7.png";
 import shard9584Shape from "../assets/images/result-shapes/shard-9584.svg";
+import meticulousCriticCharacter from "../assets/images/character/character-5.png";
+import sparkles9585MainShape from "../assets/images/result-shapes/sparkles-9585-main.svg";
+import sparkles9585AccentShape from "../assets/images/result-shapes/sparkles-9585-accent.svg";
 
 // 백엔드 실제 typeCode(GET /api/v1/mood-types) 기준 키.
 // 캐릭터 이미지/이름/설명/문구는 원래 API가 내려주지만, 결과화면 배경색·포인트컬러·배경 무늬는
@@ -146,5 +149,29 @@ export const RESULT_TYPE_THEMES: Record<string, ResultTypeTheme> = {
     backgroundShapeHeight: 490,
     contentOffsetY: 65,
     characterOffsetY: 0,
+  },
+  "meticulous-critic": {
+    name: "꼼꼼한 평론가",
+    description: "극찬부터 독설까지, 다양한 단어와 문장을 구사하는 지식가 타입",
+    quote: "생각보다 재미있는 조합이네?",
+    detailDescription:
+      "꼼꼼한 평론가 에스프레소 마티니처럼 복잡한데 어딘가 중독되는 타입이에요. 말이 없어 보여도 머릿속엔 항상 많은 생각이 흘러가고 있어요. 개성 있는 조합을 즐기고, 남들이 고개를 갸웃할 때 혼자 끄덕이죠. 조용히 앉아서 잔을 들고 있는 모습이 가장 자연스럽고, 알면 알수록 예상을 빗나가는 매력이 있는 타입이에요.",
+    backgroundColor: "#AC3E10",
+    accentColor: "#FB7915",
+    characterImage: meticulousCriticCharacter,
+    characterWidth: 254,
+    backgroundShape: sparkles9585MainShape,
+    backgroundShapeWidth: 420,
+    backgroundShapeHeight: 500,
+    contentOffsetX: 35,
+    contentOffsetY: 20,
+    characterOffsetX: 20,
+    characterOffsetY: 20,
+    // Figma 원본 좌표(454x543 캔버스) 기준 아래쪽 별 2개 위치를, 표시 크기(420x500)에 맞춰 환산
+    accentShape: sparkles9585AccentShape,
+    accentShapeWidth: 82,
+    accentShapeHeight: 113,
+    accentShapeTop: 301,
+    accentShapeLeft: 72,
   },
 };
