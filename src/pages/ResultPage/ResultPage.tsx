@@ -33,8 +33,52 @@ const MOCK_RESULT = {
 
 // TODO: 실제 API 연동 전까지, 타입별 배경색/포인트컬러/카피를 디자인팀에게 하나씩 전달받아
 // resultTypeThemes.ts에 채워넣고 여기서 미리보기로 확인하는 용도. 다 모이면 실제 결과의 typeCode로 대체
-const PREVIEW_TYPE_CODE = 'refreshing-explorer'
+const PREVIEW_TYPE_CODE = 'explosive-adventurer'
 const previewTheme = RESULT_TYPE_THEMES[PREVIEW_TYPE_CODE]
+
+// wrap 안에서는 무늬(backgroundShape) 하나만 가운데 정렬하는 게 아니라, 캐릭터/보조무늬까지
+// 합친 전체 구성(bounding box)이 가운데 오도록 계산함 (캐릭터/보조무늬가 무늬 밖으로
+// 삐져나가는 만큼 무게중심이 한쪽으로 쏠리기 때문)
+const WRAP_WIDTH = previewTheme?.wrapWidth ?? 355
+const WRAP_HEIGHT = previewTheme?.wrapHeight ?? 355
+
+function getContentBounds(theme: typeof previewTheme) {
+  if (!theme?.backgroundShapeWidth || !theme?.backgroundShapeHeight) {
+    return { left: 0, top: 0, right: 0, bottom: 0 }
+  }
+  let left = 0
+  let top = 0
+  let right = theme.backgroundShapeWidth
+  let bottom = theme.backgroundShapeHeight
+
+  if (theme.characterLayout === 'positioned') {
+    const charLeft = theme.characterPositionLeft ?? 0
+    const charTop = theme.characterPositionTop ?? 0
+    left = Math.min(left, charLeft)
+    top = Math.min(top, charTop)
+    right = Math.max(right, charLeft + (theme.characterPositionWidth ?? 0))
+    bottom = Math.max(bottom, charTop + (theme.characterPositionHeight ?? 0))
+  }
+  if (theme.accentShape) {
+    const accentLeft = theme.accentShapeLeft ?? 0
+    const accentTop = theme.accentShapeTop ?? 0
+    left = Math.min(left, accentLeft)
+    top = Math.min(top, accentTop)
+    right = Math.max(right, accentLeft + (theme.accentShapeWidth ?? 0))
+    bottom = Math.max(bottom, accentTop + (theme.accentShapeHeight ?? 0))
+  }
+  return { left, top, right, bottom }
+}
+
+const CONTENT_BOUNDS = getContentBounds(previewTheme)
+const SHAPE_OFFSET_X =
+  (WRAP_WIDTH - (CONTENT_BOUNDS.right - CONTENT_BOUNDS.left)) / 2 -
+  CONTENT_BOUNDS.left +
+  (previewTheme?.contentOffsetX ?? 0)
+const SHAPE_OFFSET_Y =
+  (WRAP_HEIGHT - (CONTENT_BOUNDS.bottom - CONTENT_BOUNDS.top)) / 2 -
+  CONTENT_BOUNDS.top +
+  (previewTheme?.contentOffsetY ?? 0)
 
 const displayResult = previewTheme
   ? {
@@ -193,18 +237,21 @@ function ResultPage({
             <img className="result-page__back-icon" src={chevronLeftIcon} alt="" aria-hidden="true" />
           </button>
 
-          <div className="result-page__character-wrap">
+          <div
+            className="result-page__character-wrap"
+            style={{ width: `${WRAP_WIDTH}px`, height: `${WRAP_HEIGHT}px` }}
+          >
             {previewTheme?.backgroundShape ? (
               <img
                 className="result-page__background-shape"
-                style={
-                  previewTheme.backgroundShapeWidth && previewTheme.backgroundShapeHeight
-                    ? {
-                        width: `${previewTheme.backgroundShapeWidth}px`,
-                        height: `${previewTheme.backgroundShapeHeight}px`,
-                      }
-                    : undefined
-                }
+                style={{
+                  top: `${SHAPE_OFFSET_Y}px`,
+                  left: `${SHAPE_OFFSET_X}px`,
+                  width: previewTheme.backgroundShapeWidth ? `${previewTheme.backgroundShapeWidth}px` : undefined,
+                  height: previewTheme.backgroundShapeHeight
+                    ? `${previewTheme.backgroundShapeHeight}px`
+                    : undefined,
+                }}
                 src={previewTheme.backgroundShape}
                 alt=""
                 aria-hidden="true"
@@ -212,13 +259,38 @@ function ResultPage({
             ) : (
               <div className="result-page__background-circle" aria-hidden="true" />
             )}
+            {previewTheme?.accentShape && (
+              <img
+                className="result-page__accent-shape"
+                style={{
+                  top: `${SHAPE_OFFSET_Y + (previewTheme.accentShapeTop ?? 0)}px`,
+                  left: `${SHAPE_OFFSET_X + (previewTheme.accentShapeLeft ?? 0)}px`,
+                  width: previewTheme.accentShapeWidth ? `${previewTheme.accentShapeWidth}px` : undefined,
+                  height: previewTheme.accentShapeHeight ? `${previewTheme.accentShapeHeight}px` : undefined,
+                }}
+                src={previewTheme.accentShape}
+                alt=""
+                aria-hidden="true"
+              />
+            )}
             <img
               className={`result-page__character${
                 previewTheme?.characterLayout === 'positioned' ? ' result-page__character--positioned' : ''
               }`}
               style={
-                previewTheme?.characterLayout !== 'positioned'
+                previewTheme?.characterLayout === 'positioned'
                   ? {
+                      top: `${SHAPE_OFFSET_Y + (previewTheme.characterPositionTop ?? 0)}px`,
+                      left: `${SHAPE_OFFSET_X + (previewTheme.characterPositionLeft ?? 0)}px`,
+                      width: previewTheme.characterPositionWidth
+                        ? `${previewTheme.characterPositionWidth}px`
+                        : undefined,
+                      height: previewTheme.characterPositionHeight
+                        ? `${previewTheme.characterPositionHeight}px`
+                        : undefined,
+                      filter: previewTheme.characterShadow,
+                    }
+                  : {
                       ...(previewTheme?.characterWidth
                         ? { width: `${previewTheme.characterWidth}px` }
                         : {}),
@@ -230,7 +302,6 @@ function ResultPage({
                           }
                         : {}),
                     }
-                  : undefined
               }
               src={displayResult.characterImage}
               alt=""

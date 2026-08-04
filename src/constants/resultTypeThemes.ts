@@ -3,6 +3,9 @@ import star21Shape from "../assets/images/result-shapes/star-21.svg";
 import freeSpiritedRomanticCharacter from "../assets/images/character/character-12.png";
 import refreshingExplorerCharacter from "../assets/images/character/character-11.png";
 import cloud9345Shape from "../assets/images/result-shapes/cloud-9345.svg";
+import explosiveAdventurerCharacter from "../assets/images/character/character-6.png";
+import star22Shape from "../assets/images/result-shapes/star-22.svg";
+import star23Shape from "../assets/images/result-shapes/star-23.svg";
 
 // 백엔드 실제 typeCode(GET /api/v1/mood-types) 기준 키.
 // 캐릭터 이미지/이름/설명/문구는 원래 API가 내려주지만, 결과화면 배경색·포인트컬러·배경 무늬는
@@ -17,17 +20,36 @@ export interface ResultTypeTheme {
   characterImage: string;
   // 무늬 이미지 없이 원형 배경만 쓰는 타입은 생략 가능 (기본 190.7px)
   characterWidth?: number;
-  // TODO: 타입별 배경 무늬(별/구름 모양 등) SVG 에셋 받으면 채우기
+  // 타입별 배경 무늬(별/구름 모양 등) SVG 에셋. 무늬는 래퍼 안에서 항상 가운데 정렬됨
   backgroundShape?: string;
-  // 무늬 크기가 기본(355x355)과 다를 때만 지정 (예: 정사각형이 아닌 무늬)
   backgroundShapeWidth?: number;
   backgroundShapeHeight?: number;
-  // 가운데 정렬된 위치에서 캐릭터를 살짝 옮길 때 (예: 캐릭터 장식이 무늬의 특정 굴곡에 맞물리도록)
+  // 래퍼(무늬+캐릭터+보조무늬를 담는 영역) 크기. 보조 무늬가 무늬 밖으로 많이 삐져나가는 등
+  // 기본값(355x355)보다 여유 공간이 더 필요할 때만 지정
+  wrapWidth?: number;
+  wrapHeight?: number;
+  // characterLayout: 'positioned' 전용 — 자동 계산된 가운데 정렬 위치에서 무늬+캐릭터+보조무늬
+  // 전체를 한번 더 미세 조정할 때 (예: 디자인상 완전 중앙이 아니라 살짝 왼쪽으로 치우친 구성일 때)
+  contentOffsetX?: number;
+  contentOffsetY?: number;
+  // 'centered'(기본값): 무늬/원 위에 캐릭터를 가운데 정렬, 필요하면 offset으로 미세조정
+  // 'positioned': Figma 절대좌표(무늬 기준 상대좌표)로 캐릭터를 정확히 배치
+  characterLayout?: "centered" | "positioned";
   characterOffsetX?: number;
   characterOffsetY?: number;
-  // 'positioned': Figma 절대좌표로 캐릭터 배치 (별처럼 무늬가 비대칭이라 정확한 정렬이 필요할 때).
-  // 기본값(미지정 시) 'centered': 무늬/원 위에 캐릭터를 가운데 정렬
-  characterLayout?: "centered" | "positioned";
+  // characterLayout: 'positioned' 전용 — 무늬 이미지의 top-left(0,0) 기준 상대 좌표/크기
+  characterPositionTop?: number;
+  characterPositionLeft?: number;
+  characterPositionWidth?: number;
+  characterPositionHeight?: number;
+  // 캐릭터 그림자 (Figma의 X/Y/blur/color를 그대로 옮긴 CSS drop-shadow 값)
+  characterShadow?: string;
+  // 보조 장식 무늬(작은 별 등). 무늬 이미지의 top-left(0,0) 기준 상대 좌표
+  accentShape?: string;
+  accentShapeWidth?: number;
+  accentShapeHeight?: number;
+  accentShapeTop?: number;
+  accentShapeLeft?: number;
 }
 
 export const RESULT_TYPE_THEMES: Record<string, ResultTypeTheme> = {
@@ -41,7 +63,14 @@ export const RESULT_TYPE_THEMES: Record<string, ResultTypeTheme> = {
     accentColor: "#FEBC39",
     characterImage: passionateChallengerCharacter,
     backgroundShape: star21Shape,
+    backgroundShapeWidth: 338,
+    backgroundShapeHeight: 355,
     characterLayout: "positioned",
+    characterPositionTop: 40,
+    characterPositionLeft: 41,
+    characterPositionWidth: 288,
+    characterPositionHeight: 302,
+    characterShadow: "drop-shadow(9px 6px 6.5px rgba(0, 0, 0, 0.25))",
   },
   "free-spirited-romantic": {
     name: "자유로운 탐험가",
@@ -68,5 +97,36 @@ export const RESULT_TYPE_THEMES: Record<string, ResultTypeTheme> = {
     backgroundShapeHeight: 345,
     characterOffsetX: 3,
     characterOffsetY: 5,
+  },
+  "explosive-adventurer": {
+    name: "폭발적인 모험가",
+    description: "어떤 상황에서도 넘치는 에너지를 보여주는 타입",
+    quote: "한 번 시작했으면 끝까지!",
+    detailDescription:
+      "폭발적인 모험가 드라이 마티니를 니트로 주문하고 눈 하나 깜짝 안 하는 타입이에요. 불꽃이 머리 위에서 타오르고 있어도 본인은 그게 일상이에요. 한 번 마음먹으면 끝까지 가고, 중간에 돌아서는 법이 없어요. 강렬한 도수처럼 처음엔 압도되지만, 적응하면 이 사람 없이는 심심해지죠. 극단적이지만 그게 매력인 타입이에요.",
+    backgroundColor: "#F8490C",
+    accentColor: "#FF0004",
+    characterImage: explosiveAdventurerCharacter,
+    backgroundShape: star22Shape,
+    backgroundShapeWidth: 257,
+    backgroundShapeHeight: 257,
+    wrapWidth: 355,
+    wrapHeight: 355,
+    contentOffsetX: -20,
+    characterLayout: "positioned",
+    // Figma: 무늬(Star22) top108 left18, 캐릭터(Group213) top93 left74 244.81x315
+    // -> 무늬 기준 상대좌표: top 93-108=-15, left 74-18=56
+    characterPositionTop: -15,
+    characterPositionLeft: 56,
+    characterPositionWidth: 244.81,
+    characterPositionHeight: 315,
+    characterShadow: "drop-shadow(13px 6px 4px rgba(0, 0, 0, 0.25))",
+    // Figma: 작은 별(Star23) top331 left245 104x104
+    // -> 무늬 기준 상대좌표: top 331-108=223, left 245-18=227
+    accentShape: star23Shape,
+    accentShapeWidth: 104,
+    accentShapeHeight: 104,
+    accentShapeTop: 223,
+    accentShapeLeft: 227,
   },
 };
