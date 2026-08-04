@@ -13,6 +13,9 @@ import sparkles9585MainShape from "../assets/images/result-shapes/sparkles-9585-
 import sparkles9585AccentShape from "../assets/images/result-shapes/sparkles-9585-accent.svg";
 import emotionalThinkerCharacter from "../assets/images/character/character-10.png";
 import wave9586Shape from "../assets/images/result-shapes/wave-9586.svg";
+import steadfastPrinciplistCharacter from "../assets/images/character/character-3.png";
+import stripes9588Shape from "../assets/images/result-shapes/stripes-9588.svg";
+import backdrop9588Shape from "../assets/images/result-shapes/backdrop-9588.svg";
 
 // 백엔드 실제 typeCode(GET /api/v1/mood-types) 기준 키.
 // 캐릭터 이미지/이름/설명/문구는 원래 API가 내려주지만, 결과화면 배경색·포인트컬러·배경 무늬는
@@ -191,5 +194,25 @@ export const RESULT_TYPE_THEMES: Record<string, ResultTypeTheme> = {
     backgroundShapeHeight: 455,
     contentOffsetY: 80,
     characterOffsetY: 10,
+  },
+  "steadfast-principlist": {
+    name: "진중한 원칙주의자",
+    description: "쓴맛도 즐길 줄 아는, 타협 없이 자신의 기준을 지키는 타입",
+    quote: "기준이 있어야 선택도 의미가 있어.",
+    detailDescription:
+      '네그로니의 쓴맛을 처음부터 좋아했다고 말하는 타입이에요. 남들이 "이거 써서 못 마시겠다"고 할 때, 오히려 한 모금 더 마시죠. 타협이나 예외는 없어요. 기준이 분명하고 그걸 지키는 게 당연하다고 생각해요. 차갑게 팔짱을 끼고 있어도 믿음직한 건 이 타입이 제일이에요. 오래 알수록 의외의 따뜻함에 놀라게 되는 사람이에요.',
+    backgroundColor: "#124480",
+    accentColor: "#4E75A4",
+    characterImage: steadfastPrinciplistCharacter,
+    characterWidth: 230,
+    backgroundShape: backdrop9588Shape,
+    backgroundShapeWidth: 394,
+    backgroundShapeHeight: 223,
+    // Figma: 흰 배경판 top92, 줄무늬 top235 -> 배경판 기준 상대좌표 235-92=143
+    accentShape: stripes9588Shape,
+    accentShapeWidth: 393,
+    accentShapeHeight: 99,
+    accentShapeTop: 143,
+    accentShapeLeft: 0,
   },
 };
