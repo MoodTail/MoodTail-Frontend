@@ -44,23 +44,31 @@
   height: 15px;
 }
 
-.result-page__character-circle {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 340px;
-  height: 340px;
-  margin-top: 12px;
-  border-radius: 50%;
-  background: #ffffff;
+.result-page__character-wrap {
+  position: relative;
+  width: 355px;
+  height: 355px;
+  margin: 12px auto 0;
 }
 
+.result-page__background-shape {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 355px;
+  height: 355px;
+}
+
+/* Figma 기준 별(무늬) top:72 left:19 355x355, 캐릭터 top:112.43 left:60 288.27x301.66 —
+   캐릭터 위치는 별 기준 상대 오프셋(top +40px, left +41px)으로 환산 */
 .result-page__character {
-  width: 190.7px;
-  height: auto;
-  max-height: 302px;
+  position: absolute;
+  top: 40px;
+  left: 41px;
+  width: 288px;
+  height: 302px;
   object-fit: contain;
-  filter: drop-shadow(8px 4px 13.3px rgba(254, 164, 144, 0.25));
+  filter: drop-shadow(9px 6px 6.5px rgba(0, 0, 0, 0.25));
 }
 
 .result-page__type-name {
@@ -137,6 +145,9 @@
   line-height: 18px;
   letter-spacing: 0;
   color: #5f5a57;
+  text-align: center;
+  text-wrap: balance;
+  word-break: keep-all;
 }
 
 .result-page__detail-percent {

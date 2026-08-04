@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, type CSSProperties } from 'react'
 import chevronLeftIcon from '../../assets/icons/chevron-left-white.svg'
 import shareIcon from '../../assets/icons/share.svg'
 import RadarChart, { type RadarChartData } from '../../components/ResultPage/RadarChart'
@@ -8,6 +8,7 @@ import TwoButtonModal from '../../components/common/modal/TwoButtonModal'
 import ResultShareModal from '../../components/common/modal/ResultShareModal'
 import ResultSnsShareModal from '../../components/common/modal/ResultSnsShareModal'
 import SaveCompleteToast from '../../components/common/SaveCompleteToast'
+import { RESULT_TYPE_THEMES } from '../../constants/resultTypeThemes'
 import romanticCharacterImg from '../../assets/images/character/character-12.png'
 import visionaryCharacterImg from '../../assets/images/character-crop/character-crop-11.svg'
 import disciplinarianCharacterImg from '../../assets/images/character-crop/character-crop-2.png'
@@ -29,6 +30,23 @@ const MOCK_RESULT = {
     '자유로운 탐험가 오늘은 상그리아, 내일은 모스코 뮬. 탄산처럼 톡 튀는 취향이라 메뉴판을 다 읽어봐야 직성이 풀려요. 우산 꽂힌 트로피컬 잔처럼 어디서든 분위기를 만들어내고, 정해진 루트 없이 흘러가는 게 오히려 제일 자연스러운 타입이에요. 예측이 안 되는 게 매력이라는 걸 본인도 알고 있어요.',
   matchPercent: 68,
 }
+
+// TODO: 실제 API 연동 전까지, 타입별 배경색/포인트컬러/카피를 디자인팀에게 하나씩 전달받아
+// resultTypeThemes.ts에 채워넣고 여기서 미리보기로 확인하는 용도. 다 모이면 실제 결과의 typeCode로 대체
+const PREVIEW_TYPE_CODE = 'passionate-challenger'
+const previewTheme = RESULT_TYPE_THEMES[PREVIEW_TYPE_CODE]
+
+const displayResult = previewTheme
+  ? {
+      ...MOCK_RESULT,
+      characterImage: previewTheme.characterImage,
+      typeName: previewTheme.name,
+      typeDescription: previewTheme.description,
+      shareDescription: previewTheme.description,
+      quote: previewTheme.quote,
+      detailDescription: previewTheme.detailDescription,
+    }
+  : MOCK_RESULT
 
 // TODO: glass-*.png 파일명이 번호로만 되어 있어 모양으로 임의 매핑함. 실제 칵테일-잔 매핑 확정되면 교체
 const MOCK_TOP_COCKTAILS: CocktailTopItem[] = [
@@ -155,7 +173,17 @@ function ResultPage({
   return (
     <>
       <div className="result-page">
-        <header className="result-page__header">
+        <header
+          className="result-page__header"
+          style={
+            previewTheme
+              ? ({
+                  background: previewTheme.backgroundColor,
+                  '--color-primary': previewTheme.accentColor,
+                } as CSSProperties)
+              : undefined
+          }
+        >
           <button
             type="button"
             className="result-page__back"
@@ -165,18 +193,26 @@ function ResultPage({
             <img className="result-page__back-icon" src={chevronLeftIcon} alt="" aria-hidden="true" />
           </button>
 
-          <div className="result-page__character-circle">
-            <img className="result-page__character" src={MOCK_RESULT.characterImage} alt="" />
+          <div className="result-page__character-wrap">
+            {previewTheme?.backgroundShape && (
+              <img
+                className="result-page__background-shape"
+                src={previewTheme.backgroundShape}
+                alt=""
+                aria-hidden="true"
+              />
+            )}
+            <img className="result-page__character" src={displayResult.characterImage} alt="" />
           </div>
-          <p className="result-page__type-name">{MOCK_RESULT.typeName}</p>
-          <p className="result-page__type-description">{MOCK_RESULT.typeDescription}</p>
-          <p className="result-page__quote">&ldquo;{MOCK_RESULT.quote}&rdquo;</p>
+          <p className="result-page__type-name">{displayResult.typeName}</p>
+          <p className="result-page__type-description">{displayResult.typeDescription}</p>
+          <p className="result-page__quote">&ldquo;{displayResult.quote}&rdquo;</p>
 
           <div className="result-page__detail-card">
-            <p className="result-page__detail-title">{MOCK_RESULT.typeName}</p>
-            <p className="result-page__detail-body">{MOCK_RESULT.detailDescription}</p>
+            <p className="result-page__detail-title">{displayResult.typeName}</p>
+            <p className="result-page__detail-body">{displayResult.detailDescription}</p>
             <p className="result-page__detail-percent">
-              사용자의 {MOCK_RESULT.matchPercent}%가 이 타입이 나왔어요
+              사용자의 {displayResult.matchPercent}%가 이 타입이 나왔어요
             </p>
           </div>
         </header>
@@ -272,10 +308,10 @@ function ResultPage({
       <ResultShareModal
         isOpen={isShareModalOpen}
         shareCard={{
-          characterImage: MOCK_RESULT.characterImage,
-          typeName: MOCK_RESULT.typeName,
-          typeDescription: MOCK_RESULT.shareDescription,
-          quote: MOCK_RESULT.quote,
+          characterImage: displayResult.characterImage,
+          typeName: displayResult.typeName,
+          typeDescription: displayResult.shareDescription,
+          quote: displayResult.quote,
         }}
         onClose={() => setIsShareModalOpen(false)}
         onSnsShare={handleSnsShare}
