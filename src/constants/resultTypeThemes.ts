@@ -6,6 +6,8 @@ import cloud9345Shape from "../assets/images/result-shapes/cloud-9345.svg";
 import explosiveAdventurerCharacter from "../assets/images/character/character-6.png";
 import star22Shape from "../assets/images/result-shapes/star-22.svg";
 import star23Shape from "../assets/images/result-shapes/star-23.svg";
+import sensitivePerfectionistCharacter from "../assets/images/character/character-7.png";
+import shard9584Shape from "../assets/images/result-shapes/shard-9584.svg";
 
 // 백엔드 실제 typeCode(GET /api/v1/mood-types) 기준 키.
 // 캐릭터 이미지/이름/설명/문구는 원래 API가 내려주지만, 결과화면 배경색·포인트컬러·배경 무늬는
@@ -112,7 +114,7 @@ export const RESULT_TYPE_THEMES: Record<string, ResultTypeTheme> = {
     backgroundShapeHeight: 257,
     wrapWidth: 355,
     wrapHeight: 355,
-    contentOffsetX: -20,
+    contentOffsetX: -10,
     characterLayout: "positioned",
     // Figma: 무늬(Star22) top108 left18, 캐릭터(Group213) top93 left74 244.81x315
     // -> 무늬 기준 상대좌표: top 93-108=-15, left 74-18=56
@@ -128,5 +130,21 @@ export const RESULT_TYPE_THEMES: Record<string, ResultTypeTheme> = {
     accentShapeHeight: 104,
     accentShapeTop: 223,
     accentShapeLeft: 227,
+  },
+  "sensitive-perfectionist": {
+    name: "예민한 완벽주의자",
+    description: "날카로운 직감으로 남들보다 빨리 변화를 알아차리는 타입",
+    quote: "이 한 방울까지 모두 계획대로야!",
+    detailDescription:
+      '예민한 완벽주의자 피스코 사워의 산미가 정확히 몇 퍼센트인지 느낄 수 있는 타입이에요. 날카롭게 뻗은 마티니 글라스처럼, 실루엣부터 취향이 분명해요. "그냥 아무거나"는 이 사람의 사전에 없는 말이에요. 디테일을 놓치지 않고, 한 번 틀어진 게 계속 신경 쓰이는 편이지만 그 섬세함 덕분에 결과물은 항상 완벽에 가까워요.',
+    backgroundColor: "#FB8558",
+    accentColor: "#FD9D78",
+    characterImage: sensitivePerfectionistCharacter,
+    characterWidth: 229,
+    backgroundShape: shard9584Shape,
+    backgroundShapeWidth: 600,
+    backgroundShapeHeight: 490,
+    contentOffsetY: 65,
+    characterOffsetY: 0,
   },
 };
