@@ -33,7 +33,7 @@ const MOCK_RESULT = {
 
 // TODO: 실제 API 연동 전까지, 타입별 배경색/포인트컬러/카피를 디자인팀에게 하나씩 전달받아
 // resultTypeThemes.ts에 채워넣고 여기서 미리보기로 확인하는 용도. 다 모이면 실제 결과의 typeCode로 대체
-const PREVIEW_TYPE_CODE = 'free-spirited-romantic'
+const PREVIEW_TYPE_CODE = 'refreshing-explorer'
 const previewTheme = RESULT_TYPE_THEMES[PREVIEW_TYPE_CODE]
 
 const displayResult = previewTheme
@@ -197,6 +197,14 @@ function ResultPage({
             {previewTheme?.backgroundShape ? (
               <img
                 className="result-page__background-shape"
+                style={
+                  previewTheme.backgroundShapeWidth && previewTheme.backgroundShapeHeight
+                    ? {
+                        width: `${previewTheme.backgroundShapeWidth}px`,
+                        height: `${previewTheme.backgroundShapeHeight}px`,
+                      }
+                    : undefined
+                }
                 src={previewTheme.backgroundShape}
                 alt=""
                 aria-hidden="true"
@@ -206,8 +214,24 @@ function ResultPage({
             )}
             <img
               className={`result-page__character${
-                previewTheme?.backgroundShape ? ' result-page__character--positioned' : ''
+                previewTheme?.characterLayout === 'positioned' ? ' result-page__character--positioned' : ''
               }`}
+              style={
+                previewTheme?.characterLayout !== 'positioned'
+                  ? {
+                      ...(previewTheme?.characterWidth
+                        ? { width: `${previewTheme.characterWidth}px` }
+                        : {}),
+                      ...(previewTheme?.characterOffsetX || previewTheme?.characterOffsetY
+                        ? {
+                            transform: `translate(${previewTheme?.characterOffsetX ?? 0}px, ${
+                              previewTheme?.characterOffsetY ?? 0
+                            }px)`,
+                          }
+                        : {}),
+                    }
+                  : undefined
+              }
               src={displayResult.characterImage}
               alt=""
             />
