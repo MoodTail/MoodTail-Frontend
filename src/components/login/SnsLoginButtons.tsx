@@ -1,7 +1,37 @@
 import type { FC } from "react";
 import googleIcon from "../../assets/icons/google-icon.png";
+import { postKakaoLogin } from "../../api/auth/auth.api";
+import { postOauthState } from "../../api/auth/auth.api";
 
 const SnsLoginButtons: FC = () => {
+  const handleKakaoClick = async (): Promise<void> => {
+    try {
+      const { state, codeChallenge, codeChallengeMethod } =
+        await postOauthState("kakao");
+
+      const kakaoAuthUrl = new URL("https://kauth.kakao.com/oauth/authorize");
+      kakaoAuthUrl.searchParams.set(
+        "client_id",
+        import.meta.env.VITE_KAKAO_CLIENT_ID,
+      );
+      kakaoAuthUrl.searchParams.set(
+        "redirect_uri",
+        import.meta.env.VITE_KAKAO_REDIRECT_URI,
+      );
+      kakaoAuthUrl.searchParams.set("response_type", "code");
+      kakaoAuthUrl.searchParams.set("state", state);
+      kakaoAuthUrl.searchParams.set("code_challenge", codeChallenge);
+      kakaoAuthUrl.searchParams.set(
+        "code_challenge_method",
+        codeChallengeMethod,
+      );
+
+      window.location.href = kakaoAuthUrl.toString();
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   return (
     <div className="sns-login-buttons">
       <button

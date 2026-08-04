@@ -1,14 +1,17 @@
 import { apiClient } from "../client";
-import {
-  type BaseVoidResponse,
-  type PostGuestLoginRequest,
-  type PostGuestLoginResponse,
-  type PostSignupLocalRequest,
-  type PostSignupLocalResponse,
-  type PostLoginLocalRequest,
-  type PostLoginLocalResponse,
-  type GetLocalEmailAvailabilityResponse,
-  type GetLocalEmailAvailabilityRequest,
+import type {
+  BaseVoidResponse,
+  PostGuestLoginRequest,
+  PostGuestLoginResponse,
+  PostSignupLocalRequest,
+  PostSignupLocalResponse,
+  PostLoginLocalRequest,
+  PostLoginLocalResponse,
+  GetLocalEmailAvailabilityRequest,
+  GetLocalEmailAvailabilityResponse,
+  PostKakaoLoginRequest,
+  PostKakaoLoginResponse,
+  PostOauthStateResponse,
 } from "./auth.types";
 
 // TODO: 로그인 API 연동 후 accessToken이 실제로 발급되면 end-to-end 테스트 필요
@@ -36,6 +39,14 @@ export const postSignupLocal = async (body: PostSignupLocalRequest) => {
   return response.data.result;
 };
 
+export const postKakaoLogin = async (body: PostKakaoLoginRequest) => {
+  const response = await apiClient.post<PostKakaoLoginResponse>(
+    "/api/v1/auth/kakao",
+    body,
+  );
+  return response.data.result;
+};
+
 export const postLoginLocal = async (body: PostLoginLocalRequest) => {
   const response = await apiClient.post<PostLoginLocalResponse>(
     "/api/v1/auth/login/local",
@@ -50,6 +61,14 @@ export const getLocalEmailAvailability = async (
   const response = await apiClient.get<GetLocalEmailAvailabilityResponse>(
     "/api/v1/auth/signup/local/email-availability",
     { params },
+  );
+  return response.data.result;
+};
+
+export const postOauthState = async (provider: string) => {
+  const response = await apiClient.post<PostOauthStateResponse>(
+    `/api/v1/auth/oauth-states/${provider}`,
+    {},
   );
   return response.data.result;
 };

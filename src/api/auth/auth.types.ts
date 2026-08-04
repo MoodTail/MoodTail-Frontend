@@ -24,17 +24,17 @@ export interface PostGuestLoginResponse {
   result: GuestLoginResult;
 }
 
+export interface SignupAgreement {
+  termId: number;
+  agreed: boolean;
+}
+
 export interface PostSignupLocalRequest {
   email: string;
   password: string;
   passwordConfirm: string;
   nickname: string;
-  agreements: SignupLocalAgreements[];
-}
-
-export interface SignupLocalAgreements {
-  termId: number;
-  agreed: boolean;
+  agreements: SignupAgreement[];
 }
 
 export interface SignupLocalResult {
@@ -88,4 +88,48 @@ export interface GetLocalEmailAvailabilityResponse {
   code: string;
   message: string;
   result: LocalEmailAvailabilityResult;
+}
+
+export interface PostKakaoLoginRequest {
+  authorizationCode: string;
+  redirectUri: string;
+  state: string;
+  nickname: string;
+  agreements: KakaoLoginAgreements[];
+}
+
+export interface KakaoLoginAgreements {
+  termId: number;
+  agreed: boolean;
+}
+
+export interface KakaoLoginResult {
+  userId: number;
+  email: string;
+  nickname: string;
+  provider: string;
+  isNewUser: boolean;
+  grantType: string;
+  accessToken: string;
+}
+
+export interface PostKakaoLoginResponse {
+  timestamp: string;
+  code: string;
+  message: string;
+  result: KakaoLoginResult;
+}
+
+export interface OauthStateResult {
+  state: string;
+  codeChallenge: string;
+  codeChallengeMethod: string;
+  expiresInSeconds: number;
+}
+
+export interface PostOauthStateResponse {
+  timestamp: string;
+  code: string;
+  message: string;
+  result: OauthStateResult;
 }
