@@ -17,7 +17,8 @@ import LoginPage from "./pages/LoginPage/LoginPage";
 import ResultPage from "./pages/ResultPage/ResultPage";
 import QuizQuestionPage from "./pages/QuizQuestionPage";
 import { buildQuizQuestions, toQuizQuestions, type QuizQuestion } from "./data/quiz";
-import { getTestQuestions, submitTestResult, type TestAnswer, type TestResult } from "./api/tests";
+import { getMoodTestQuestions, postMoodTestResult } from "./api/mood-tests/moodTests.api";
+import type { MoodTestAnswer, MoodTestResult } from "./api/mood-tests/moodTests.types";
 import "./App.css";
 
 export type NavKey = "history" | "dictionary" | "home" | "recipe" | "mypage";
@@ -45,7 +46,7 @@ function App() {
     {},
   );
   const [retestQuestions, setRetestQuestions] = useState<QuizQuestion[]>(() => buildQuizQuestions());
-  const [quizResult, setQuizResult] = useState<TestResult | null>(null);
+  const [quizResult, setQuizResult] = useState<MoodTestResult | null>(null);
 
   const startRetest = () => {
     setIsTestResultOpen(false);
@@ -53,8 +54,8 @@ function App() {
     setRetestAnswers({});
     setRetestQuestions(buildQuizQuestions());
     setIsRetestOpen(true);
-    getTestQuestions()
-      .then((questions) => setRetestQuestions(toQuizQuestions(questions)))
+    getMoodTestQuestions()
+      .then(({ questions }) => setRetestQuestions(toQuizQuestions(questions)))
       .catch((err) => console.error("테스트 질문을 불러오지 못했습니다", err));
   };
 
@@ -62,6 +63,15 @@ function App() {
     setIsRetestOpen(false);
     setRetestStep(0);
     setRetestAnswers({});
+    setRetestQuestions(buildQuizQuestions());
+    setIsRetestOpen(true);
+  };
+
+  const startTestFromHistory = () => {
+    setHistoryView("calendar");
+    setRetestStep(0);
+    setRetestAnswers({});
+    setIsRetestOpen(true);
   };
 
   const handleGoToTest = () => {
@@ -106,7 +116,7 @@ function App() {
               openHistoryRecordPage(hasTestResult, date, "result")
             }
             onOpenMonthlyReport={openMonthlyReportPage}
-            onGoTest={handleGoToTest}
+            onStartTest={startTestFromHistory}
           />
         );
       case "dictionary":
@@ -160,6 +170,7 @@ function App() {
           initialTab={historyRecordTab}
           onBack={() => setHistoryView("calendar")}
           onOpenFullResult={() => setHistoryView("test-result")}
+          onStartTest={startTestFromHistory}
         />
       ),
       "test-result": <TestResultPage onBack={() => setHistoryView("photo")} />,
@@ -210,11 +221,11 @@ function App() {
                       if (Number.isNaN(questionId) || Number.isNaN(optionId)) return null;
                       return { questionId, optionId };
                     })
-                    .filter((a): a is TestAnswer => a !== null);
+                    .filter((a): a is MoodTestAnswer => a !== null);
 
                   exitRetest();
                   if (answers.length === retestQuestions.length) {
-                    submitTestResult(answers)
+                    postMoodTestResult(answers)
                       .then((result) => {
                         setQuizResult(result);
                         setIsTestResultOpen(true);

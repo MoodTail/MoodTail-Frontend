@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import chevronLeftIcon from '../../assets/icons/chevron-left-white.svg'
 import shareIcon from '../../assets/icons/share.svg'
 import RadarChart, { type RadarChartData } from '../../components/ResultPage/RadarChart'
@@ -15,7 +15,7 @@ import glass1 from '../../assets/images/glass/glass-1.png'
 import glass2 from '../../assets/images/glass/glass-2.png'
 import glass3 from '../../assets/images/glass/glass-3.png'
 import glass4 from '../../assets/images/glass/glass-4.png'
-import type { TestResult } from '../../api/tests'
+import type { MoodTestResult } from '../../api/mood-tests/moodTests.types'
 import '../../styles/ResultPage.css'
 
 // TODO: 실제 테스트 결과 API 연동 후 실제 응답으로 대체
@@ -56,7 +56,7 @@ type ModalStep = 'none' | 'save-overwrite-warning' | 'login-required' | 'back-co
 interface ResultPageProps {
   isLoggedIn?: boolean
   // 실제 테스트 제출(POST /api/v1/tests/results) 응답. 없으면 목데이터로 보여줍니다.
-  result?: TestResult | null
+  result?: MoodTestResult | null
   // TODO: react-router-dom 도입되면 이 prop 대신 라우팅으로 대체
   onBack?: () => void
   onRetest?: () => void
@@ -110,6 +110,13 @@ function ResultPage({
   const [isShareModalOpen, setIsShareModalOpen] = useState(false)
   const [isSnsModalOpen, setIsSnsModalOpen] = useState(false)
   const [isSaveToastVisible, setIsSaveToastVisible] = useState(false)
+  const [isSaveResultToastVisible, setIsSaveResultToastVisible] = useState(false)
+
+  useEffect(() => {
+    if (!isSaveResultToastVisible) return
+    const timer = setTimeout(() => setIsSaveResultToastVisible(false), 1500)
+    return () => clearTimeout(timer)
+  }, [isSaveResultToastVisible])
 
   const goBack = () => {
     if (onBack) {
@@ -142,6 +149,7 @@ function ResultPage({
     console.log('TODO: 테스트 결과 저장')
     setIsResultSaved(true)
     setModalStep('none')
+    setIsSaveResultToastVisible(true)
   }
 
   const handleSaveResult = () => {
@@ -248,9 +256,15 @@ function ResultPage({
           </section>
 
           <div className="result-page__actions">
-            <button type="button" className="result-page__retest" onClick={handleRetest}>
-              다시 테스트하기
-            </button>
+            {isSaveResultToastVisible ? (
+              <div className="result-page__save-toast" role="status" aria-live="polite">
+                저장 완료되었습니다
+              </div>
+            ) : (
+              <button type="button" className="result-page__retest" onClick={handleRetest}>
+                다시 테스트하기
+              </button>
+            )}
             <button type="button" className="result-page__save" onClick={handleSaveResult}>
               테스트 결과 저장
             </button>

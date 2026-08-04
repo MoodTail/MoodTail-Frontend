@@ -1,4 +1,4 @@
-import type { TestQuestion } from "../api/tests";
+import type { MoodTestQuestion } from "../api/mood-tests/moodTests.types";
 
 export type TasteStat = "당도" | "산도" | "쓴맛" | "청량감" | "도수";
 
@@ -22,7 +22,7 @@ export interface QuizQuestion {
 
 // 실제 API(/api/v1/tests/questions)에서 받아온 문항을 화면에서 쓰는 QuizQuestion 형태로 변환합니다.
 // id는 questionId/optionId를 그대로 문자열화해서, 제출할 때 다시 숫자로 되돌릴 수 있게 합니다.
-export function toQuizQuestions(questions: TestQuestion[]): QuizQuestion[] {
+export function toQuizQuestions(questions: MoodTestQuestion[]): QuizQuestion[] {
   return questions.map((q) => ({
     id: String(q.questionId),
     title: q.content,

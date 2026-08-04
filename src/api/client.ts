@@ -1,25 +1,25 @@
-const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+import axios from "axios";
 
-interface ApiEnvelope<T> {
-  code: string;
-  message: string;
-  result: T;
+const baseURL = import.meta.env.VITE_API_BASE_URL;
+
+if (!baseURL) {
+  throw new Error("VITE_API_BASE_URL이 설정되지 않았습니다.");
 }
 
-export async function apiGet<T>(path: string): Promise<T> {
-  const res = await fetch(`${BASE_URL}${path}`);
-  if (!res.ok) throw new Error(`API ${res.status}: ${path}`);
-  const body: ApiEnvelope<T> = await res.json();
-  return body.result;
-}
+export const apiClient = axios.create({
+  baseURL,
+  timeout: 10_000,
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
 
-export async function apiPost<T>(path: string, payload: unknown): Promise<T> {
-  const res = await fetch(`${BASE_URL}${path}`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
-  });
-  if (!res.ok) throw new Error(`API ${res.status}: ${path}`);
-  const body: ApiEnvelope<T> = await res.json();
-  return body.result;
-}
+apiClient.interceptors.request.use((config) => {
+  const accessToken = localStorage.getItem("accessToken");
+
+  if (accessToken) {
+    config.headers.Authorization = `Bearer ${accessToken}`;
+  }
+
+  return config;
+});

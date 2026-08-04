@@ -23,6 +23,7 @@ type HistoryRecordTab = 'photo' | 'cocktail' | 'result'
 interface HistoryPhotoPageProps {
   onBack: () => void
   onOpenFullResult: () => void
+  onStartTest: () => void
   hasTestResult: boolean
   selectedDate: Date
   initialTab?: HistoryRecordTab
@@ -31,6 +32,7 @@ interface HistoryPhotoPageProps {
 function HistoryPhotoPage({
   onBack,
   onOpenFullResult,
+  onStartTest,
   hasTestResult,
   selectedDate,
   initialTab = 'photo',
@@ -211,7 +213,10 @@ function HistoryPhotoPage({
                 <img src={emptyResultCharacter} alt="테스트 기록 없음" />
                 <strong>테스트 기록이 없어요..</strong>
               </article>
-              <HistoryPrimaryButton className="history-test-result__bottom-button">
+              <HistoryPrimaryButton
+                className="history-test-result__bottom-button"
+                onClick={onStartTest}
+              >
                 테스트하러 가기
               </HistoryPrimaryButton>
             </>

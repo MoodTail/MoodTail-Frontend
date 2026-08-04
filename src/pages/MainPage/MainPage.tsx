@@ -10,7 +10,8 @@ import CustomRecommendResultPage from "../CustomRecommendResultPage/CustomRecomm
 import QuizQuestionPage from "../QuizQuestionPage";
 import LoadingPage from "../LoadingPage";
 import { buildQuizQuestions, toQuizQuestions, type QuizQuestion } from "../../data/quiz";
-import { getTestQuestions, submitTestResult, type TestAnswer, type TestResult } from "../../api/tests";
+import { getMoodTestQuestions, postMoodTestResult } from "../../api/mood-tests/moodTests.api";
+import type { MoodTestAnswer, MoodTestResult } from "../../api/mood-tests/moodTests.types";
 
 // ui 구현용으로 잔 이미지 하나 무작위로 넣음
 import cocktail from "../../assets/images/glass/glass-1.png";
@@ -31,7 +32,7 @@ interface TasteValues {
 type ViewState = "home" | "trend" | "together" | "custom" | "customResult" | "quiz" | "quizLoading";
 
 interface MainPageProps {
-  onQuizComplete?: (result: TestResult | null) => void;
+  onQuizComplete?: (result: MoodTestResult | null) => void;
   initialView?: "quiz";
   onInitialViewConsumed?: () => void;
 }
@@ -44,7 +45,7 @@ const MainPage: FC<MainPageProps> = ({ onQuizComplete, initialView, onInitialVie
   const [quizStep, setQuizStep] = useState(0);
   const [quizAnswers, setQuizAnswers] = useState<Record<number, string>>({});
   const [quizQuestions, setQuizQuestions] = useState<QuizQuestion[]>(() => buildQuizQuestions());
-  const [quizResult, setQuizResult] = useState<TestResult | null>(null);
+  const [quizResult, setQuizResult] = useState<MoodTestResult | null>(null);
 
   useEffect(() => {
     if (initialView === "quiz") onInitialViewConsumed?.();
@@ -56,8 +57,8 @@ const MainPage: FC<MainPageProps> = ({ onQuizComplete, initialView, onInitialVie
   useEffect(() => {
     if (view !== "quiz") return;
     let cancelled = false;
-    getTestQuestions()
-      .then((questions) => {
+    getMoodTestQuestions()
+      .then(({ questions }) => {
         if (!cancelled) setQuizQuestions(toQuizQuestions(questions));
       })
       .catch((err) => console.error("테스트 질문을 불러오지 못했습니다", err));
@@ -106,10 +107,10 @@ const MainPage: FC<MainPageProps> = ({ onQuizComplete, initialView, onInitialVie
                 if (Number.isNaN(questionId) || Number.isNaN(optionId)) return null;
                 return { questionId, optionId };
               })
-              .filter((a): a is TestAnswer => a !== null);
+              .filter((a): a is MoodTestAnswer => a !== null);
 
             if (answers.length === quizQuestions.length) {
-              submitTestResult(answers)
+              postMoodTestResult(answers)
                 .then(setQuizResult)
                 .catch((err) => {
                   console.error("테스트 결과 제출에 실패했습니다", err);

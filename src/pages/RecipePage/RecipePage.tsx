@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { RECIPES, type Recipe } from "./recipeData";
-import { getCocktail, getCocktails } from "../../api/cocktails";
+import { getCocktailDetail, getCocktails } from "../../api/cocktails/cocktails.api";
 import RecipeCard from "./RecipeCard";
 import RecipeDetailView from "./RecipeDetailView";
 import SavedRecipesView from "./SavedRecipesView";
@@ -53,7 +53,7 @@ function RecipePage({ onNavVisibilityChange }: RecipePageProps) {
   useEffect(() => {
     let cancelled = false;
     getCocktails()
-      .then((cocktails) => {
+      .then(({ cocktails }) => {
         if (cancelled) return;
         const merged: Recipe[] = [];
         const idMap: Record<string, number> = {};
@@ -88,7 +88,7 @@ function RecipePage({ onNavVisibilityChange }: RecipePageProps) {
     const cocktailId = cocktailIdByRecipeId[detailId];
     if (!cocktailId) return;
     let cancelled = false;
-    getCocktail(cocktailId)
+    getCocktailDetail(cocktailId)
       .then((detail) => {
         if (cancelled) return;
         if (detail.cocktailIngredients.length === 0 && detail.recipeSteps.length === 0) return;
