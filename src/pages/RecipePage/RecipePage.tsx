@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { RECIPES, type Recipe } from "./recipeData";
+import { getCocktail, getCocktails } from "../../api/cocktails";
 import RecipeCard from "./RecipeCard";
 import RecipeDetailView from "./RecipeDetailView";
 import SavedRecipesView from "./SavedRecipesView";
@@ -38,20 +39,85 @@ function RecipePage({ onNavVisibilityChange }: RecipePageProps) {
   const [query, setQuery] = useState("");
   const [selectingId, setSelectingId] = useState<string | null>(null);
   const [savedIds, setSavedIds] = useState<Set<string>>(() => new Set(INITIAL_SAVED_IDS));
+  const [recipes, setRecipes] = useState<Recipe[]>(RECIPES);
+  const [cocktailIdByRecipeId, setCocktailIdByRecipeId] = useState<Record<string, number>>({});
+  const [liveDetail, setLiveDetail] = useState<Record<string, { ingredients: string[]; steps: string[] }>>({});
 
   useEffect(() => {
     onNavVisibilityChange?.(view.name === "list");
     return () => onNavVisibilityChange?.(true);
   }, [view.name, onNavVisibilityChange]);
 
+  // 목록 화면은 실제 API(/api/v1/cocktails)에서 이름/도수/설명을 받아오되,
+  // 재료/조리법 등 백엔드에 아직 없는 필드는 이름이 일치하는 로컬 목데이터에서 그대로 가져옵니다.
+  useEffect(() => {
+    let cancelled = false;
+    getCocktails()
+      .then((cocktails) => {
+        if (cancelled) return;
+        const merged: Recipe[] = [];
+        const idMap: Record<string, number> = {};
+        cocktails.forEach((c) => {
+          const local = RECIPES.find((r) => r.name === c.nameKo);
+          if (!local) return;
+          merged.push({
+            ...local,
+            description: c.description,
+            degree: `${Math.round(c.alcoholDegree)}°`,
+            taste: { ...local.taste, 도수: Math.round(c.alcoholDegree) },
+          });
+          idMap[local.id] = c.cocktailId;
+        });
+        if (merged.length > 0) {
+          setRecipes(merged);
+          setCocktailIdByRecipeId(idMap);
+        }
+      })
+      .catch((err) => console.error("칵테일 목록을 불러오지 못했습니다", err));
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const detailId = view.name === "detail" ? view.id : null;
+
+  // 상세 화면을 열면 실제 재료/조리법(/api/v1/cocktails/{id})을 받아와 덮어씁니다.
+  // 아직 데이터가 비어있는 칵테일이면 조용히 무시하고 로컬 재료/조리법을 그대로 보여줍니다.
+  useEffect(() => {
+    if (!detailId) return;
+    const cocktailId = cocktailIdByRecipeId[detailId];
+    if (!cocktailId) return;
+    let cancelled = false;
+    getCocktail(cocktailId)
+      .then((detail) => {
+        if (cancelled) return;
+        if (detail.cocktailIngredients.length === 0 && detail.recipeSteps.length === 0) return;
+        setLiveDetail((prev) => ({
+          ...prev,
+          [detailId]: {
+            ingredients: [...detail.cocktailIngredients]
+              .sort((a, b) => a.sortOrder - b.sortOrder)
+              .map((i) => `${i.amountText} ${i.name}`),
+            steps: [...detail.recipeSteps]
+              .sort((a, b) => a.stepOrder - b.stepOrder)
+              .map((s) => s.description),
+          },
+        }));
+      })
+      .catch((err) => console.error("칵테일 상세 정보를 불러오지 못했습니다", err));
+    return () => {
+      cancelled = true;
+    };
+  }, [detailId, cocktailIdByRecipeId]);
+
   const isSearching = query.length > 0;
   const filteredRecipes = useMemo(() => {
-    if (isSearching) return filterAndSortBySimilarity(RECIPES, query);
+    if (isSearching) return filterAndSortBySimilarity(recipes, query);
     const filter = FILTERS.find((f) => f.label === activeFilter) ?? FILTERS[0];
-    return RECIPES.filter(filter.test);
-  }, [query, isSearching, activeFilter]);
+    return recipes.filter(filter.test);
+  }, [recipes, query, isSearching, activeFilter]);
   const hasNoResults = isSearching && filteredRecipes.length === 0;
-  const savedRecipes = RECIPES.filter((r) => savedIds.has(r.id));
+  const savedRecipes = recipes.filter((r) => savedIds.has(r.id));
 
   const handleSelectRecipe = (id: string) => {
     if (selectingId) return;
@@ -72,11 +138,13 @@ function RecipePage({ onNavVisibilityChange }: RecipePageProps) {
   };
 
   if (view.name === "detail") {
-    const recipe = RECIPES.find((r) => r.id === view.id);
+    const recipe = recipes.find((r) => r.id === view.id);
     if (recipe) {
+      const override = liveDetail[view.id];
+      const displayRecipe = override ? { ...recipe, ...override } : recipe;
       return (
         <RecipeDetailView
-          recipe={recipe}
+          recipe={displayRecipe}
           onBack={() => setView({ name: "list" })}
           saved={savedIds.has(recipe.id)}
         />
