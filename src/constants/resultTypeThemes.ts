@@ -204,15 +204,27 @@ export const RESULT_TYPE_THEMES: Record<string, ResultTypeTheme> = {
     backgroundColor: "#124480",
     accentColor: "#4E75A4",
     characterImage: steadfastPrinciplistCharacter,
-    characterWidth: 230,
     backgroundShape: backdrop9588Shape,
-    backgroundShapeWidth: 394,
+    backgroundShapeWidth: 400,
     backgroundShapeHeight: 223,
-    // Figma: 흰 배경판 top92, 줄무늬 top235 -> 배경판 기준 상대좌표 235-92=143
+    // 배경판/줄무늬 폭(394)이 프레임 폭과 거의 같아서, 래퍼 폭을 그대로 맞춰
+    // 가운데 정렬 계산 때 왼쪽에 여백이 남지 않도록 함
+    wrapWidth: 450,
+    // 캐릭터+배경판+줄무늬 전체를 한꺼번에 왼쪽으로 이동
+    contentOffsetX: -49,
+    // Figma 실측: 배경판 top92, 캐릭터(Group9278) top98 left45 303.81x286
+    // -> 배경판 기준 상대좌표: top 98-92=6, left 45-0=45 (+20 보정 = 65)
+    characterLayout: "positioned",
+    characterPositionTop: 6,
+    characterPositionLeft: 55,
+    characterPositionWidth: 303.81,
+    characterPositionHeight: 286,
+    characterShadow: "drop-shadow(8px 6px 4px rgba(0, 0, 0, 0.25))",
+    // Figma 실측: 줄무늬 5개 top 327/379/405/418/424 -> 배경판 기준 상대좌표 327-92=235
     accentShape: stripes9588Shape,
-    accentShapeWidth: 393,
+    accentShapeWidth: 400,
     accentShapeHeight: 99,
-    accentShapeTop: 143,
+    accentShapeTop: 235,
     accentShapeLeft: 0,
   },
 };
