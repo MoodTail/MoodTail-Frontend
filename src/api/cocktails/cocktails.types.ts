@@ -51,3 +51,34 @@ export interface GetCocktailDetailResponse {
   message: string;
   result: CocktailDetailResult;
 }
+
+export interface FavoriteToggleResult {
+  cocktailId: number;
+  name: string;
+}
+
+export interface FavoriteToggleResponse {
+  timestamp: string;
+  code: string;
+  message: string;
+  result: FavoriteToggleResult;
+}
+
+export interface FavoriteCocktail {
+  cocktailId: number;
+  name: string;
+  description: string;
+  imageUrl: string;
+  isFavorite: boolean;
+}
+
+export interface GetFavoriteCocktailsResult {
+  cocktails: FavoriteCocktail[];
+}
+
+export interface GetFavoriteCocktailsResponse {
+  timestamp: string;
+  code: string;
+  message: string;
+  result: GetFavoriteCocktailsResult;
+}

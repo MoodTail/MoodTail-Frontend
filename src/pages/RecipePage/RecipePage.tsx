@@ -1,6 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
 import { RECIPES, type Recipe } from "./recipeData";
-import { getCocktailDetail, getCocktails } from "../../api/cocktails/cocktails.api";
+import {
+  addFavoriteCocktail,
+  getCocktailDetail,
+  getCocktails,
+  getFavoriteCocktails,
+  removeFavoriteCocktail,
+} from "../../api/cocktails/cocktails.api";
 import RecipeCard from "./RecipeCard";
 import RecipeDetailView from "./RecipeDetailView";
 import SavedRecipesView from "./SavedRecipesView";
@@ -79,6 +85,24 @@ function RecipePage({ onNavVisibilityChange }: RecipePageProps) {
     };
   }, []);
 
+  // 저장(즐겨찾기) 목록도 실제 API(/api/v1/cocktails/favorites)에서 받아옵니다.
+  // 인증이 안 된 상태(게스트 등)면 실패하므로, 그 경우 기존 로컬 목데이터를 그대로 씁니다.
+  useEffect(() => {
+    let cancelled = false;
+    getFavoriteCocktails()
+      .then(({ cocktails }) => {
+        if (cancelled) return;
+        const ids = cocktails
+          .map((c) => RECIPES.find((r) => r.name === c.name)?.id)
+          .filter((id): id is string => id !== undefined);
+        setSavedIds(new Set(ids));
+      })
+      .catch((err) => console.error("즐겨찾기 목록을 불러오지 못했습니다", err));
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   const detailId = view.name === "detail" ? view.id : null;
 
   // 상세 화면을 열면 실제 재료/조리법(/api/v1/cocktails/{id})을 받아와 덮어씁니다.
@@ -129,12 +153,20 @@ function RecipePage({ onNavVisibilityChange }: RecipePageProps) {
   };
 
   const toggleSaved = (id: string) => {
+    const wasSaved = savedIds.has(id);
     setSavedIds((prev) => {
       const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
+      if (wasSaved) next.delete(id);
       else next.add(id);
       return next;
     });
+
+    // 실제 즐겨찾기 API 반영은 최선 노력으로만 시도합니다.
+    // 실패해도(비로그인 등) 위에서 이미 반영한 로컬 상태는 그대로 유지합니다.
+    const cocktailId = cocktailIdByRecipeId[id];
+    if (!cocktailId) return;
+    const request = wasSaved ? removeFavoriteCocktail(cocktailId) : addFavoriteCocktail(cocktailId);
+    request.catch((err) => console.error("즐겨찾기 반영에 실패했습니다", err));
   };
 
   if (view.name === "detail") {
