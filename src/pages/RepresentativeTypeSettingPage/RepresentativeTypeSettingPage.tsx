@@ -1,23 +1,15 @@
-import drinkImages from "../../assets/drinks";
 import { COLORS } from "../../theme/colors";
 import Header from "../../components/Header";
 import PhoneFrame from "../../components/PhoneFrame";
 import DexBackground from "../../components/DexBackground";
-import { Mascot } from "../../components/icons";
-import type { PersonalityType } from "../../data/types";
-
-const PERSONALITY_DRINK_IMAGES: Record<string, string> = {
-  idealist: drinkImages[0],
-  romantic: drinkImages[1],
-  realist: drinkImages[4],
-};
+import type { DexGridEntry } from "../../data/moodTypes";
 
 export default function RepresentativeTypeSettingPage({
-  type,
+  entry,
   onBack,
   onConfirm,
 }: {
-  type: PersonalityType;
+  entry: DexGridEntry;
   onBack: () => void;
   onConfirm: () => void;
 }) {
@@ -57,19 +49,12 @@ export default function RepresentativeTypeSettingPage({
               boxShadow: "0 8px 24px rgba(255,107,53,0.12)",
             }}
           >
-            {PERSONALITY_DRINK_IMAGES[type.id] ? (
-              <img
-                src={PERSONALITY_DRINK_IMAGES[type.id]}
-                alt=""
-                style={{ width: 200, height: 250, objectFit: "contain" }}
-              />
-            ) : (
-              <Mascot size={120} color={type.color} />
-            )}
-            <div style={{ fontSize: 25, fontWeight: 700, color: "#FD881C" }}>{type.name}</div>
-            <div style={{ fontSize: 12, color: "#FD881C", textAlign: "center", lineHeight: 1.5 }}>
-              {type.description}
-            </div>
+            <img
+              src={entry.image}
+              alt=""
+              style={{ width: 200, height: 250, objectFit: "contain" }}
+            />
+            <div style={{ fontSize: 25, fontWeight: 700, color: "#FD881C" }}>{entry.name}</div>
             <p
               style={{
                 fontSize: 11,

@@ -1,27 +1,23 @@
-import drink0 from "../assets/drinks/0.png";
-import drinkImages from "../assets/drinks";
 import { COLORS } from "../theme/colors";
-import type { PersonalityType } from "../data/types";
-import { DEX_DATA } from "../data/dexData";
+import type { DexGridEntry } from "../data/moodTypes";
 import Modal from "./Modal";
 import DexBackground from "./DexBackground";
 import { CloseIcon } from "./icons";
 import DexBox from "./DexBox";
 
 export default function DexShareModal({
-  type,
+  entry,
+  entries,
   onClose,
   onShareSns,
   onSaveImage,
 }: {
-  type: PersonalityType;
+  entry: DexGridEntry;
+  entries: DexGridEntry[];
   onClose: () => void;
   onShareSns: () => void;
   onSaveImage: () => void;
 }) {
-  const unlockedCount = type.cocktails.filter((c) => c.unlocked).length;
-  const collectRate = Math.round((unlockedCount / type.cocktails.length) * 100);
-
   return (
     <Modal onClose={onClose} background={<DexBackground />}>
       <div style={{ position: "relative", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 16 }}>
@@ -53,13 +49,13 @@ export default function DexShareModal({
           boxShadow: "0 8px 20px rgba(255, 107, 53, 0.16)",
         }}
       >
-        <img src={drink0} alt="" style={{ width: 44, height: 44, objectFit: "contain", flexShrink: 0 }} />
+        <img src={entry.image} alt="" style={{ width: 44, height: 44, objectFit: "contain", flexShrink: 0 }} />
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ fontSize: 12, color: COLORS.inkSoft, fontWeight: 600, marginBottom: 4 }}>
             대표 타입
           </div>
           <div style={{ fontSize: 17, fontWeight: 800, color: COLORS.ink, whiteSpace: "nowrap" }}>
-            {type.name}
+            {entry.name}
           </div>
         </div>
         <div
@@ -74,7 +70,7 @@ export default function DexShareModal({
             flexShrink: 0,
           }}
         >
-          수집률 {collectRate}%
+          수집률 {entry.collectionRate}%
         </div>
       </div>
 
@@ -86,13 +82,14 @@ export default function DexShareModal({
           marginBottom: 20,
         }}
       >
-        {DEX_DATA.map((dex) => (
+        {entries.map((e) => (
           <DexBox
-            key={dex.id}
-            drinkImg={drinkImages[dex.id]}
-            type={dex.typeNumber}
-            unlocked={dex.unlocked}
-            collectionRate={dex.collectionRate}
+            key={e.typeCode}
+            image={e.image}
+            name={e.name}
+            accent={e.accent}
+            unlocked={e.unlocked}
+            collectionRate={e.collectionRate}
           />
         ))}
       </div>

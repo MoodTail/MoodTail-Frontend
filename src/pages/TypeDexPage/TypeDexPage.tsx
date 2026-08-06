@@ -1,21 +1,6 @@
-
 import { useState } from "react";
-import drink0 from "../../assets/drinks/0.png";
-import drink1 from "../../assets/drinks/1.png";
-import drink2 from "../../assets/drinks/2.png";
-import drink3 from "../../assets/drinks/3.png";
-import drink4 from "../../assets/drinks/4.png";
-import drink5 from "../../assets/drinks/5.png";
-import drink6 from "../../assets/drinks/6.png";
-import drink7 from "../../assets/drinks/7.png";
-import drink8 from "../../assets/drinks/8.png";
-import drink9 from "../../assets/drinks/9.png";
-import drink10 from "../../assets/drinks/10.png";
-import drink11 from "../../assets/drinks/11.png";
-import drinkImages from "../../assets/drinks";
 import { COLORS } from "../../theme/colors";
-import { TYPES } from "../../data/types";
-import { DEX_DATA } from "../../data/dexData";
+import type { DexGridEntry } from "../../data/moodTypes";
 import Header from "../../components/Header";
 import PhoneFrame from "../../components/PhoneFrame";
 import DexBackground from "../../components/DexBackground";
@@ -23,18 +8,18 @@ import LockedCocktailModal from "../../components/LockedCocktailModal";
 import DexBox from "../../components/DexBox";
 
 export default function TypeDexPage({
-  repTypeId,
+  repEntry,
+  entries,
   onOpenTypeDetail,
   onShare,
   onGoTest,
 }: {
-  repTypeId: string;
-  onOpenType: (typeId: string) => void;
-  onOpenTypeDetail: (typeId: string) => void;
+  repEntry: DexGridEntry;
+  entries: DexGridEntry[];
+  onOpenTypeDetail: (typeCode: string) => void;
   onShare: () => void;
   onGoTest: () => void;
 }) {
-  const repType = TYPES.find((t) => t.id === repTypeId)!;
   const [lockedName, setLockedName] = useState<string | null>(null);
 
   return (
@@ -65,7 +50,7 @@ export default function TypeDexPage({
         />
 
         <button
-          onClick={() => onOpenTypeDetail(repType.id)}
+          onClick={() => onOpenTypeDetail(repEntry.typeCode)}
           style={{
             background: '#FFFAF9',
             border: "1px solid #fff",
@@ -81,12 +66,12 @@ export default function TypeDexPage({
             textAlign: "left",
           }}
         >
-          <img src={drink0} alt="" style={{ width: 84, height: 84, objectFit: "contain" }} />
+          <img src={repEntry.image} alt="" style={{ width: 84, height: 84, objectFit: "contain" }} />
           <div style={{ flex: 1 }}>
             <div style={{ fontSize: 14, color: COLORS.inkSoft, fontWeight: 600, marginBottom: 4 }}>
               대표 타입
             </div>
-            <div style={{ fontSize: 24, fontWeight: 800, color: COLORS.ink }}>{repType.name}</div>
+            <div style={{ fontSize: 24, fontWeight: 800, color: COLORS.ink }}>{repEntry.name}</div>
           </div>
         </button>
 
@@ -98,17 +83,18 @@ export default function TypeDexPage({
             paddingBottom: 20,
           }}
         >
-          {DEX_DATA.map((dex) => (
+          {entries.map((entry) => (
             <DexBox
-              key={dex.id}
-              drinkImg={drinkImages[dex.id]}
-              type={dex.typeNumber}
-              unlocked={dex.unlocked}
-              collectionRate={dex.collectionRate}
+              key={entry.typeCode}
+              image={entry.image}
+              name={entry.name}
+              accent={entry.accent}
+              unlocked={entry.unlocked}
+              collectionRate={entry.collectionRate}
               onClick={
-                dex.unlocked
-                  ? () => onOpenTypeDetail(dex.typeId)
-                  : () => setLockedName(dex.name)
+                entry.unlocked
+                  ? () => onOpenTypeDetail(entry.typeCode)
+                  : () => setLockedName(entry.name)
               }
             />
           ))}
