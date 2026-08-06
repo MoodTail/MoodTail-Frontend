@@ -1,19 +1,22 @@
+import { COLORS } from "../theme/colors";
+import { CHARACTER_TYPES } from "../data/characterType";
+
 export default function DexBox({
-  image,
-  name,
-  accent,
+  drinkImg,
+  type,
   collectionRate,
   unlocked,
   onClick,
 }: {
-  image: string;
-  name: string;
-  accent: string;
+  drinkImg: string;
+  type: number;
   collectionRate?: number;
   unlocked: boolean;
   onClick?: () => void;
 }) {
   if (unlocked) {
+    const characterType = CHARACTER_TYPES.find((t) => t.number === type);
+
     return (
       <button
         type="button"
@@ -34,8 +37,10 @@ export default function DexBox({
           cursor: onClick ? "pointer" : "default",
         }}
       >
-        <img src={image} alt="" style={{ width: "90%", height: "70%", objectFit: "contain" }} />
-        <span style={{ fontSize: 12, fontWeight: 700, color: accent }}>{name}</span>
+        <img src={drinkImg} alt="" style={{ width: "90%", height: "70%", objectFit: "contain" }} />
+        <span style={{ fontSize: 12, fontWeight: 700, color: characterType?.color }}>
+          {characterType?.name}
+        </span>
       </button>
     );
   }
@@ -60,7 +65,7 @@ export default function DexBox({
       }}
     >
       <div style={{ fontSize: 18, fontWeight: 700, color: "#323232" }}>타입명</div>
-      <div style={{ fontSize: 11, fontWeight: 600, color: "#8E8A88" }}>수집률 {collectionRate ?? 0}%</div>
+      <div style={{ fontSize: 11, fontWeight: 600, color: "#8E8A88" }}>수집률 {collectionRate}%</div>
     </button>
   );
 }

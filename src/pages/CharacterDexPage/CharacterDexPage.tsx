@@ -1,6 +1,9 @@
 import { useState } from "react";
+import drink0 from "../../assets/drinks/0.png";
+import drinkImages from "../../assets/drinks";
 import { COLORS } from "../../theme/colors";
-import type { DexGridEntry } from "../../data/moodTypes";
+import type { PersonalityType } from "../../data/types";
+import { DEX_DATA } from "../../data/dexData";
 import Header from "../../components/Header";
 import PhoneFrame from "../../components/PhoneFrame";
 import DexBackground from "../../components/DexBackground";
@@ -8,20 +11,20 @@ import LockedCocktailModal from "../../components/LockedCocktailModal";
 import DexBox from "../../components/DexBox";
 
 export default function CharacterDexPage({
-  entry,
-  entries,
+  type,
   onShare,
   onOpenDetail,
   onOpenTypeDetail,
   onGoTest,
 }: {
-  entry: DexGridEntry;
-  entries: DexGridEntry[];
+  type: PersonalityType;
   onShare: () => void;
   onOpenDetail: () => void;
-  onOpenTypeDetail: (typeCode: string) => void;
+  onOpenTypeDetail: (typeId: string) => void;
   onGoTest: () => void;
 }) {
+  const unlockedCount = type.cocktails.filter((c) => c.unlocked).length;
+  const collectRate = Math.round((unlockedCount / type.cocktails.length) * 100);
   const [lockedName, setLockedName] = useState<string | null>(null);
 
   return (
@@ -68,12 +71,12 @@ export default function CharacterDexPage({
             boxShadow: "0 8px 20px rgba(255, 107, 53, 0.16)",
           }}
         >
-          <img src={entry.image} alt="" style={{ width: 44, height: 44, objectFit: "contain", flexShrink: 0 }} />
+          <img src={drink0} alt="" style={{ width: 44, height: 44, objectFit: "contain", flexShrink: 0 }} />
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ fontSize: 12, color: COLORS.inkSoft, fontWeight: 600, marginBottom: 4 }}>
               대표 타입
             </div>
-            <div style={{ fontSize: 19, fontWeight: 800, color: COLORS.ink }}>{entry.name}</div>
+            <div style={{ fontSize: 19, fontWeight: 800, color: COLORS.ink }}>{type.name}</div>
           </div>
           <div
             style={{
@@ -87,7 +90,7 @@ export default function CharacterDexPage({
               flexShrink: 0,
             }}
           >
-            수집률 {entry.collectionRate}%
+            수집률 {collectRate}%
           </div>
         </button>
 
@@ -99,18 +102,17 @@ export default function CharacterDexPage({
             paddingBottom: 20,
           }}
         >
-          {entries.map((e) => (
+          {DEX_DATA.map((dex) => (
             <DexBox
-              key={e.typeCode}
-              image={e.image}
-              name={e.name}
-              accent={e.accent}
-              unlocked={e.unlocked}
-              collectionRate={e.collectionRate}
+              key={dex.id}
+              drinkImg={drinkImages[dex.id]}
+              type={dex.typeNumber}
+              unlocked={dex.unlocked}
+              collectionRate={dex.collectionRate}
               onClick={
-                e.unlocked
-                  ? () => onOpenTypeDetail(e.typeCode)
-                  : () => setLockedName(e.name)
+                dex.unlocked
+                  ? () => onOpenTypeDetail(dex.typeId)
+                  : () => setLockedName(dex.name)
               }
             />
           ))}
