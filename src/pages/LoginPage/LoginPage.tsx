@@ -11,6 +11,7 @@ import FindPasswordPage from "../../components/login/FindPasswordPage";
 import SignupPage from "../SignupPage/SignupPage";
 import PostLoginScreen from "../PostLoginScreen/PostLoginScreen";
 import { postGuestLogin } from "../../api/auth/auth.api";
+import { postLoginLocal } from "../../api/auth/auth.api";
 
 interface LoginPageProps {
   onLogin: () => void;
@@ -46,9 +47,16 @@ const LoginPage: FC<LoginPageProps> = ({ onLogin }) => {
     return <PostLoginScreen onComplete={onLogin} />;
   }
 
-  const handleLoginClick = (): void => {
-    localStorage.removeItem("isGuest");
-    setStep("postLogin");
+  const handleLoginClick = async (): Promise<void> => {
+    try {
+      const result = await postLoginLocal({ email: userId, password });
+
+      localStorage.removeItem("isGuest");
+      localStorage.setItem("accessToken", result.accessToken);
+      setStep("postLogin");
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const handleSkipLogin = async (): Promise<void> => {
@@ -104,7 +112,7 @@ const LoginPage: FC<LoginPageProps> = ({ onLogin }) => {
       <button
         type="button"
         className="login-page__login-button"
-        onClick={handleLoginClick}
+        onClick={() => void handleLoginClick()}
       >
         로그인
       </button>
