@@ -64,7 +64,6 @@ function App() {
     setRetestStep(0);
     setRetestAnswers({});
     setRetestQuestions(buildQuizQuestions());
-    setIsRetestOpen(true);
   };
 
   const startTestFromHistory = () => {
@@ -133,7 +132,12 @@ function App() {
           />
         );
       case "recipe":
-        return <RecipePage onNavVisibilityChange={setRecipeNavVisible} />;
+        return (
+          <RecipePage
+            onNavVisibilityChange={setRecipeNavVisible}
+            onGoToLogin={handleGoToLoginScreen}
+          />
+        );
       case "mypage":
         return (
           <MyPage

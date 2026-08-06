@@ -37,9 +37,10 @@ type View = { name: "list" } | { name: "detail"; id: string } | { name: "saved" 
 
 interface RecipePageProps {
   onNavVisibilityChange?: (visible: boolean) => void;
+  onGoToLogin: () => void;
 }
 
-function RecipePage({ onNavVisibilityChange }: RecipePageProps) {
+function RecipePage({ onNavVisibilityChange, onGoToLogin }: RecipePageProps) {
   const [view, setView] = useState<View>({ name: "list" });
   const [activeFilter, setActiveFilter] = useState(FILTERS[0].label);
   const [query, setQuery] = useState("");
@@ -179,6 +180,7 @@ function RecipePage({ onNavVisibilityChange }: RecipePageProps) {
           recipe={displayRecipe}
           onBack={() => setView({ name: "list" })}
           saved={savedIds.has(recipe.id)}
+          onGoToLogin={onGoToLogin}
         />
       );
     }
