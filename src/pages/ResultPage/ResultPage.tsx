@@ -15,6 +15,7 @@ import glass1 from '../../assets/images/glass/glass-1.png'
 import glass2 from '../../assets/images/glass/glass-2.png'
 import glass3 from '../../assets/images/glass/glass-3.png'
 import glass4 from '../../assets/images/glass/glass-4.png'
+import { saveMoodTestResult } from '../../api/mood-tests/moodTests.api'
 import type { MoodTestResult } from '../../api/mood-tests/moodTests.types'
 import '../../styles/ResultPage.css'
 
@@ -111,6 +112,7 @@ function ResultPage({
   const [isSnsModalOpen, setIsSnsModalOpen] = useState(false)
   const [isSaveToastVisible, setIsSaveToastVisible] = useState(false)
   const [isSaveResultToastVisible, setIsSaveResultToastVisible] = useState(false)
+  const [shareUrl, setShareUrl] = useState<string | null>(null)
 
   useEffect(() => {
     if (!isSaveResultToastVisible) return
@@ -145,11 +147,22 @@ function ResultPage({
   }
 
   const performSave = () => {
-    // TODO: 테스트 결과 저장 API 연동
-    console.log('TODO: 테스트 결과 저장')
     setIsResultSaved(true)
     setModalStep('none')
     setIsSaveResultToastVisible(true)
+
+    // 실제 테스트 결과가 있을 때만(직접 완료한 테스트) 저장 API를 호출합니다.
+    // 게스트 등 비로그인 상태거나 실패해도 위 토스트/로컬 상태는 이미 반영되어 있습니다.
+    if (result && result.recommendations.length === 4) {
+      saveMoodTestResult({
+        moodType: { moodTypeId: result.moodType.moodTypeId, typeCode: result.moodType.typeCode },
+        tasteProfile: result.tasteProfile,
+        recommendedCocktails: result.recommendations.map((r) => ({
+          cocktailId: r.cocktailId,
+          matchScore: r.matchScore,
+        })),
+      }).catch((err) => console.error('테스트 결과 저장에 실패했습니다', err))
+    }
   }
 
   const handleSaveResult = () => {
@@ -174,7 +187,8 @@ function ResultPage({
     setIsShareModalOpen(true)
   }
 
-  const handleSnsShare = () => {
+  const handleSnsShare = (generatedShareUrl?: string) => {
+    setShareUrl(generatedShareUrl ?? null)
     setIsSnsModalOpen(true)
   }
 
@@ -307,11 +321,12 @@ function ResultPage({
       <ResultShareModal
         isOpen={isShareModalOpen}
         shareCard={{
-          characterImage: MOCK_RESULT.characterImage,
-          typeName: MOCK_RESULT.typeName,
-          typeDescription: MOCK_RESULT.shareDescription,
-          quote: MOCK_RESULT.quote,
+          characterImage,
+          typeName,
+          typeDescription: result?.moodType.shortDescription ?? MOCK_RESULT.shareDescription,
+          quote,
         }}
+        tasteProfile={result?.tasteProfile}
         onClose={() => setIsShareModalOpen(false)}
         onSnsShare={handleSnsShare}
         onImageSaved={handleImageSaved}
@@ -319,7 +334,7 @@ function ResultPage({
 
       <ResultSnsShareModal
         isOpen={isSnsModalOpen}
-        url="https://moodtail.app/share/mock-id"
+        url={shareUrl ?? "https://moodtail.app/share/mock-id"}
         onClose={() => setIsSnsModalOpen(false)}
         onKakaoShare={handleKakaoShare}
       />

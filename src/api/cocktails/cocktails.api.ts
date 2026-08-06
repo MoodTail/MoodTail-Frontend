@@ -10,8 +10,16 @@ import type {
   GetFavoriteCocktailsResult,
 } from "./cocktails.types";
 
-export const getCocktails = async (): Promise<GetCocktailsResult> => {
-  const response = await apiClient.get<GetCocktailsResponse>("/api/v1/cocktails");
+export interface GetCocktailsParams {
+  minAlcoholDegree?: number;
+  maxAlcoholDegree?: number;
+  keyword?: string;
+}
+
+export const getCocktails = async (
+  params?: GetCocktailsParams,
+): Promise<GetCocktailsResult> => {
+  const response = await apiClient.get<GetCocktailsResponse>("/api/v1/cocktails", { params });
   return response.data.result;
 };
 

@@ -1,20 +1,25 @@
 import { useRef } from 'react'
-import { toPng } from 'html-to-image'
+import { toBlob, toPng } from 'html-to-image'
 import ResultShareCard, { type ResultShareCardProps } from '../ResultShareCard'
 import closeIcon from '../../../assets/icons/close.svg'
+import { createMoodTestResultShare } from '../../../api/mood-tests/moodTests.api'
+import type { MoodTasteScores } from '../../../api/mood-tests/moodTests.types'
 import '../../../styles/ResultShareModal.css'
 
 interface ResultShareModalProps {
   isOpen: boolean
   shareCard: ResultShareCardProps
+  // 있으면 "SNS 공유하기" 클릭 시 실제 공유 URL을 생성합니다. 없거나 실패하면 목 URL로 폴백합니다.
+  tasteProfile?: MoodTasteScores
   onClose: () => void
-  onSnsShare: () => void
+  onSnsShare: (shareUrl?: string) => void
   onImageSaved: () => void
 }
 
 function ResultShareModal({
   isOpen,
   shareCard,
+  tasteProfile,
   onClose,
   onSnsShare,
   onImageSaved,
@@ -32,6 +37,22 @@ function ResultShareModal({
     link.href = dataUrl
     link.click()
     onImageSaved()
+  }
+
+  const handleSnsShare = async () => {
+    if (!cardRef.current || !tasteProfile) {
+      onSnsShare()
+      return
+    }
+    try {
+      const blob = await toBlob(cardRef.current, { pixelRatio: 2 })
+      if (!blob) throw new Error('썸네일 이미지 생성에 실패했습니다')
+      const { shareUrl } = await createMoodTestResultShare(tasteProfile, blob)
+      onSnsShare(shareUrl)
+    } catch (err) {
+      console.error('공유 URL 생성에 실패했습니다', err)
+      onSnsShare()
+    }
   }
 
   return (
@@ -52,7 +73,7 @@ function ResultShareModal({
         </div>
 
         <div className="result-share-modal__buttons">
-          <button type="button" className="result-share-modal__button result-share-modal__button--primary" onClick={onSnsShare}>
+          <button type="button" className="result-share-modal__button result-share-modal__button--primary" onClick={handleSnsShare}>
             SNS 공유하기
           </button>
           <button

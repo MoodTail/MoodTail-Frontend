@@ -80,3 +80,47 @@ export interface PostMoodTestResultResponse {
   message: string;
   result: MoodTestResult;
 }
+
+export interface SaveMoodTestResultMoodType {
+  moodTypeId: number;
+  typeCode: string;
+}
+
+export interface SaveMoodTestResultRecommendedCocktail {
+  cocktailId: number;
+  matchScore: number;
+}
+
+export interface SaveMoodTestResultRequest {
+  moodType: SaveMoodTestResultMoodType;
+  tasteProfile: MoodTasteScores;
+  // 정확히 4개여야 합니다.
+  recommendedCocktails: SaveMoodTestResultRecommendedCocktail[];
+}
+
+export interface SaveMoodTestResultResult {
+  test_result_id: number;
+}
+
+export interface SaveMoodTestResultResponse {
+  timestamp: string;
+  code: string;
+  message: string;
+  result: SaveMoodTestResultResult;
+}
+
+export interface CreateMoodTestResultShareRequest {
+  tasteProfile: MoodTasteScores;
+}
+
+export interface CreateMoodTestResultShareResult {
+  shareToken: string;
+  shareUrl: string;
+}
+
+export interface CreateMoodTestResultShareResponse {
+  timestamp: string;
+  code: string;
+  message: string;
+  result: CreateMoodTestResultShareResult;
+}

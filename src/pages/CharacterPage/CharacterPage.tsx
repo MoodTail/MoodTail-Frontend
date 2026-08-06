@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { getType } from "../../data/types";
+import { useEffect, useState } from "react";
+import { getType, TYPES } from "../../data/types";
 import CharacterDexPage from "../CharacterDexPage/CharacterDexPage";
 import RepresentativeTypeSettingPage from "../RepresentativeTypeSettingPage/RepresentativeTypeSettingPage";
 import TypeDetailPage from "../TypeDetailPage/TypeDetailPage";
@@ -7,6 +7,7 @@ import TypeDexPage from "../TypeDexPage/TypeDexPage";
 import DexShareModal from "../../components/DexShareModal";
 import ResultSnsShareModal from "../../components/common/modal/ResultSnsShareModal";
 import SaveCompleteToast from "../../components/common/SaveCompleteToast";
+import { getCollection, updateRepresentativeMoodType } from "../../api/collections/collections.api";
 
 type DexOrigin = "typeDex" | "characterDex";
 
@@ -26,6 +27,27 @@ function CharacterPage({ onGoTest }: CharacterPageProps) {
   const [shareTypeId, setShareTypeId] = useState<string | null>(null);
   const [snsModalOpen, setSnsModalOpen] = useState(false);
   const [showSavedToast, setShowSavedToast] = useState(false);
+  const [moodTypeIdByLocalId, setMoodTypeIdByLocalId] = useState<Record<string, number>>({});
+
+  // 도감 정보를 실제 API로 받아와, 이름이 일치하는 로컬 타입에 실제 moodTypeId를 매핑해둡니다.
+  // 게스트 등 비로그인 상태거나 CORS 등으로 실패하면 조용히 무시합니다(대표 타입 지정은 로컬 상태만 반영).
+  useEffect(() => {
+    let cancelled = false;
+    getCollection()
+      .then((result) => {
+        if (cancelled) return;
+        const idMap: Record<string, number> = {};
+        result.moodTypes.forEach((mt) => {
+          const local = TYPES.find((t) => t.name === mt.name);
+          if (local) idMap[local.id] = mt.moodTypeId;
+        });
+        setMoodTypeIdByLocalId(idMap);
+      })
+      .catch((err) => console.error("도감 정보를 불러오지 못했습니다", err));
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const goTypeDex = () => setScreen({ name: "typeDex" });
   const openCharacterDex = (typeId: string) => setScreen({ name: "characterDex", typeId });
@@ -82,6 +104,13 @@ function CharacterPage({ onGoTest }: CharacterPageProps) {
           onConfirm={() => {
             setRepTypeId(screen.typeId);
             setShowSavedToast(true);
+
+            const moodTypeId = moodTypeIdByLocalId[screen.typeId];
+            if (moodTypeId) {
+              updateRepresentativeMoodType(moodTypeId).catch((err) =>
+                console.error("대표 타입 변경에 실패했습니다", err),
+              );
+            }
           }}
         />
       )}
