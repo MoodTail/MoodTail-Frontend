@@ -14,6 +14,8 @@ import type {
   HistoryTestResultDetail,
   MonthlyHistoryResult,
   UploadHistoryPhotoParams,
+  UploadHistoryPhotoResponse,
+  UploadHistoryPhotoResult,
 } from "./histories.types";
 
 export const getMonthlyHistory = async (
@@ -43,21 +45,26 @@ export const getHistoryTestResult = async (
 
 export const uploadHistoryPhoto = async ({
   date,
-  sourceType,
   image,
-}: UploadHistoryPhotoParams): Promise<void> => {
+}: UploadHistoryPhotoParams): Promise<UploadHistoryPhotoResult> => {
   const formData = new FormData();
+  formData.append("date", date);
   formData.append("image", image);
 
-  await apiClient.post(
-    `/api/v1/history/dates/${encodeURIComponent(date)}/photos`,
+  const response = await apiClient.post<UploadHistoryPhotoResponse>(
+    "/api/v1/history/photos",
     formData,
-    {
-      params: { sourceType },
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    },
+  );
+
+  return response.data.result;
+};
+
+export const deleteHistoryPhoto = async (
+  date: string,
+  photoId: number,
+): Promise<void> => {
+  await apiClient.delete(
+    `/api/v1/history/dates/${encodeURIComponent(date)}/photos/${photoId}`,
   );
 };
 

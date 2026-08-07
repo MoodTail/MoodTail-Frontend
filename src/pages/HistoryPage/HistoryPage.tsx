@@ -19,6 +19,7 @@ import HistoryBackground from '../../components/common/HistoryBackground'
 import '../../styles/HistoryPage.css'
 
 const INITIAL_CALENDAR_DATE = new Date()
+const MAX_HISTORY_DATE = new Date()
 
 function toDateKey(date: Date) {
   const year = date.getFullYear()
@@ -186,6 +187,7 @@ function HistoryPage({
 
       <HistoryCalendar
         initialDate={INITIAL_CALENDAR_DATE}
+        maxDate={MAX_HISTORY_DATE}
         markedDates={markedDates}
         selectedDate={selectedDate}
         onDateClick={handleDateClick}

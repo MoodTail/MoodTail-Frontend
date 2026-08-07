@@ -7,8 +7,14 @@ import {
   type ChangeEvent,
   type PointerEvent,
 } from 'react'
-import { uploadHistoryPhoto } from '../../api/histories/histories.api'
-import type { HistoryPhotoSourceType } from '../../api/histories/histories.types'
+import {
+  deleteHistoryPhoto,
+  uploadHistoryPhoto,
+} from '../../api/histories/histories.api'
+import type {
+  DailyHistoryPhoto,
+  HistoryPhotoSourceType,
+} from '../../api/histories/histories.types'
 import cameraIcon from '../../assets/icons/camera.svg'
 import galleryIcon from '../../assets/icons/gallery.svg'
 import photoEditIcon from '../../assets/icons/photo_edit.svg'
@@ -21,10 +27,10 @@ import './HistoryPhotoUploader.css'
 
 interface PhotoPreview {
   id: string
+  photoId: number
   name: string
   url: string
   originalUrl: string
-  sourceType: HistoryPhotoSourceType
 }
 
 interface PhotoToCrop {
@@ -40,6 +46,7 @@ const COLLAPSED_SHEET_OFFSET = 272
 interface HistoryPhotoUploaderProps {
   collapsible?: boolean
   date: string
+  initialPhotos?: DailyHistoryPhoto[]
 }
 
 interface HistoryPhotoUploaderHandle {
@@ -49,7 +56,11 @@ interface HistoryPhotoUploaderHandle {
 const HistoryPhotoUploader = forwardRef<
   HistoryPhotoUploaderHandle,
   HistoryPhotoUploaderProps
->(function HistoryPhotoUploader({ collapsible = false, date }, ref) {
+>(function HistoryPhotoUploader({
+  collapsible = false,
+  date,
+  initialPhotos = [],
+}, ref) {
   const [photos, setPhotos] = useState<PhotoPreview[]>([])
   const [cropQueue, setCropQueue] = useState<PhotoToCrop[]>([])
   const [editingPhoto, setEditingPhoto] = useState<PhotoPreview>()
@@ -78,6 +89,18 @@ const HistoryPhotoUploader = forwardRef<
   useEffect(() => {
     cropQueueRef.current = cropQueue
   }, [cropQueue])
+
+  useEffect(() => {
+    setPhotos(
+      initialPhotos.map((photo) => ({
+        id: `server-${photo.photoId}`,
+        photoId: photo.photoId,
+        name: `사진 ${photo.photoId}`,
+        url: photo.imageUrl,
+        originalUrl: photo.imageUrl,
+      })),
+    )
+  }, [initialPhotos])
 
   useImperativeHandle(ref, () => ({
     collapseSheet: () => {
@@ -135,9 +158,8 @@ const HistoryPhotoUploader = forwardRef<
         type: blob.type || 'image/jpeg',
       })
 
-      await uploadHistoryPhoto({
+      const uploadedPhoto = await uploadHistoryPhoto({
         date,
-        sourceType: currentPhoto.sourceType,
         image,
       })
 
@@ -150,10 +172,10 @@ const HistoryPhotoUploader = forwardRef<
         ...current,
         {
           id: `${currentPhoto.id}-cropped`,
+          photoId: uploadedPhoto.photoId,
           name: currentPhoto.name,
           url: URL.createObjectURL(blob),
           originalUrl: currentPhoto.url,
-          sourceType: currentPhoto.sourceType,
         },
       ])
       setCropQueue((current) => current.slice(1))
@@ -178,16 +200,27 @@ const HistoryPhotoUploader = forwardRef<
     setEditingPhoto(undefined)
   }
 
-  const handleDeletePhoto = () => {
+  const handleDeletePhoto = async () => {
     if (!deletingPhoto) return
 
-    URL.revokeObjectURL(deletingPhoto.url)
-    URL.revokeObjectURL(deletingPhoto.originalUrl)
-    setPhotos((current) =>
-      current.filter((photo) => photo.id !== deletingPhoto.id),
-    )
-    setDeletingPhoto(undefined)
-    setModalTitle('삭제되었습니다')
+    try {
+      await deleteHistoryPhoto(date, deletingPhoto.photoId)
+      if (deletingPhoto.url.startsWith('blob:')) {
+        URL.revokeObjectURL(deletingPhoto.url)
+      }
+      if (deletingPhoto.originalUrl.startsWith('blob:')) {
+        URL.revokeObjectURL(deletingPhoto.originalUrl)
+      }
+      setPhotos((current) =>
+        current.filter((photo) => photo.id !== deletingPhoto.id),
+      )
+      setModalTitle('삭제되었습니다')
+    } catch (error) {
+      console.error(error)
+      setModalTitle('사진을 삭제하지 못했습니다')
+    } finally {
+      setDeletingPhoto(undefined)
+    }
   }
 
   const handlePointerDown = (event: PointerEvent<HTMLDivElement>) => {

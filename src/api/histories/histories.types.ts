@@ -53,6 +53,7 @@ export interface HistoryTasteProfile {
 export interface HistoryRecommendedCocktail {
   cocktailId: number;
   cocktailName: string;
+  shortDescription: string;
   cocktailImageUrl: string;
   ranking: number;
   matchScore: number;
@@ -61,12 +62,26 @@ export interface HistoryRecommendedCocktail {
 export interface HistoryTestResultMoodType extends HistoryMoodType {
   description: string;
   characterQuote: string;
+  displayTasteScores: HistoryTasteProfile;
+}
+
+export interface HistoryCompatibilityMoodType {
+  moodTypeId: number;
+  typeCode: string;
+  name: string;
+}
+
+export interface HistoryCompatibilities {
+  best: HistoryCompatibilityMoodType | null;
+  worst: HistoryCompatibilityMoodType | null;
 }
 
 export interface HistoryTestResultDetail extends HistoryTestResult {
   moodType: HistoryTestResultMoodType;
   tasteProfile: HistoryTasteProfile;
+  displayTasteScores: HistoryTasteProfile;
   recommendedCocktails: HistoryRecommendedCocktail[];
+  compatibilities: HistoryCompatibilities;
 }
 
 export interface GetHistoryTestResultResponse {
@@ -80,8 +95,20 @@ export type HistoryPhotoSourceType = "CAMERA" | "GALLERY";
 
 export interface UploadHistoryPhotoParams {
   date: string;
-  sourceType: HistoryPhotoSourceType;
   image: File;
+}
+
+export interface UploadHistoryPhotoResult {
+  photoId: number;
+  recordDate: string;
+  imageUrl: string;
+}
+
+export interface UploadHistoryPhotoResponse {
+  timestamp: string;
+  code: string;
+  message: string;
+  result: UploadHistoryPhotoResult;
 }
 
 export interface DailyHistoryTestResult {
@@ -100,7 +127,6 @@ export interface DailyHistoryDrinkingRecord {
 
 export interface DailyHistoryPhoto {
   photoId: number;
-  sourceType: HistoryPhotoSourceType;
   imageUrl: string;
 }
 
@@ -119,7 +145,7 @@ export interface GetDailyHistoryResponse {
 }
 
 export interface CreateDrinkingRecordRequest {
-  cocktailId: number;
+  cocktailIds: number[];
   recordDate: string;
 }
 

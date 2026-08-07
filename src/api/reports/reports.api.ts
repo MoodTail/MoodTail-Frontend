@@ -37,9 +37,6 @@ export const uploadMonthlyReportShareImage = async ({
       formData,
       {
         params: { year, month },
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
       },
     );
 

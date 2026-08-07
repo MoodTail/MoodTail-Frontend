@@ -36,8 +36,15 @@ function drawRoundedRect(
 async function createMonthlyReportPng(report: MonthlyReportResult) {
   await document.fonts.ready;
   const character = new Image();
-  character.src = monthlyReportCharacter;
-  await character.decode();
+  character.crossOrigin = 'anonymous';
+  character.src = report.monthlyMoodType.characterImageUrl ?? monthlyReportCharacter;
+  try {
+    await character.decode();
+  } catch {
+    character.removeAttribute('crossorigin');
+    character.src = monthlyReportCharacter;
+    await character.decode();
+  }
 
   const scale = 2;
   const canvas = document.createElement('canvas');
@@ -90,8 +97,13 @@ async function createMonthlyReportPng(report: MonthlyReportResult) {
   context.fillText(report.monthlyMoodType.name, 168, 195);
   context.fillStyle = '#666666';
   context.font = '500 10px Pretendard, sans-serif';
-  context.fillText('“차분하지만 분명한 취향이', 168, 222);
-  context.fillText('이번 달을 채웠어요.”', 168, 242);
+  const quote = `“${report.monthlyMoodType.characterQuote}”`;
+  const quoteLines = quote.length > 15
+    ? [quote.slice(0, 15), quote.slice(15)]
+    : [quote];
+  quoteLines.slice(0, 2).forEach((line, index) => {
+    context.fillText(line, 168, 222 + index * 20);
+  });
 
   drawCard(18, 302, 309, 291, 24);
   context.fillStyle = '#17172a';
@@ -106,12 +118,7 @@ async function createMonthlyReportPng(report: MonthlyReportResult) {
     rank: cocktail.ranking,
     name: cocktail.nameKo || cocktail.nameEn,
     count: cocktail.count,
-    percent:
-      report.activity.drinkingRecordCount > 0
-        ? Math.round(
-            (cocktail.count / report.activity.drinkingRecordCount) * 100,
-          )
-        : 0,
+    percent: cocktail.recordPercentage,
     color: rankColors[index] ?? '#ff6248',
   }));
   cocktails.forEach((cocktail, index) => {
@@ -235,6 +242,9 @@ function CocktailsCard({ report }: { report: MonthlyReportResult }) {
               <h3>{cocktail.nameKo || cocktail.nameEn}</h3>
               <p>{cocktail.count}회 기록</p>
             </div>
+            <strong className="monthly-report-page__cocktail-percent">
+              {cocktail.recordPercentage}%
+            </strong>
           </article>
         ))}
       </div>

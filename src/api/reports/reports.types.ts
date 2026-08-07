@@ -8,6 +8,7 @@ export interface MonthlyReportMoodType {
   typeCode: string;
   name: string;
   shortDescription: string;
+  characterQuote: string;
   characterImageUrl: string | null;
 }
 
@@ -35,6 +36,7 @@ export interface MonthlyReportFrequentCocktail {
   shortDescription: string;
   imageUrl: string | null;
   count: number;
+  recordPercentage: number;
   ranking: number;
 }
 

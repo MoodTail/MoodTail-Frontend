@@ -5,7 +5,10 @@ import {
   getDailyHistory,
   getHistoryTestResult,
 } from '../../api/histories/histories.api'
-import type { HistoryTestResultDetail } from '../../api/histories/histories.types'
+import type {
+  DailyHistoryPhoto,
+  HistoryTestResultDetail,
+} from '../../api/histories/histories.types'
 import chevronLeftIcon from '../../assets/icons/chevron-left.svg'
 import emptyResultCharacter from '../../assets/images/history/no_list_character.png'
 import ginAndTonicImage from '../../assets/images/history/gin-and-tonic.png'
@@ -58,6 +61,7 @@ function HistoryPhotoPage({
   const [testResultDetail, setTestResultDetail] =
     useState<HistoryTestResultDetail>()
   const [testResultError, setTestResultError] = useState<string>()
+  const [historyPhotos, setHistoryPhotos] = useState<DailyHistoryPhoto[]>([])
   const photoUploaderRef = useRef<HistoryPhotoUploaderHandle>(null)
 
   const fetchDailyHistory = useCallback(async (signal?: AbortSignal) => {
@@ -68,6 +72,7 @@ function HistoryPhotoPage({
       setTestResultDetail(undefined)
 
       const result = await getDailyHistory(selectedDateKey, signal)
+      setHistoryPhotos(result.photos)
       setSelectedCocktails(
         result.drinkingRecords.map((record) => ({
           id: record.cocktailId,
@@ -143,15 +148,13 @@ function HistoryPhotoPage({
       (cocktail) => cocktail.recordId === undefined,
     )
 
+    if (newCocktails.length === 0) return
+
     try {
-      await Promise.all(
-        newCocktails.map((cocktail) =>
-          createDrinkingRecord({
-            cocktailId: cocktail.id,
-            recordDate: selectedDateKey,
-          }),
-        ),
-      )
+      await createDrinkingRecord({
+        cocktailIds: newCocktails.map((cocktail) => cocktail.id),
+        recordDate: selectedDateKey,
+      })
     } finally {
       await fetchDailyHistory()
     }
@@ -212,6 +215,7 @@ function HistoryPhotoPage({
           ref={photoUploaderRef}
           collapsible
           date={selectedDateKey}
+          initialPhotos={historyPhotos}
         />
       </div>
 
@@ -316,7 +320,7 @@ function HistoryPhotoPage({
                       <span>{cocktail.ranking}위</span>
                       <img src={cocktail.cocktailImageUrl} alt="" />
                       <strong>{cocktail.cocktailName}</strong>
-                      <small>일치율 {cocktail.matchScore}%</small>
+                      <small>{cocktail.shortDescription} · {cocktail.matchScore}%</small>
                     </article>
                   ))}
                 </div>
