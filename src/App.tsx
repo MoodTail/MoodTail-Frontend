@@ -18,6 +18,8 @@ import ResultPage from "./pages/ResultPage/ResultPage";
 import QuizQuestionPage from "./pages/QuizQuestionPage";
 import { buildQuizQuestions, type QuizQuestion } from "./data/quiz";
 import "./App.css";
+import { parseOauthCallback } from "./utils/oauth";
+import SocialSignupPage from "./pages/SocialSignupPage/SocialSignupPage";
 
 export type NavKey = "history" | "dictionary" | "home" | "recipe" | "mypage";
 type HistoryView = "calendar" | "photo" | "test-result" | "monthly-report";
@@ -43,7 +45,12 @@ function App() {
   const [retestAnswers, setRetestAnswers] = useState<Record<number, string>>(
     {},
   );
-  const [retestQuestions, setRetestQuestions] = useState<QuizQuestion[]>(() => buildQuizQuestions());
+  const [retestQuestions, setRetestQuestions] = useState<QuizQuestion[]>(() =>
+    buildQuizQuestions(),
+  );
+  const [oauthCallback, setOauthCallback] = useState(() =>
+    parseOauthCallback(),
+  );
 
   const startRetest = () => {
     setIsTestResultOpen(false);
@@ -140,6 +147,28 @@ function App() {
         return <MainPage />;
     }
   };
+
+  if (oauthCallback) {
+    const redirectUri =
+      oauthCallback.provider === "kakao"
+        ? import.meta.env.VITE_KAKAO_REDIRECT_URI
+        : import.meta.env.VITE_GOOGLE_REDIRECT_URI;
+
+    return (
+      <SocialSignupPage
+        provider={oauthCallback.provider}
+        authorizationCode={oauthCallback.code}
+        stateValue={oauthCallback.state}
+        redirectUri={redirectUri}
+        onSignupComplete={() => {
+          window.history.replaceState({}, "", "/");
+          setOauthCallback(null);
+          setIsGuest(localStorage.getItem("isGuest") === "true");
+          setIsLoggedIn(true);
+        }}
+      />
+    );
+  }
 
   if (!isLoggedIn) {
     return (

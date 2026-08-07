@@ -1,6 +1,10 @@
-import { useState } from "react";
 import type { FC, ChangeEvent } from "react";
 import "../../styles/SignupPage.css";
+import { useEffect, useState } from "react";
+import { postSignupLocal } from "../../api/auth/auth.api";
+import { getTerms } from "../../api/terms/terms.api";
+import type { Term } from "../../api/terms/terms.types";
+import { getLocalEmailAvailability } from "../../api/auth/auth.api";
 
 function PasswordToggleIcon({ visible }: { visible: boolean }) {
   return (
@@ -44,9 +48,22 @@ const SignupPage: FC<SignupPageProps> = ({ onSignupComplete }) => {
   const [nickname, setNickname] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
-  const [agreeTerms1, setAgreeTerms1] = useState(false); // [필수] 서비스 이용약관 동의 (보기 없음)
-  const [agreeTerms2, setAgreeTerms2] = useState(false); // [필수] 서비스 이용약관 동의 (보기 있음) - 실제 문구 확인 필요
-  const [agreePrivacy, setAgreePrivacy] = useState(false); // [필수] 개인정보 수집 및 이용 동의
+  const [agreeTerms1, setAgreeTerms1] = useState(false);
+  const [agreeTerms2, setAgreeTerms2] = useState(false);
+  const [agreePrivacy, setAgreePrivacy] = useState(false);
+  const [terms, setTerms] = useState<Term[]>([]);
+
+  useEffect(() => {
+    const fetchTerms = async () => {
+      try {
+        const result = await getTerms();
+        setTerms(result);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    void fetchTerms();
+  }, []);
 
   const agreeAll = agreeTerms1 && agreeTerms2 && agreePrivacy;
   const passwordMismatch =
@@ -68,9 +85,13 @@ const SignupPage: FC<SignupPageProps> = ({ onSignupComplete }) => {
     if (isEmailDuplicate) setIsEmailDuplicate(false);
   };
 
-  const handleCheckEmailDuplicate = () => {
-    // TODO: API 연동
-    setIsEmailDuplicate(true);
+  const handleCheckEmailDuplicate = async (): Promise<void> => {
+    try {
+      const result = await getLocalEmailAvailability({ email });
+      setIsEmailDuplicate(!result.available);
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const handleToggleAgreeAll = () => {
@@ -80,9 +101,36 @@ const SignupPage: FC<SignupPageProps> = ({ onSignupComplete }) => {
     setAgreePrivacy(next);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async (): Promise<void> => {
     if (!isFormValid) return;
-    onSignupComplete?.();
+
+    try {
+      const serviceTermId = terms.find((t) => t.termType === "SERVICE")?.termId;
+      const privacyTermId = terms.find((t) => t.termType === "PRIVACY")?.termId;
+
+      if (!serviceTermId || !privacyTermId) {
+        console.error("약관 정보를 불러오지 못했습니다.");
+        return;
+      }
+
+      const agreements = [
+        { termId: serviceTermId, agreed: agreeTerms2 },
+        { termId: privacyTermId, agreed: agreePrivacy },
+      ];
+
+      const result = await postSignupLocal({
+        email,
+        password,
+        passwordConfirm,
+        nickname,
+        agreements,
+      });
+
+      localStorage.setItem("accessToken", result.accessToken);
+      onSignupComplete?.();
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (
@@ -108,7 +156,7 @@ const SignupPage: FC<SignupPageProps> = ({ onSignupComplete }) => {
       <button
         type="button"
         className="signup-page__duplicate-check"
-        onClick={handleCheckEmailDuplicate}
+        onClick={() => void handleCheckEmailDuplicate()}
       >
         중복확인
       </button>
@@ -241,7 +289,7 @@ const SignupPage: FC<SignupPageProps> = ({ onSignupComplete }) => {
       <button
         type="button"
         className="signup-page__submit"
-        onClick={handleSubmit}
+        onClick={() => void handleSubmit()}
         disabled={!isFormValid}
       >
         회원가입 완료
