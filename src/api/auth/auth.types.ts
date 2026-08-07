@@ -90,20 +90,20 @@ export interface GetLocalEmailAvailabilityResponse {
   result: LocalEmailAvailabilityResult;
 }
 
-export interface PostKakaoLoginRequest {
-  authorizationCode: string;
-  redirectUri: string;
-  state: string;
-  nickname: string;
-  agreements: KakaoLoginAgreements[];
-}
-
-export interface KakaoLoginAgreements {
+export interface SocialLoginAgreement {
   termId: number;
   agreed: boolean;
 }
 
-export interface KakaoLoginResult {
+export interface SocialLoginRequest {
+  authorizationCode: string;
+  redirectUri: string;
+  state: string;
+  nickname: string;
+  agreements: SocialLoginAgreement[];
+}
+
+export interface SocialLoginResult {
   userId: number;
   email: string;
   nickname: string;
@@ -113,11 +113,11 @@ export interface KakaoLoginResult {
   accessToken: string;
 }
 
-export interface PostKakaoLoginResponse {
+export interface SocialLoginResponse {
   timestamp: string;
   code: string;
   message: string;
-  result: KakaoLoginResult;
+  result: SocialLoginResult;
 }
 
 export interface OauthStateResult {

@@ -9,8 +9,8 @@ import type {
   PostLoginLocalResponse,
   GetLocalEmailAvailabilityRequest,
   GetLocalEmailAvailabilityResponse,
-  PostKakaoLoginRequest,
-  PostKakaoLoginResponse,
+  SocialLoginRequest,
+  SocialLoginResponse,
   PostOauthStateResponse,
 } from "./auth.types";
 
@@ -39,9 +39,17 @@ export const postSignupLocal = async (body: PostSignupLocalRequest) => {
   return response.data.result;
 };
 
-export const postKakaoLogin = async (body: PostKakaoLoginRequest) => {
-  const response = await apiClient.post<PostKakaoLoginResponse>(
+export const postKakaoLogin = async (body: SocialLoginRequest) => {
+  const response = await apiClient.post<SocialLoginResponse>(
     "/api/v1/auth/kakao",
+    body,
+  );
+  return response.data.result;
+};
+
+export const postGoogleLogin = async (body: SocialLoginRequest) => {
+  const response = await apiClient.post<SocialLoginResponse>(
+    "/api/v1/auth/google",
     body,
   );
   return response.data.result;

@@ -3,14 +3,21 @@ import type { FC } from "react";
 import "../../styles/SocialSignupPage.css";
 import { getTerms } from "../../api/terms/terms.api";
 import type { Term } from "../../api/terms/terms.types";
+import { postKakaoLogin, postGoogleLogin } from "../../api/auth/auth.api";
 
 interface SocialSignupPageProps {
   provider: "kakao" | "google";
+  authorizationCode: string;
+  stateValue: string;
+  redirectUri: string;
   onSignupComplete?: () => void;
 }
 
 const SocialSignupPage: FC<SocialSignupPageProps> = ({
   provider,
+  authorizationCode,
+  stateValue,
+  redirectUri,
   onSignupComplete,
 }) => {
   const [nickname, setNickname] = useState("");
@@ -60,10 +67,20 @@ const SocialSignupPage: FC<SocialSignupPageProps> = ({
         { termId: privacyTermId, agreed: agreePrivacy },
       ];
 
-      // TODO: provider(kakao/google) 회원가입 API 연동
-      // const result = await postSocialSignup(provider, { nickname, agreements });
-      // localStorage.setItem("accessToken", result.accessToken);
+      const requestBody = {
+        authorizationCode,
+        redirectUri,
+        state: stateValue,
+        nickname,
+        agreements,
+      };
 
+      const result =
+        provider === "kakao"
+          ? await postKakaoLogin(requestBody)
+          : await postGoogleLogin(requestBody);
+
+      localStorage.setItem("accessToken", result.accessToken);
       onSignupComplete?.();
     } catch (error) {
       console.error(error);

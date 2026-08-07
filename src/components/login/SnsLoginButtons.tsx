@@ -1,6 +1,5 @@
 import type { FC } from "react";
 import googleIcon from "../../assets/icons/google-icon.png";
-import { postKakaoLogin } from "../../api/auth/auth.api";
 import { postOauthState } from "../../api/auth/auth.api";
 
 const SnsLoginButtons: FC = () => {
@@ -32,11 +31,43 @@ const SnsLoginButtons: FC = () => {
     }
   };
 
+  const handleGoogleClick = async (): Promise<void> => {
+    try {
+      const { state, codeChallenge, codeChallengeMethod } =
+        await postOauthState("google");
+
+      const googleAuthUrl = new URL(
+        "https://accounts.google.com/o/oauth2/v2/auth",
+      );
+      googleAuthUrl.searchParams.set(
+        "client_id",
+        import.meta.env.VITE_GOOGLE_CLIENT_ID,
+      );
+      googleAuthUrl.searchParams.set(
+        "redirect_uri",
+        import.meta.env.VITE_GOOGLE_REDIRECT_URI,
+      );
+      googleAuthUrl.searchParams.set("response_type", "code");
+      googleAuthUrl.searchParams.set("scope", "email profile");
+      googleAuthUrl.searchParams.set("state", state);
+      googleAuthUrl.searchParams.set("code_challenge", codeChallenge);
+      googleAuthUrl.searchParams.set(
+        "code_challenge_method",
+        codeChallengeMethod,
+      );
+
+      window.location.href = googleAuthUrl.toString();
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   return (
     <div className="sns-login-buttons">
       <button
         type="button"
         className="sns-login-buttons__button sns-login-buttons__button--kakao"
+        onClick={() => void handleKakaoClick()}
       >
         <span className="sns-login-buttons__icon-wrap">
           <svg width="22" height="20" viewBox="0 0 22 20" fill="none">
@@ -52,6 +83,7 @@ const SnsLoginButtons: FC = () => {
       <button
         type="button"
         className="sns-login-buttons__button sns-login-buttons__button--google"
+        onClick={() => void handleGoogleClick()}
       >
         <span className="sns-login-buttons__icon-wrap">
           <img
