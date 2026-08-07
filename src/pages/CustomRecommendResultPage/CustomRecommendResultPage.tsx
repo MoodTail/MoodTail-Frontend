@@ -71,64 +71,70 @@ const CustomRecommendResultPage: FC<CustomRecommendResultPageProps> = ({
         내가 조절한 맛과 가장 가까운 칵테일이에요
       </p>
 
-      <div className="custom-recommend-result-page__top-card">
-        <div className="custom-recommend-result-page__image-bg" />
-        <img
-          src={imageUrl || cocktail}
-          alt={cocktailName}
-          className="custom-recommend-result-page__image"
-        />
-        <p className="custom-recommend-result-page__name">{cocktailName}</p>
-        <p className="custom-recommend-result-page__desc">{description}</p>
-        <span className="custom-recommend-result-page__badge">
-          취향 일치율 {matchPercent}%
-        </span>
-      </div>
-
-      <div className="custom-recommend-result-page__chart-card">
-        <p className="custom-recommend-result-page__chart-title">
-          추천 칵테일 맛 강도
-        </p>
-        <p className="custom-recommend-result-page__chart-desc">
-          연한색은 내 입력값, 진한색은 추천 칵테일 값이에요
-        </p>
-
-        <div className="custom-recommend-result-page__legend">
-          <span className="custom-recommend-result-page__legend-item">
-            <span
-              className="custom-recommend-result-page__legend-dot"
-              style={{ background: "#90b4f9" }}
+      <div className="custom-recommend-result-page__content">
+        <div className="custom-recommend-result-page__top-card">
+          <div className="custom-recommend-result-page__image-bg">
+            <img
+              src={imageUrl || cocktail}
+              alt={cocktailName}
+              className="custom-recommend-result-page__image"
             />
-            내 입력
-          </span>
-          <span className="custom-recommend-result-page__legend-item">
-            <span
-              className="custom-recommend-result-page__legend-dot"
-              style={{ background: "#ff9279" }}
-            />
-            칵테일
-          </span>
+          </div>
+
+          <div className="custom-recommend-result-page__info">
+            <p className="custom-recommend-result-page__name">{cocktailName}</p>
+            <p className="custom-recommend-result-page__desc">{description}</p>
+            <span className="custom-recommend-result-page__badge">
+              취향 일치율 {matchPercent}%
+            </span>
+          </div>
         </div>
 
-        <div className="custom-recommend-result-page__bars">
-          {bars.map((bar) => (
-            <TasteComparisonBar
-              key={bar.key}
-              label={bar.label}
-              myValue={myValues[bar.key]}
-              cocktailValue={cocktailValues[bar.key]}
-            />
-          ))}
-        </div>
-      </div>
+        <div className="custom-recommend-result-page__chart-card">
+          <p className="custom-recommend-result-page__chart-title">
+            추천 칵테일 맛 강도
+          </p>
+          <p className="custom-recommend-result-page__chart-desc">
+            연한색은 내 입력값, 진한색은 추천 칵테일 값이에요
+          </p>
 
-      <button
-        type="button"
-        className="custom-recommend-result-page__retry"
-        onClick={onRetry}
-      >
-        다시하기
-      </button>
+          <div className="custom-recommend-result-page__legend">
+            <span className="custom-recommend-result-page__legend-item">
+              <span
+                className="custom-recommend-result-page__legend-dot"
+                style={{ background: "#90b4f9" }}
+              />
+              내 입력
+            </span>
+            <span className="custom-recommend-result-page__legend-item">
+              <span
+                className="custom-recommend-result-page__legend-dot"
+                style={{ background: "#ff9279" }}
+              />
+              칵테일
+            </span>
+          </div>
+
+          <div className="custom-recommend-result-page__bars">
+            {bars.map((bar) => (
+              <TasteComparisonBar
+                key={bar.key}
+                label={bar.label}
+                myValue={myValues[bar.key]}
+                cocktailValue={cocktailValues[bar.key]}
+              />
+            ))}
+          </div>
+        </div>
+
+        <button
+          type="button"
+          className="custom-recommend-result-page__retry"
+          onClick={onRetry}
+        >
+          다시하기
+        </button>
+      </div>
     </div>
   );
 };
