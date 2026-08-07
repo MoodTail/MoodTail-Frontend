@@ -20,6 +20,14 @@ interface HistoryPhotoCropEditorProps {
   onSave: (blob: Blob) => void
 }
 
+function getOutputImageType(imageName: string) {
+  const extension = imageName.split('.').pop()?.toLowerCase()
+
+  if (extension === 'png') return 'image/png'
+  if (extension === 'webp') return 'image/webp'
+  return 'image/jpeg'
+}
+
 interface ImageSize {
   width: number
   height: number
@@ -167,8 +175,9 @@ function HistoryPhotoCropEditor({
       canvas.height,
     )
 
+    const outputType = getOutputImageType(imageName)
     const blob = await new Promise<Blob | null>((resolve) =>
-      canvas.toBlob(resolve, 'image/jpeg', 0.92),
+      canvas.toBlob(resolve, outputType, outputType === 'image/png' ? undefined : 0.92),
     )
     if (!blob) return
 

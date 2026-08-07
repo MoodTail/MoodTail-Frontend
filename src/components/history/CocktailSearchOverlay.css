@@ -39,6 +39,17 @@
 
 .cocktail-search__list::-webkit-scrollbar { display: none; }
 
+.cocktail-search__status {
+  margin: 32px 0 0;
+  color: #77716e;
+  font-size: 13px;
+  text-align: center;
+}
+
+.cocktail-search__status--error {
+  color: #e97857;
+}
+
 .cocktail-search__item {
   position: relative;
   display: block;
@@ -58,6 +69,10 @@
 .cocktail-search__item.is-selected {
   border-color: #ff6f4f;
   background: #ffede961;
+}
+
+.cocktail-search__item.is-saved {
+  cursor: default;
 }
 
 .cocktail-search__item.is-selected > img {
@@ -114,6 +129,18 @@
   width: 345px;
   height: 52px;
   border-radius: 26px;
+}
+
+.cocktail-search__save-error {
+  position: absolute;
+  right: 24px;
+  bottom: 88px;
+  left: 24px;
+  z-index: 2;
+  margin: 0;
+  color: #e97857;
+  font-size: 12px;
+  text-align: center;
 }
 
 @keyframes cocktail-glass-settle {
