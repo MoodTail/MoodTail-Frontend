@@ -9,6 +9,10 @@ import type {
   PostLoginLocalResponse,
   GetLocalEmailAvailabilityRequest,
   GetLocalEmailAvailabilityResponse,
+  PostPasswordResetCodesRequest,
+  PostPasswordResetCodesResponse,
+  PostPasswordResetVerifyRequest,
+  PostPasswordResetVerifyResponse,
   SocialLoginRequest,
   SocialLoginResponse,
   PostOauthStateResponse,
@@ -73,6 +77,28 @@ export const getLocalEmailAvailability = async (
   return response.data.result;
 };
 
+export const postPasswordResetCodes = async (
+  body: PostPasswordResetCodesRequest,
+) => {
+  const response = await apiClient.post<PostPasswordResetCodesResponse>(
+    "/api/v1/auth/password-reset/codes",
+    body,
+  );
+
+  return response.data.result;
+};
+
+export const postPasswordResetVerify = async (
+  body: PostPasswordResetVerifyRequest,
+) => {
+  const response = await apiClient.post<PostPasswordResetVerifyResponse>(
+    "/api/v1/auth/password-reset/codes/verify",
+    body,
+  );
+
+  return response.data.result;
+};
+
 export const postOauthState = async (provider: string) => {
   const response = await apiClient.post<PostOauthStateResponse>(
     `/api/v1/auth/oauth-states/${provider}`,
@@ -80,3 +106,4 @@ export const postOauthState = async (provider: string) => {
   );
   return response.data.result;
 };
+
