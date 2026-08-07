@@ -1,5 +1,14 @@
+.social-signup-page p,
+.social-signup-page button {
+  margin: 0;
+  padding: 0;
+}
+
 .social-signup-page {
-  position: relative;
+  position: fixed;
+  left: 50%;
+  top: 0;
+  transform: translateX(-50%);
   width: 393px;
   height: 824px;
   overflow: hidden;
@@ -10,6 +19,12 @@
     #fff 81.62%,
     #c2ede9 117.1%
   );
+}
+
+.social-signup-page__bg-decoration {
+  display: block;
+  width: 670px;
+  height: 1024px;
 }
 
 .social-signup-page__title {
