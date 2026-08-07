@@ -89,6 +89,52 @@ const SocialSignupPage: FC<SocialSignupPageProps> = ({
 
   return (
     <div className="social-signup-page">
+      <svg
+        className="social-signup-page__bg-decoration"
+        viewBox="0 0 393 824"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        preserveAspectRatio="none"
+      >
+        <circle
+          cx="331"
+          cy="230"
+          r="173"
+          fill="url(#moodtail-blob-1)"
+          fillOpacity="0.28"
+        />
+        <circle
+          cx="33"
+          cy="676"
+          r="199"
+          fill="url(#moodtail-blob-2)"
+          fillOpacity="0.38"
+        />
+        <defs>
+          <radialGradient
+            id="moodtail-blob-1"
+            cx="0"
+            cy="0"
+            r="1"
+            gradientUnits="userSpaceOnUse"
+            gradientTransform="translate(331 230) rotate(90) scale(173)"
+          >
+            <stop stopColor="#FF6F4F" />
+            <stop offset="1" stopColor="white" stopOpacity="0" />
+          </radialGradient>
+          <radialGradient
+            id="moodtail-blob-2"
+            cx="0"
+            cy="0"
+            r="1"
+            gradientUnits="userSpaceOnUse"
+            gradientTransform="translate(33 676) rotate(90) scale(199)"
+          >
+            <stop stopColor="#FEF6D9" />
+            <stop offset="1" stopColor="white" stopOpacity="0" />
+          </radialGradient>
+        </defs>
+      </svg>
       <p className="social-signup-page__title">MoodTail</p>
       <p className="social-signup-page__subtitle">
         오늘의 기분을, 한잔의 칵테일로
