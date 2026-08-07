@@ -106,4 +106,3 @@ export const postOauthState = async (provider: string) => {
   );
   return response.data.result;
 };
-
