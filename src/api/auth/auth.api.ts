@@ -9,6 +9,10 @@ import {
   type PostLoginLocalResponse,
   type GetLocalEmailAvailabilityResponse,
   type GetLocalEmailAvailabilityRequest,
+  type PostPasswordResetCodesRequest,
+  type PostPasswordResetCodesResponse,
+  type PostPasswordResetVerifyRequest,
+  type PostPasswordResetVerifyResponse,
 } from "./auth.types";
 
 // TODO: 로그인 API 연동 후 accessToken이 실제로 발급되면 end-to-end 테스트 필요
@@ -50,6 +54,27 @@ export const getLocalEmailAvailability = async (
   const response = await apiClient.get<GetLocalEmailAvailabilityResponse>(
     "/api/v1/auth/signup/local/email-availability",
     { params },
+  );
+  return response.data.result;
+};
+
+export const postPasswordResetCodes = async (
+  body: PostPasswordResetCodesRequest,
+) => {
+  const response = await apiClient.post<PostPasswordResetCodesResponse>(
+    "/api/v1/auth/password-reset/codes",
+    body,
+  );
+
+  return response.data.result;
+};
+
+export const postPasswordResetVerify = async (
+  body: PostPasswordResetVerifyRequest,
+) => {
+  const response = await apiClient.post<PostPasswordResetVerifyResponse>(
+    "/api/v1/auth/password-reset/codes/verify",
+    body,
   );
   return response.data.result;
 };

@@ -89,3 +89,35 @@ export interface GetLocalEmailAvailabilityResponse {
   message: string;
   result: LocalEmailAvailabilityResult;
 }
+
+export interface PostPasswordResetCodesRequest {
+  email: string;
+}
+
+export interface PasswordResetCodesResult {
+  expiresInSeconds: number;
+}
+
+export interface PostPasswordResetCodesResponse {
+  timestamp: string;
+  code: string;
+  message: string;
+  result: PasswordResetCodesResult;
+}
+
+export interface PostPasswordResetVerifyRequest {
+  email: string;
+  code: string;
+}
+
+export interface PasswordResetVerifyResult {
+  resetToken: string;
+  expiresInSeconds: number;
+}
+
+export interface PostPasswordResetVerifyResponse {
+  timestamp: string;
+  code: string;
+  message: string;
+  result: PasswordResetVerifyResult;
+}
