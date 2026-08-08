@@ -13,9 +13,11 @@ import { buildQuizQuestions, toQuizQuestions, type QuizQuestion } from "../../da
 import { getMoodTestQuestions, postMoodTestResult } from "../../api/mood-tests/moodTests.api";
 import type { MoodTestAnswer, MoodTestResult } from "../../api/mood-tests/moodTests.types";
 import { getTodayCocktail } from "../../api/cocktails/cocktails.api";
-import type { TodayCocktailResult } from "../../api/cocktails/cocktails.types";
+import type {
+  TodayCocktailResult,
+  CustomCocktailResult,
+} from "../../api/cocktails/cocktails.types";
 
-// ui 구현용으로 잔 이미지 하나 무작위로 넣음
 import cocktail from "../../assets/images/glass/glass-1.png";
 
 interface MenuItem {
@@ -56,6 +58,9 @@ const MainPage: FC<MainPageProps> = ({
   );
   const [isShareOpen, setIsShareOpen] = useState(false); // TODO: 확인용 임시 코드, 삭제 예정
   const [myTasteValues, setMyTasteValues] = useState<TasteValues | null>(null);
+  const [customResult, setCustomResult] = useState<CustomCocktailResult | null>(
+    null,
+  );
 
   const [quizStep, setQuizStep] = useState(0);
   const [quizAnswers, setQuizAnswers] = useState<Record<number, string>>({});
@@ -185,29 +190,31 @@ const MainPage: FC<MainPageProps> = ({
     return (
       <CustomRecommend
         onBack={() => setView("home")}
-        onViewResult={(values) => {
+        onViewResult={(values, result) => {
           setMyTasteValues(values);
+          setCustomResult(result);
           setView("customResult");
         }}
       />
     );
   }
 
-  if (view === "customResult" && myTasteValues) {
+  if (view === "customResult" && myTasteValues && customResult) {
     return (
       <CustomRecommendResultPage
         onBack={() => setView("custom")}
         onRetry={() => setView("custom")}
-        cocktailName="피치 하이볼"
-        description="달콤함과 청량감은 살리고 도수는 부담 없이 맞춘 추천이에요."
-        matchPercent={92}
+        cocktailName={customResult.name}
+        description={customResult.description}
+        matchPercent={customResult.matchRate}
+        imageUrl={customResult.imageUrl}
         myValues={myTasteValues}
         cocktailValues={{
-          strength: 40,
-          sweetness: 80,
-          acidity: 60,
-          bitterness: 20,
-          refreshing: 100,
+          strength: customResult.cocktailFigures.alcoholIntensity,
+          sweetness: customResult.cocktailFigures.sweetness,
+          acidity: customResult.cocktailFigures.sourness,
+          bitterness: customResult.cocktailFigures.bitterness,
+          refreshing: customResult.cocktailFigures.refreshing,
         }}
       />
     );
