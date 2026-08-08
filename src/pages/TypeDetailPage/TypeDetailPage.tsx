@@ -13,8 +13,8 @@ import drinkImages from "../../assets/drinks";
 import fitFan from "../../assets/match/fit_fan.png";
 import unfitStr from "../../assets/match/unfit_str.png";
 import { COLORS } from "../../theme/colors";
-import { getType, type Cocktail, type PersonalityType } from "../../data/types";
-import { getCharacterType } from "../../data/characterType";
+import type { Cocktail, PersonalityType } from "../../data/types";
+import { getCharacterMatch, getCharacterType } from "../../data/characterType";
 import { DEX_DATA } from "../../data/dexData";
 import { getCocktailsByType, getGlassImage } from "../../data/cocktailGlasses";
 import Header from "../../components/Header";
@@ -43,8 +43,7 @@ export default function TypeDetailPage({
   onGoTest: () => void;
 }) {
   const [lockedCocktail, setLockedCocktail] = useState<Cocktail | null>(null);
-  const goodMatch = getType(type.goodMatchId);
-  const badMatch = getType(type.badMatchId);
+  const { good: goodMatch, bad: badMatch } = getCharacterMatch(type.id);
   const dexEntry = DEX_DATA.find((d) => d.typeId === type.id);
   const characterImg = dexEntry ? drinkImages[dexEntry.id] : undefined;
   const characterType = getCharacterType(type.id);

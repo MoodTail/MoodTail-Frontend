@@ -16,7 +16,9 @@ import Terms from "./pages/MyPage/Terms";
 import LoginPage from "./pages/LoginPage/LoginPage";
 import ResultPage from "./pages/ResultPage/ResultPage";
 import QuizQuestionPage from "./pages/QuizQuestionPage";
-import { buildQuizQuestions, type QuizQuestion } from "./data/quiz";
+import { buildQuizQuestions, toQuizQuestions, type QuizQuestion } from "./data/quiz";
+import { getMoodTestQuestions, postMoodTestResult } from "./api/mood-tests/moodTests.api";
+import type { MoodTestAnswer, MoodTestResult } from "./api/mood-tests/moodTests.types";
 import "./App.css";
 import { parseOauthCallback } from "./utils/oauth";
 import SocialSignupPage from "./pages/SocialSignupPage/SocialSignupPage";
@@ -48,6 +50,7 @@ function App() {
   const [retestQuestions, setRetestQuestions] = useState<QuizQuestion[]>(() =>
     buildQuizQuestions(),
   );
+  const [quizResult, setQuizResult] = useState<MoodTestResult | null>(null);
   const [oauthCallback, setOauthCallback] = useState(() =>
     parseOauthCallback(),
   );
@@ -58,6 +61,9 @@ function App() {
     setRetestAnswers({});
     setRetestQuestions(buildQuizQuestions());
     setIsRetestOpen(true);
+    getMoodTestQuestions()
+      .then(({ questions }) => setRetestQuestions(toQuizQuestions(questions)))
+      .catch((err) => console.error("테스트 질문을 불러오지 못했습니다", err));
   };
 
   const exitRetest = () => {
@@ -65,7 +71,6 @@ function App() {
     setRetestStep(0);
     setRetestAnswers({});
     setRetestQuestions(buildQuizQuestions());
-    setIsRetestOpen(true);
   };
 
   const startTestFromHistory = () => {
@@ -125,13 +130,21 @@ function App() {
       case "home":
         return (
           <MainPage
-            onQuizComplete={() => setIsTestResultOpen(true)}
+            onQuizComplete={(result) => {
+              setQuizResult(result);
+              setIsTestResultOpen(true);
+            }}
             initialView={goToQuizOnHome ? "quiz" : undefined}
             onInitialViewConsumed={() => setGoToQuizOnHome(false)}
           />
         );
       case "recipe":
-        return <RecipePage onNavVisibilityChange={setRecipeNavVisible} />;
+        return (
+          <RecipePage
+            onNavVisibilityChange={setRecipeNavVisible}
+            onGoToLogin={handleGoToLoginScreen}
+          />
+        );
       case "mypage":
         return (
           <MyPage
@@ -233,8 +246,32 @@ function App() {
               }
               onNext={() => {
                 if (isLastStep) {
+                  // 로컬 목데이터로 폴백된 상태라면 id가 실제 숫자 id가 아니라서 제출을 건너뜁니다.
+                  const answers = retestQuestions
+                    .map((q, i) => {
+                      const questionId = Number(q.id);
+                      const optionId = Number(retestAnswers[i]);
+                      if (Number.isNaN(questionId) || Number.isNaN(optionId)) return null;
+                      return { questionId, optionId };
+                    })
+                    .filter((a): a is MoodTestAnswer => a !== null);
+
                   exitRetest();
-                  setIsTestResultOpen(true);
+                  if (answers.length === retestQuestions.length) {
+                    postMoodTestResult(answers)
+                      .then((result) => {
+                        setQuizResult(result);
+                        setIsTestResultOpen(true);
+                      })
+                      .catch((err) => {
+                        console.error("테스트 결과 제출에 실패했습니다", err);
+                        setQuizResult(null);
+                        setIsTestResultOpen(true);
+                      });
+                  } else {
+                    setQuizResult(null);
+                    setIsTestResultOpen(true);
+                  }
                 } else {
                   setRetestStep((s) => s + 1);
                 }
@@ -254,6 +291,7 @@ function App() {
           <section className="app-content app-content--full">
             <ResultPage
               isLoggedIn={!isGuest}
+              result={quizResult}
               onBack={() => setIsTestResultOpen(false)}
               onRetest={startRetest}
               onGoToLogin={handleGoToLoginScreen}

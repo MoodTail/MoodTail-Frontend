@@ -9,7 +9,9 @@ import CustomRecommend from "../CustomRecommend/CustomRecommend";
 import CustomRecommendResultPage from "../CustomRecommendResultPage/CustomRecommendResultPage";
 import QuizQuestionPage from "../QuizQuestionPage";
 import LoadingPage from "../LoadingPage";
-import { buildQuizQuestions, type QuizQuestion } from "../../data/quiz";
+import { buildQuizQuestions, toQuizQuestions, type QuizQuestion } from "../../data/quiz";
+import { getMoodTestQuestions, postMoodTestResult } from "../../api/mood-tests/moodTests.api";
+import type { MoodTestAnswer, MoodTestResult } from "../../api/mood-tests/moodTests.types";
 import { getTodayCocktail } from "../../api/cocktails/cocktails.api";
 import type {
   TodayCocktailResult,
@@ -41,7 +43,7 @@ type ViewState =
   | "quizLoading";
 
 interface MainPageProps {
-  onQuizComplete?: () => void;
+  onQuizComplete?: (result: MoodTestResult | null) => void;
   initialView?: "quiz";
   onInitialViewConsumed?: () => void;
 }
@@ -65,6 +67,7 @@ const MainPage: FC<MainPageProps> = ({
   const [quizQuestions, setQuizQuestions] = useState<QuizQuestion[]>(() =>
     buildQuizQuestions(),
   );
+  const [quizResult, setQuizResult] = useState<MoodTestResult | null>(null);
 
   const [todayCocktail, setTodayCocktail] =
     useState<TodayCocktailResult | null>(null);
@@ -73,6 +76,21 @@ const MainPage: FC<MainPageProps> = ({
     if (initialView === "quiz") onInitialViewConsumed?.();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // 퀴즈 화면에 들어갈 때마다 실제 문항(/api/v1/tests/questions)을 받아와 교체합니다.
+  // 실패하면 조용히 무시하고 로컬 목데이터(buildQuizQuestions)를 그대로 씁니다.
+  useEffect(() => {
+    if (view !== "quiz") return;
+    let cancelled = false;
+    getMoodTestQuestions()
+      .then(({ questions }) => {
+        if (!cancelled) setQuizQuestions(toQuizQuestions(questions));
+      })
+      .catch((err) => console.error("테스트 질문을 불러오지 못했습니다", err));
+    return () => {
+      cancelled = true;
+    };
+  }, [view]);
 
   useEffect(() => {
     const fetchTodayCocktail = async () => {
@@ -118,6 +136,27 @@ const MainPage: FC<MainPageProps> = ({
         onPrevious={quizStep > 0 ? () => setQuizStep((s) => s - 1) : undefined}
         onNext={() => {
           if (isLastStep) {
+            // 로컬 목데이터로 폴백된 상태라면 questionId/optionId가 실제 숫자 id가 아니라서 제출을 건너뜁니다.
+            const answers = quizQuestions
+              .map((q, i) => {
+                const questionId = Number(q.id);
+                const optionId = Number(quizAnswers[i]);
+                if (Number.isNaN(questionId) || Number.isNaN(optionId)) return null;
+                return { questionId, optionId };
+              })
+              .filter((a): a is MoodTestAnswer => a !== null);
+
+            if (answers.length === quizQuestions.length) {
+              postMoodTestResult(answers)
+                .then(setQuizResult)
+                .catch((err) => {
+                  console.error("테스트 결과 제출에 실패했습니다", err);
+                  setQuizResult(null);
+                });
+            } else {
+              setQuizResult(null);
+            }
+
             setView("quizLoading");
           } else {
             setQuizStep((s) => s + 1);
@@ -133,7 +172,7 @@ const MainPage: FC<MainPageProps> = ({
       <LoadingPage
         onComplete={() => {
           exitQuiz();
-          onQuizComplete?.();
+          onQuizComplete?.(quizResult);
         }}
       />
     );

@@ -15,6 +15,8 @@ import glass1 from '../../assets/images/glass/glass-1.png'
 import glass2 from '../../assets/images/glass/glass-2.png'
 import glass3 from '../../assets/images/glass/glass-3.png'
 import glass4 from '../../assets/images/glass/glass-4.png'
+import { saveMoodTestResult } from '../../api/mood-tests/moodTests.api'
+import type { MoodTestResult } from '../../api/mood-tests/moodTests.types'
 import '../../styles/ResultPage.css'
 
 // TODO: 실제 테스트 결과 API 연동 후 실제 응답으로 대체
@@ -54,6 +56,8 @@ type ModalStep = 'none' | 'save-overwrite-warning' | 'login-required' | 'back-co
 
 interface ResultPageProps {
   isLoggedIn?: boolean
+  // 실제 테스트 제출(POST /api/v1/tests/results) 응답. 없으면 목데이터로 보여줍니다.
+  result?: MoodTestResult | null
   // TODO: react-router-dom 도입되면 이 prop 대신 라우팅으로 대체
   onBack?: () => void
   onRetest?: () => void
@@ -62,12 +66,44 @@ interface ResultPageProps {
 
 function ResultPage({
   isLoggedIn = true,
+  result = null,
   onBack,
   onRetest,
   onGoToLogin,
 }: ResultPageProps) {
   // TODO: 실제 저장 상태 API 연동 후 아래 mock state를 실제 값으로 교체
   const [isResultSaved, setIsResultSaved] = useState(false) // 지금 보고 있는 결과를 저장했는지
+
+  // result가 있으면(실제 테스트를 막 완료한 경우) 그 값을, 없으면 목데이터를 사용합니다.
+  // matchPercent(이 타입이 나온 사용자 비율)는 실제 API에 대응 필드가 없어 목데이터 값을 그대로 씁니다.
+  const characterImage = result?.moodType.characterImageUrl ?? MOCK_RESULT.characterImage
+  const typeName = result?.moodType.name ?? MOCK_RESULT.typeName
+  const typeDescription = result?.moodType.shortDescription ?? MOCK_RESULT.typeDescription
+  const quote = result?.moodType.characterQuote ?? MOCK_RESULT.quote
+  const detailDescription = result?.moodType.shortDescription ?? MOCK_RESULT.detailDescription
+  const matchPercent = MOCK_RESULT.matchPercent
+
+  const topCocktails: CocktailTopItem[] = result
+    ? result.recommendations.map((r) => ({
+        rank: r.ranking,
+        name: r.nameKo,
+        matchRate: r.matchScore,
+        glassImage: r.imageUrl,
+      }))
+    : MOCK_TOP_COCKTAILS
+
+  const myTaste: RadarChartData = result
+    ? {
+        당도: result.displayTasteScores.sweetness,
+        산도: result.displayTasteScores.sourness,
+        쓴맛: result.displayTasteScores.bitterness,
+        청량감: result.displayTasteScores.refreshing,
+        도수: result.displayTasteScores.alcoholIntensity,
+      }
+    : MOCK_MY_TASTE
+
+  const goodMatch = result?.compatibilities.best
+  const badMatch = result?.compatibilities.worst
 
   const [modalStep, setModalStep] = useState<ModalStep>('none')
   const closeModal = () => setModalStep('none')
@@ -76,6 +112,7 @@ function ResultPage({
   const [isSnsModalOpen, setIsSnsModalOpen] = useState(false)
   const [isSaveToastVisible, setIsSaveToastVisible] = useState(false)
   const [isSaveResultToastVisible, setIsSaveResultToastVisible] = useState(false)
+  const [shareUrl, setShareUrl] = useState<string | null>(null)
 
   useEffect(() => {
     if (!isSaveResultToastVisible) return
@@ -110,11 +147,22 @@ function ResultPage({
   }
 
   const performSave = () => {
-    // TODO: 테스트 결과 저장 API 연동
-    console.log('TODO: 테스트 결과 저장')
     setIsResultSaved(true)
     setModalStep('none')
     setIsSaveResultToastVisible(true)
+
+    // 실제 테스트 결과가 있을 때만(직접 완료한 테스트) 저장 API를 호출합니다.
+    // 게스트 등 비로그인 상태거나 실패해도 위 토스트/로컬 상태는 이미 반영되어 있습니다.
+    if (result && result.recommendations.length === 4) {
+      saveMoodTestResult({
+        moodType: { moodTypeId: result.moodType.moodTypeId, typeCode: result.moodType.typeCode },
+        tasteProfile: result.tasteProfile,
+        recommendedCocktails: result.recommendations.map((r) => ({
+          cocktailId: r.cocktailId,
+          matchScore: r.matchScore,
+        })),
+      }).catch((err) => console.error('테스트 결과 저장에 실패했습니다', err))
+    }
   }
 
   const handleSaveResult = () => {
@@ -139,7 +187,8 @@ function ResultPage({
     setIsShareModalOpen(true)
   }
 
-  const handleSnsShare = () => {
+  const handleSnsShare = (generatedShareUrl?: string) => {
+    setShareUrl(generatedShareUrl ?? null)
     setIsSnsModalOpen(true)
   }
 
@@ -166,17 +215,17 @@ function ResultPage({
           </button>
 
           <div className="result-page__character-circle">
-            <img className="result-page__character" src={MOCK_RESULT.characterImage} alt="" />
+            <img className="result-page__character" src={characterImage} alt="" />
           </div>
-          <p className="result-page__type-name">{MOCK_RESULT.typeName}</p>
-          <p className="result-page__type-description">{MOCK_RESULT.typeDescription}</p>
-          <p className="result-page__quote">&ldquo;{MOCK_RESULT.quote}&rdquo;</p>
+          <p className="result-page__type-name">{typeName}</p>
+          <p className="result-page__type-description">{typeDescription}</p>
+          <p className="result-page__quote">&ldquo;{quote}&rdquo;</p>
 
           <div className="result-page__detail-card">
-            <p className="result-page__detail-title">{MOCK_RESULT.typeName}</p>
-            <p className="result-page__detail-body">{MOCK_RESULT.detailDescription}</p>
+            <p className="result-page__detail-title">{typeName}</p>
+            <p className="result-page__detail-body">{detailDescription}</p>
             <p className="result-page__detail-percent">
-              사용자의 {MOCK_RESULT.matchPercent}%가 이 타입이 나왔어요
+              사용자의 {matchPercent}%가 이 타입이 나왔어요
             </p>
           </div>
         </header>
@@ -186,12 +235,12 @@ function ResultPage({
 
           <section className="result-page__section">
             <h2 className="result-page__section-title">나와 일치하는 칵테일 TOP 4</h2>
-            <CocktailTopList items={MOCK_TOP_COCKTAILS} />
+            <CocktailTopList items={topCocktails} />
           </section>
 
           <section className="result-page__section">
             <h2 className="result-page__section-title">나의 취향 분석</h2>
-            <RadarChart myData={MOCK_MY_TASTE} compareData={MOCK_COMPARE_TASTE} />
+            <RadarChart myData={myTaste} compareData={MOCK_COMPARE_TASTE} />
             <div className="taste-chips">
               {TASTE_CHIP_ORDER.map(({ key, label, active }) => (
                 <div
@@ -199,7 +248,7 @@ function ResultPage({
                   className={`taste-chips__item${active ? ' taste-chips__item--active' : ''}`}
                 >
                   <span className="taste-chips__label">{label}</span>
-                  <span className="taste-chips__value">{MOCK_MY_TASTE[key]}</span>
+                  <span className="taste-chips__value">{myTaste[key]}</span>
                 </div>
               ))}
             </div>
@@ -208,15 +257,15 @@ function ResultPage({
           <section className="result-page__match-section">
             <TypeMatchCard
               label="잘 맞는 타입"
-              typeName="환상주의자"
+              typeName={goodMatch?.name ?? "환상주의자"}
               typeNameColor="#fda8a8"
-              image={visionaryCharacterImg}
+              image={goodMatch?.characterImageUrl ?? visionaryCharacterImg}
             />
             <TypeMatchCard
               label="안 맞는 타입"
-              typeName="규칙주의자"
+              typeName={badMatch?.name ?? "규칙주의자"}
               typeNameColor="#6fa8dc"
-              image={disciplinarianCharacterImg}
+              image={badMatch?.characterImageUrl ?? disciplinarianCharacterImg}
             />
           </section>
 
@@ -272,11 +321,12 @@ function ResultPage({
       <ResultShareModal
         isOpen={isShareModalOpen}
         shareCard={{
-          characterImage: MOCK_RESULT.characterImage,
-          typeName: MOCK_RESULT.typeName,
-          typeDescription: MOCK_RESULT.shareDescription,
-          quote: MOCK_RESULT.quote,
+          characterImage,
+          typeName,
+          typeDescription: result?.moodType.shortDescription ?? MOCK_RESULT.shareDescription,
+          quote,
         }}
+        tasteProfile={result?.tasteProfile}
         onClose={() => setIsShareModalOpen(false)}
         onSnsShare={handleSnsShare}
         onImageSaved={handleImageSaved}
@@ -284,7 +334,7 @@ function ResultPage({
 
       <ResultSnsShareModal
         isOpen={isSnsModalOpen}
-        url="https://moodtail.app/share/mock-id"
+        url={shareUrl ?? "https://moodtail.app/share/mock-id"}
         onClose={() => setIsSnsModalOpen(false)}
         onKakaoShare={handleKakaoShare}
       />
