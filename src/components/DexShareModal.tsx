@@ -3,6 +3,7 @@ import drinkImages from "../assets/drinks";
 import { COLORS } from "../theme/colors";
 import type { PersonalityType } from "../data/types";
 import { DEX_DATA } from "../data/dexData";
+import { getCharacterType } from "../data/characterType";
 import Modal from "./Modal";
 import DexBackground from "./DexBackground";
 import { CloseIcon } from "./icons";
@@ -19,6 +20,7 @@ export default function DexShareModal({
   onShareSns: () => void;
   onSaveImage: () => void;
 }) {
+  const characterType = getCharacterType(type.id);
   const unlockedCount = type.cocktails.filter((c) => c.unlocked).length;
   const collectRate = Math.round((unlockedCount / type.cocktails.length) * 100);
 
@@ -59,7 +61,7 @@ export default function DexShareModal({
             대표 타입
           </div>
           <div style={{ fontSize: 17, fontWeight: 800, color: COLORS.ink, whiteSpace: "nowrap" }}>
-            {type.name}
+            {characterType.name}
           </div>
         </div>
         <div
@@ -90,7 +92,7 @@ export default function DexShareModal({
           <DexBox
             key={dex.id}
             drinkImg={drinkImages[dex.id]}
-            type={dex.typeNumber}
+            typeId={dex.typeId}
             unlocked={dex.unlocked}
             collectionRate={dex.collectionRate}
           />

@@ -16,6 +16,7 @@ import drinkImages from "../../assets/drinks";
 import { COLORS } from "../../theme/colors";
 import { TYPES } from "../../data/types";
 import { DEX_DATA } from "../../data/dexData";
+import { getCharacterType } from "../../data/characterType";
 import Header from "../../components/Header";
 import PhoneFrame from "../../components/PhoneFrame";
 import DexBackground from "../../components/DexBackground";
@@ -35,6 +36,7 @@ export default function TypeDexPage({
   onGoTest: () => void;
 }) {
   const repType = TYPES.find((t) => t.id === repTypeId)!;
+  const repCharacterType = getCharacterType(repTypeId);
   const [lockedName, setLockedName] = useState<string | null>(null);
 
   return (
@@ -86,7 +88,7 @@ export default function TypeDexPage({
             <div style={{ fontSize: 14, color: COLORS.inkSoft, fontWeight: 600, marginBottom: 4 }}>
               대표 타입
             </div>
-            <div style={{ fontSize: 24, fontWeight: 800, color: COLORS.ink }}>{repType.name}</div>
+            <div style={{ fontSize: 24, fontWeight: 800, color: COLORS.ink }}>{repCharacterType.name}</div>
           </div>
         </button>
 
@@ -102,7 +104,7 @@ export default function TypeDexPage({
             <DexBox
               key={dex.id}
               drinkImg={drinkImages[dex.id]}
-              type={dex.typeNumber}
+              typeId={dex.typeId}
               unlocked={dex.unlocked}
               collectionRate={dex.collectionRate}
               onClick={

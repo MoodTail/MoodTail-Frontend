@@ -142,6 +142,7 @@ function App() {
         return (
           <RecipePage
             onNavVisibilityChange={setRecipeNavVisible}
+            isLoggedIn={!isGuest}
             onGoToLogin={handleGoToLoginScreen}
           />
         );

@@ -1,21 +1,23 @@
 import { COLORS } from "../theme/colors";
-import { CHARACTER_TYPES } from "../data/characterType";
+import { getCharacterType } from "../data/characterType";
 
 export default function DexBox({
   drinkImg,
-  type,
+  typeId,
   collectionRate,
   unlocked,
   onClick,
 }: {
   drinkImg: string;
-  type: number;
+  typeId: string;
   collectionRate?: number;
   unlocked: boolean;
   onClick?: () => void;
 }) {
   if (unlocked) {
-    const characterType = CHARACTER_TYPES.find((t) => t.number === type);
+    // number가 아니라 typeId로 직접 찾습니다 — number는 characterType.ts에서 중복될 수 있어서
+    // (예: realist/straightforward가 둘 다 number 3) number 기준 조회는 틀린 항목을 찾을 수 있습니다.
+    const characterType = getCharacterType(typeId);
 
     return (
       <button

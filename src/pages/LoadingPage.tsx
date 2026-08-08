@@ -51,6 +51,9 @@ export default function LoadingPage({ onComplete }: { onComplete: () => void }) 
               height: 532,
               objectFit: "contain",
               animation: "breathe-0 3s ease-in-out infinite",
+              willChange: "transform, opacity",
+              backfaceVisibility: "hidden",
+              WebkitBackfaceVisibility: "hidden",
             }}
           />
 
@@ -64,6 +67,9 @@ export default function LoadingPage({ onComplete }: { onComplete: () => void }) 
               background:
                 "radial-gradient(50% 50% at 50% 50%, #FFF0E9 0%, rgba(255, 255, 255, 0) 100%)",
               animation: "breathe-1 3s ease-in-out infinite",
+              willChange: "transform, opacity",
+              backfaceVisibility: "hidden",
+              WebkitBackfaceVisibility: "hidden",
             }}
           />
 
@@ -77,6 +83,9 @@ export default function LoadingPage({ onComplete }: { onComplete: () => void }) 
               background:
                 "radial-gradient(50% 50% at 50% 50%, #FFE8DC 0%, rgba(255, 255, 255, 0) 100%)",
               animation: "breathe-2 3s ease-in-out infinite",
+              willChange: "transform, opacity",
+              backfaceVisibility: "hidden",
+              WebkitBackfaceVisibility: "hidden",
             }}
           />
 
@@ -90,6 +99,9 @@ export default function LoadingPage({ onComplete }: { onComplete: () => void }) 
               background:
                 "radial-gradient(50% 50% at 50% 50%, #FFD3BF 0%, rgba(255, 255, 255, 0) 100%)",
               animation: "breathe-3 3s ease-in-out infinite",
+              willChange: "transform, opacity",
+              backfaceVisibility: "hidden",
+              WebkitBackfaceVisibility: "hidden",
             }}
           />
 

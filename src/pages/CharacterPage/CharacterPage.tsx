@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getType, TYPES } from "../../data/types";
+import { getType } from "../../data/types";
 import CharacterDexPage from "../CharacterDexPage/CharacterDexPage";
 import RepresentativeTypeSettingPage from "../RepresentativeTypeSettingPage/RepresentativeTypeSettingPage";
 import TypeDetailPage from "../TypeDetailPage/TypeDetailPage";
@@ -8,7 +8,7 @@ import DexShareModal from "../../components/DexShareModal";
 import ResultSnsShareModal from "../../components/common/modal/ResultSnsShareModal";
 import SaveCompleteToast from "../../components/common/SaveCompleteToast";
 import { getCollection, updateRepresentativeMoodType } from "../../api/collections/collections.api";
-import { CHARACTER_LABELS, type CharacterType } from "../../constants/characters";
+import { TYPECODE_TO_LOCAL_TYPE } from "../../data/typeCodeMapping";
 
 type DexOrigin = "typeDex" | "characterDex";
 
@@ -31,14 +31,7 @@ function CharacterPage({ onGoTest }: CharacterPageProps) {
   const [moodTypeIdByLocalId, setMoodTypeIdByLocalId] = useState<Record<string, number>>({});
 
   // 도감 정보를 실제 API로 받아와 실제 moodTypeId를 로컬 타입에 매핑해둡니다.
-  //
-  // ⚠️ 알려진 한계: 이 화면(TypeDexPage/CharacterDexPage/data/types.ts)이 쓰는 12종 로컬 목데이터와,
-  // 실제 백엔드 typeCode 기준으로 새로 정리된 constants/characters.ts의 12종 목데이터는 서로 다른
-  // 체계입니다(예: 로컬 "직설가" ↔ 실제 "규칙주의자"/passionate-challenger처럼 이름이 아예 다른
-  // 경우가 절반 가까이 됩니다). 여기서는 API 응답의 typeCode를 CHARACTER_LABELS로 로컬 placeholder
-  // 라벨로 변환한 뒤 이름이 일치하는 것만 매핑하므로, 이름이 겹치는 절반 정도만 정확히 연결되고
-  // 나머지는 매핑되지 않아 대표 타입 지정이 로컬 상태로만 남습니다.
-  // 근본적으로는 이 화면의 로컬 타입 체계를 constants/characters.ts 기준으로 통일해야 합니다.
+  // 로컬 typeId ↔ 실제 typeCode 매핑(data/typeCodeMapping.ts)은 사용자가 직접 확정한 값입니다.
   useEffect(() => {
     let cancelled = false;
     getCollection()
@@ -46,9 +39,8 @@ function CharacterPage({ onGoTest }: CharacterPageProps) {
         if (cancelled) return;
         const idMap: Record<string, number> = {};
         result.moodTypes.forEach((mt) => {
-          const placeholderLabel = CHARACTER_LABELS[mt.typeCode as CharacterType];
-          const local = TYPES.find((t) => t.name === placeholderLabel);
-          if (local) idMap[local.id] = mt.moodTypeId;
+          const localId = TYPECODE_TO_LOCAL_TYPE[mt.typeCode];
+          if (localId) idMap[localId] = mt.moodTypeId;
         });
         setMoodTypeIdByLocalId(idMap);
       })
@@ -98,6 +90,7 @@ function CharacterPage({ onGoTest }: CharacterPageProps) {
       {screen.name === "typeDetail" && (
         <TypeDetailPage
           type={getType(screen.typeId)}
+          moodTypeId={moodTypeIdByLocalId[screen.typeId]}
           onBack={() =>
             screen.from === "typeDex" ? goTypeDex() : openCharacterDex(screen.typeId)
           }

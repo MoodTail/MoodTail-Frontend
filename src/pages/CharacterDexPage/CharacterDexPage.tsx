@@ -4,6 +4,7 @@ import drinkImages from "../../assets/drinks";
 import { COLORS } from "../../theme/colors";
 import type { PersonalityType } from "../../data/types";
 import { DEX_DATA } from "../../data/dexData";
+import { getCharacterType } from "../../data/characterType";
 import Header from "../../components/Header";
 import PhoneFrame from "../../components/PhoneFrame";
 import DexBackground from "../../components/DexBackground";
@@ -23,6 +24,7 @@ export default function CharacterDexPage({
   onOpenTypeDetail: (typeId: string) => void;
   onGoTest: () => void;
 }) {
+  const characterType = getCharacterType(type.id);
   const unlockedCount = type.cocktails.filter((c) => c.unlocked).length;
   const collectRate = Math.round((unlockedCount / type.cocktails.length) * 100);
   const [lockedName, setLockedName] = useState<string | null>(null);
@@ -76,7 +78,7 @@ export default function CharacterDexPage({
             <div style={{ fontSize: 12, color: COLORS.inkSoft, fontWeight: 600, marginBottom: 4 }}>
               대표 타입
             </div>
-            <div style={{ fontSize: 19, fontWeight: 800, color: COLORS.ink }}>{type.name}</div>
+            <div style={{ fontSize: 19, fontWeight: 800, color: COLORS.ink }}>{characterType.name}</div>
           </div>
           <div
             style={{
@@ -106,7 +108,7 @@ export default function CharacterDexPage({
             <DexBox
               key={dex.id}
               drinkImg={drinkImages[dex.id]}
-              type={dex.typeNumber}
+              typeId={dex.typeId}
               unlocked={dex.unlocked}
               collectionRate={dex.collectionRate}
               onClick={
