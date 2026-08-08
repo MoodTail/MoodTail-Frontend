@@ -640,7 +640,13 @@ function MonthlyReportPage({ onBack, reportMonth }: MonthlyReportPageProps) {
             isOpen
             url={shareImageUrl}
             onClose={() => setIsSnsShareModalOpen(false)}
-            onKakaoShare={() => setIsSnsShareModalOpen(false)}
+            kakaoShare={{
+              title: `MoodTail ${reportYear}년 ${reportMonthNumber}월 리포트`,
+              description: `${report.monthlyMoodType.name} 유형의 월간 취향 리포트예요.`,
+              imageUrl: shareImageUrl,
+              webUrl: window.location.origin,
+              buttonTitle: 'MoodTail 보기',
+            }}
           />,
           mobileFrame ?? document.body,
         )}
