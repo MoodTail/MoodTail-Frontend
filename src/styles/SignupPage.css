@@ -206,16 +206,18 @@
   height: 20px;
   padding: 0;
   border-radius: 6px;
-  border: 1.5px solid #e8dbd4;
   background: #fff;
+  border: 1.5px solid #e8dbd4;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-size: 12px;
-  line-height: 1;
-  color: #fff;
+  color: #ff6f4f;
 }
 .signup-page__checkbox--checked {
-  background: #ff6f4f;
   border-color: #ff6f4f;
+  background: #fff6f3;
 }
 .signup-page__checkbox--all {
   left: 19.75px;

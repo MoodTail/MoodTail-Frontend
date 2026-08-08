@@ -12,6 +12,8 @@ import LoadingPage from "../LoadingPage";
 import { buildQuizQuestions, toQuizQuestions, type QuizQuestion } from "../../data/quiz";
 import { getMoodTestQuestions, postMoodTestResult } from "../../api/mood-tests/moodTests.api";
 import type { MoodTestAnswer, MoodTestResult } from "../../api/mood-tests/moodTests.types";
+import { getTodayCocktail } from "../../api/cocktails/cocktails.api";
+import type { TodayCocktailResult } from "../../api/cocktails/cocktails.types";
 
 // ui 구현용으로 잔 이미지 하나 무작위로 넣음
 import cocktail from "../../assets/images/glass/glass-1.png";
@@ -29,7 +31,14 @@ interface TasteValues {
   refreshing: number;
 }
 
-type ViewState = "home" | "trend" | "together" | "custom" | "customResult" | "quiz" | "quizLoading";
+type ViewState =
+  | "home"
+  | "trend"
+  | "together"
+  | "custom"
+  | "customResult"
+  | "quiz"
+  | "quizLoading";
 
 interface MainPageProps {
   onQuizComplete?: (result: MoodTestResult | null) => void;
@@ -37,15 +46,26 @@ interface MainPageProps {
   onInitialViewConsumed?: () => void;
 }
 
-const MainPage: FC<MainPageProps> = ({ onQuizComplete, initialView, onInitialViewConsumed }) => {
-  const [view, setView] = useState<ViewState>(initialView === "quiz" ? "quiz" : "home");
+const MainPage: FC<MainPageProps> = ({
+  onQuizComplete,
+  initialView,
+  onInitialViewConsumed,
+}) => {
+  const [view, setView] = useState<ViewState>(
+    initialView === "quiz" ? "quiz" : "home",
+  );
   const [isShareOpen, setIsShareOpen] = useState(false); // TODO: 확인용 임시 코드, 삭제 예정
   const [myTasteValues, setMyTasteValues] = useState<TasteValues | null>(null);
 
   const [quizStep, setQuizStep] = useState(0);
   const [quizAnswers, setQuizAnswers] = useState<Record<number, string>>({});
-  const [quizQuestions, setQuizQuestions] = useState<QuizQuestion[]>(() => buildQuizQuestions());
+  const [quizQuestions, setQuizQuestions] = useState<QuizQuestion[]>(() =>
+    buildQuizQuestions(),
+  );
   const [quizResult, setQuizResult] = useState<MoodTestResult | null>(null);
+
+  const [todayCocktail, setTodayCocktail] =
+    useState<TodayCocktailResult | null>(null);
 
   useEffect(() => {
     if (initialView === "quiz") onInitialViewConsumed?.();
@@ -67,6 +87,18 @@ const MainPage: FC<MainPageProps> = ({ onQuizComplete, initialView, onInitialVie
     };
   }, [view]);
 
+  useEffect(() => {
+    const fetchTodayCocktail = async () => {
+      try {
+        const result = await getTodayCocktail();
+        setTodayCocktail(result);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    void fetchTodayCocktail();
+  }, []);
+
   const exitQuiz = () => {
     setView("home");
     setQuizStep(0);
@@ -79,7 +111,7 @@ const MainPage: FC<MainPageProps> = ({ onQuizComplete, initialView, onInitialVie
   };
 
   const menuItems: MenuItem[] = [
-    { label: "트렌드집계 확인", onClick: () => setView("trend") },
+    { label: "트렌드집계", onClick: () => setView("trend") },
     { label: "같이 고르기", onClick: () => setView("together") },
     { label: "커스텀 추천", onClick: () => setView("custom") },
   ];
@@ -222,43 +254,44 @@ const MainPage: FC<MainPageProps> = ({ onQuizComplete, initialView, onInitialVie
       {/* 오늘의 추천 칵테일 */}
       <h2 className="main-page__section-title">오늘의 추천 칵테일</h2>
 
-      <div className="main-page__cocktail-card">
-        <div className="main-page__cocktail-thumb">
-          <img
-            src={cocktail}
-            alt="선라이즈 소다"
-            className="main-page__cocktail-image"
-          />
+      <div className="main-page__below-title">
+        <div className="main-page__cocktail-card">
+          <div className="main-page__cocktail-thumb">
+            <img
+              src={todayCocktail?.cocktail.imageUrl || cocktail}
+              alt={todayCocktail?.cocktail.nameKo ?? "오늘의 칵테일"}
+              className="main-page__cocktail-image"
+            />
+          </div>
+
+          <div className="main-page__cocktail-info">
+            <p className="main-page__cocktail-name">
+              {todayCocktail?.cocktail.nameKo ?? "불러오는 중..."}
+            </p>
+            <p className="main-page__cocktail-desc">
+              {todayCocktail?.cocktail.shortDescription}
+            </p>
+          </div>
         </div>
 
-        <div className="main-page__cocktail-info">
-          <p className="main-page__cocktail-name">선라이즈 소다</p>
-          <p className="main-page__cocktail-tags">달콤 · 청량 · 과일향</p>
-          <p className="main-page__cocktail-desc">
-            오렌지 주스 + 소다워터 + 그레나딘으로
-            <br />
-            만드는 상큼한 여름 칵테일이에요.
-          </p>
-        </div>
+        {/* 메뉴 리스트 */}
+        <ul className="main-page__menu-list">
+          {menuItems.map((item) => (
+            <li key={item.label} className="main-page__menu-item">
+              <button
+                type="button"
+                className="main-page__menu-item-button"
+                onClick={item.onClick}
+              >
+                <span className="main-page__menu-item-label">{item.label}</span>
+                <span className="main-page__menu-item-arrow" aria-hidden="true">
+                  ↗
+                </span>
+              </button>
+            </li>
+          ))}
+        </ul>
       </div>
-
-      {/* 메뉴 리스트 */}
-      <ul className="main-page__menu-list">
-        {menuItems.map((item) => (
-          <li key={item.label} className="main-page__menu-item">
-            <button
-              type="button"
-              className="main-page__menu-item-button"
-              onClick={item.onClick}
-            >
-              <span className="main-page__menu-item-label">{item.label}</span>
-              <span className="main-page__menu-item-arrow" aria-hidden="true">
-                ↗
-              </span>
-            </button>
-          </li>
-        ))}
-      </ul>
 
       {isShareOpen && (
         <ShareModal

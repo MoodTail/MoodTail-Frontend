@@ -24,17 +24,17 @@ export interface PostGuestLoginResponse {
   result: GuestLoginResult;
 }
 
+export interface SignupAgreement {
+  termId: number;
+  agreed: boolean;
+}
+
 export interface PostSignupLocalRequest {
   email: string;
   password: string;
   passwordConfirm: string;
   nickname: string;
-  agreements: SignupLocalAgreements[];
-}
-
-export interface SignupLocalAgreements {
-  termId: number;
-  agreed: boolean;
+  agreements: SignupAgreement[];
 }
 
 export interface SignupLocalResult {
@@ -88,4 +88,70 @@ export interface GetLocalEmailAvailabilityResponse {
   code: string;
   message: string;
   result: LocalEmailAvailabilityResult;
+}
+
+export interface PostPasswordResetCodesRequest {
+  email: string;
+}
+export interface PasswordResetCodesResult {
+  expiresInSeconds: number;
+}
+export interface PostPasswordResetCodesResponse {
+  timestamp: string;
+  code: string;
+  message: string;
+  result: PasswordResetCodesResult;
+}
+export interface PostPasswordResetVerifyRequest {
+  email: string;
+  code: string;
+}
+export interface PasswordResetVerifyResult {
+  resetToken: string;
+  expiresInSeconds: number;
+}
+export interface PostPasswordResetVerifyResponse {
+  timestamp: string;
+  code: string;
+  message: string;
+  result: PasswordResetVerifyResult;
+}
+
+export interface SocialLoginAgreement {
+  termId: number;
+  agreed: boolean;
+}
+export interface SocialLoginRequest {
+  authorizationCode: string;
+  redirectUri: string;
+  state: string;
+  nickname: string;
+  agreements: SocialLoginAgreement[];
+}
+export interface SocialLoginResult {
+  userId: number;
+  email: string;
+  nickname: string;
+  provider: string;
+  isNewUser: boolean;
+  grantType: string;
+  accessToken: string;
+}
+export interface SocialLoginResponse {
+  timestamp: string;
+  code: string;
+  message: string;
+  result: SocialLoginResult;
+}
+export interface OauthStateResult {
+  state: string;
+  codeChallenge: string;
+  codeChallengeMethod: string;
+  expiresInSeconds: number;
+}
+export interface PostOauthStateResponse {
+  timestamp: string;
+  code: string;
+  message: string;
+  result: OauthStateResult;
 }

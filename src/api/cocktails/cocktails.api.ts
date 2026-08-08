@@ -8,6 +8,7 @@ import type {
   GetCocktailsResult,
   GetFavoriteCocktailsResponse,
   GetFavoriteCocktailsResult,
+  GetTodayCocktailResponse,
 } from "./cocktails.types";
 
 export interface GetCocktailsParams {
@@ -56,6 +57,13 @@ export const removeFavoriteCocktail = async (
 export const getFavoriteCocktails = async (): Promise<GetFavoriteCocktailsResult> => {
   const response = await apiClient.get<GetFavoriteCocktailsResponse>(
     "/api/v1/cocktails/favorites",
+  );
+  return response.data.result;
+};
+
+export const getTodayCocktail = async () => {
+  const response = await apiClient.get<GetTodayCocktailResponse>(
+    "/api/v1/cocktails/today",
   );
   return response.data.result;
 };
