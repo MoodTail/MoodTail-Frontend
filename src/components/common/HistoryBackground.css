@@ -3,7 +3,7 @@
   inset: 0;
   z-index: -1;
   width: 100%;
-  min-width: 393px;
+  min-width: 0;
   height: max(824px, 100%);
   overflow: hidden;
   background: linear-gradient(

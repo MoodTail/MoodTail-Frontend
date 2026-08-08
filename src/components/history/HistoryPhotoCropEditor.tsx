@@ -1,4 +1,5 @@
 import {
+  useEffect,
   useRef,
   useState,
   type PointerEvent,
@@ -8,9 +9,8 @@ import {
 import SaveCompleteModal from '../Modal/SaveCompleteModal'
 import './HistoryPhotoCropEditor.css'
 
-const CROP_WIDTH = 333
-const CROP_HEIGHT = 170
-const STAGE_WIDTH = 393
+const DEFAULT_CROP_WIDTH = 333
+const DEFAULT_CROP_HEIGHT = 170
 const MIN_ZOOM = 1
 const MAX_ZOOM = 3
 
@@ -39,6 +39,8 @@ function HistoryPhotoCropEditor({
   onSave,
 }: HistoryPhotoCropEditorProps) {
   const dragRef = useRef({ isDragging: false, x: 0, y: 0 })
+  const stageRef = useRef<HTMLDivElement>(null)
+  const viewportRef = useRef<HTMLDivElement>(null)
   const pointersRef = useRef(new Map<number, { x: number; y: number }>())
   const pinchRef = useRef({ distance: 0, zoom: 1 })
   const [imageSize, setImageSize] = useState<ImageSize>()
@@ -46,9 +48,35 @@ function HistoryPhotoCropEditor({
   const [zoom, setZoom] = useState(1)
   const [croppedBlob, setCroppedBlob] = useState<Blob>()
   const [isSaveCompleteModalOpen, setIsSaveCompleteModalOpen] = useState(false)
+  const [stageWidth, setStageWidth] = useState(393)
+  const [cropSize, setCropSize] = useState({
+    width: DEFAULT_CROP_WIDTH,
+    height: DEFAULT_CROP_HEIGHT,
+  })
+
+  useEffect(() => {
+    const stage = stageRef.current
+    const viewport = viewportRef.current
+    if (!stage || !viewport) return
+
+    const updateSizes = () => {
+      setStageWidth(stage.getBoundingClientRect().width)
+      const viewportRect = viewport.getBoundingClientRect()
+      setCropSize({ width: viewportRect.width, height: viewportRect.height })
+    }
+
+    updateSizes()
+    const observer = new ResizeObserver(updateSizes)
+    observer.observe(stage)
+    observer.observe(viewport)
+    return () => observer.disconnect()
+  }, [])
 
   const baseScale = imageSize
-    ? STAGE_WIDTH / imageSize.width
+    ? Math.max(
+        stageWidth / imageSize.width,
+        cropSize.height / imageSize.height,
+      )
     : 1
   const displayWidth = imageSize ? imageSize.width * baseScale * zoom : 0
   const displayHeight = imageSize ? imageSize.height * baseScale * zoom : 0
@@ -57,8 +85,8 @@ function HistoryPhotoCropEditor({
     if (!imageSize) return { x: 0, y: 0 }
 
     const scale = baseScale * nextZoom
-    const maxX = Math.max(0, (imageSize.width * scale - CROP_WIDTH) / 2)
-    const maxY = Math.max(0, (imageSize.height * scale - CROP_HEIGHT) / 2)
+    const maxX = Math.max(0, (imageSize.width * scale - cropSize.width) / 2)
+    const maxY = Math.max(0, (imageSize.height * scale - cropSize.height) / 2)
 
     return {
       x: Math.min(maxX, Math.max(-maxX, x)),
@@ -148,12 +176,12 @@ function HistoryPhotoCropEditor({
     await sourceImage.decode()
 
     const scale = baseScale * zoom
-    const imageLeft = CROP_WIDTH / 2 - displayWidth / 2 + offset.x
-    const imageTop = CROP_HEIGHT / 2 - displayHeight / 2 + offset.y
+    const imageLeft = cropSize.width / 2 - displayWidth / 2 + offset.x
+    const imageTop = cropSize.height / 2 - displayHeight / 2 + offset.y
     const sourceX = -imageLeft / scale
     const sourceY = -imageTop / scale
-    const sourceWidth = CROP_WIDTH / scale
-    const sourceHeight = CROP_HEIGHT / scale
+    const sourceWidth = cropSize.width / scale
+    const sourceHeight = cropSize.height / scale
     const canvas = document.createElement('canvas')
     canvas.width = 666
     canvas.height = 340
@@ -198,6 +226,7 @@ function HistoryPhotoCropEditor({
       aria-label={`${imageName} 사진 편집`}
     >
       <div
+        ref={stageRef}
         className="history-photo-crop-editor__stage"
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
@@ -224,7 +253,7 @@ function HistoryPhotoCropEditor({
             transform: `translate(-50%, -50%) translate(${offset.x}px, ${offset.y}px)`,
           }}
         />
-        <div className="history-photo-crop-editor__viewport">
+        <div ref={viewportRef} className="history-photo-crop-editor__viewport">
           <img
             className="history-photo-crop-editor__image"
             src={imageUrl}

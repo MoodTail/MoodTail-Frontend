@@ -1,9 +1,9 @@
 .history-photo-uploader {
-  position: absolute;
+  position: fixed;
   z-index: 11;
-  bottom: 0;
-  left: 0;
-  width: 100%;
+  bottom: max(0px, calc(100dvh - 824px));
+  left: max(0px, calc((100vw - 393px) / 2));
+  width: min(393px, 100vw);
   height: 363px;
   border-radius: 20px 20px 0 0;
   background: #ffffff;
@@ -14,13 +14,23 @@
   height: 300px;
   border-radius: 24px 24px 0 0;
   touch-action: none;
-  transition: transform 300ms cubic-bezier(0.22, 1, 0.36, 1);
+  opacity: 1;
+  visibility: visible;
+  transition:
+    transform 300ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 180ms ease-out,
+    visibility 0s;
 }
 
 .history-photo-uploader--collapsible.is-collapsed {
   transform: translateY(100%);
-  transition-duration: 260ms;
-  transition-timing-function: cubic-bezier(0.64, 0, 0.78, 0);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition:
+    transform 260ms cubic-bezier(0.64, 0, 0.78, 0),
+    opacity 180ms ease-in,
+    visibility 0s 260ms;
 }
 
 .history-photo-uploader--collapsible.is-dragging {
@@ -32,8 +42,12 @@
 }
 
 .history-photo-uploader__overlay {
-  position: absolute;
-  inset: 0;
+  position: fixed;
+  top: 0;
+  bottom: auto;
+  left: max(0px, calc((100vw - 393px) / 2));
+  width: min(393px, 100vw);
+  height: min(824px, 100dvh);
   z-index: 10;
   padding: 0;
   border: 0;
@@ -312,4 +326,11 @@
   position: absolute;
   top: 286px;
   left: 28px;
+}
+
+@media (max-width: 392px) {
+  .history-photo-uploader__preview-list { right: 30px; width: auto; }
+  .history-photo-uploader__preview-card,
+  .history-photo-uploader__add-more { width: 100%; }
+  .history-photo-uploader__save-button { right: 28px; width: auto; }
 }
