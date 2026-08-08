@@ -1,6 +1,7 @@
 import { Fragment, useState } from "react";
 import { splitDescriptionLines, type Recipe } from "./recipeData";
 import "../../styles/SavedRecipesView.css";
+import "../../styles/RecipePage.css";
 
 type CardPhase = "visible" | "exiting" | "collapsing";
 
@@ -19,6 +20,7 @@ function SavedRecipesView({ recipes, onBack, onUnsave }: SavedRecipesViewProps) 
   const [items, setItems] = useState<SavedItem[]>(
     recipes.map((recipe) => ({ recipe, phase: "visible" }))
   );
+  const [query, setQuery] = useState("");
 
   function handleUnsave(id: string) {
     onUnsave(id);
@@ -31,6 +33,10 @@ function SavedRecipesView({ recipes, onBack, onUnsave }: SavedRecipesViewProps) 
     }, 500);
   }
 
+  const isEmpty = recipes.length === 0;
+  const q = query.trim().toLowerCase();
+  const visibleItems = q ? items.filter((it) => it.recipe.name.toLowerCase().includes(q)) : items;
+
   return (
     <div className="saved-recipes">
       <div className="saved-recipes__header">
@@ -42,8 +48,29 @@ function SavedRecipesView({ recipes, onBack, onUnsave }: SavedRecipesViewProps) 
         <span>저장된 레시피</span>
       </div>
 
+      <div className="recipe-page__subtitle" style={{ marginBottom: 14 }}>
+        {recipes.length}가지 칵테일 레시피
+      </div>
+
+      <div className="recipe-page__search">
+        <input
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder={isEmpty ? "아직 저장한 칵테일이 없어요" : "칵테일 검색..."}
+          disabled={isEmpty}
+        />
+        {query.length > 0 && (
+          <button type="button" className="recipe-page__clear" onClick={() => setQuery("")} aria-label="검색어 지우기">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+              <circle cx="12" cy="12" r="10" fill="#efe7de" />
+              <path d="M9 9 L15 15 M15 9 L9 15" stroke="#9b9088" strokeWidth="1.8" strokeLinecap="round" />
+            </svg>
+          </button>
+        )}
+      </div>
+
       <div className="saved-recipes__list">
-        {items.map(({ recipe, phase }) => {
+        {visibleItems.map(({ recipe, phase }) => {
           const descLines = splitDescriptionLines(recipe.description);
           return (
           <div

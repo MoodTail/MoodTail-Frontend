@@ -29,20 +29,35 @@ function CharacterPage({ onGoTest }: CharacterPageProps) {
   const [snsModalOpen, setSnsModalOpen] = useState(false);
   const [showSavedToast, setShowSavedToast] = useState(false);
   const [moodTypeIdByLocalId, setMoodTypeIdByLocalId] = useState<Record<string, number>>({});
+  const [dexStatusByLocalId, setDexStatusByLocalId] = useState<
+    Record<string, { unlocked: boolean; collectionRate: number }>
+  >({});
 
   // 도감 정보를 실제 API로 받아와 실제 moodTypeId를 로컬 타입에 매핑해둡니다.
   // 로컬 typeId ↔ 실제 typeCode 매핑(data/typeCodeMapping.ts)은 사용자가 직접 확정한 값입니다.
+  // representativeMoodType도 서버 값으로 초기화합니다 — repTypeId를 로컬 state 기본값(idealist)에만
+  // 의존하면, 탭을 이동했다가 도감으로 돌아올 때 CharacterPage가 다시 마운트되면서 방금 설정한
+  // 대표 타입이 초기값으로 되돌아가 버립니다.
+  // unlocked/collectionRate도 서버 값을 그대로 씁니다 — data/dexData.ts는 전부 unlocked: true로
+  // 고정되어 있어서, 실제로는 아직 안 모은 타입도 항상 해금된 것처럼 보였습니다.
   useEffect(() => {
     let cancelled = false;
     getCollection()
       .then((result) => {
         if (cancelled) return;
         const idMap: Record<string, number> = {};
+        const statusMap: Record<string, { unlocked: boolean; collectionRate: number }> = {};
         result.moodTypes.forEach((mt) => {
           const localId = TYPECODE_TO_LOCAL_TYPE[mt.typeCode];
-          if (localId) idMap[localId] = mt.moodTypeId;
+          if (!localId) return;
+          idMap[localId] = mt.moodTypeId;
+          statusMap[localId] = { unlocked: mt.unlocked, collectionRate: mt.collectionRate };
         });
         setMoodTypeIdByLocalId(idMap);
+        setDexStatusByLocalId(statusMap);
+
+        const repLocalId = TYPECODE_TO_LOCAL_TYPE[result.representativeMoodType?.typeCode];
+        if (repLocalId) setRepTypeId(repLocalId);
       })
       .catch((err) => console.error("도감 정보를 불러오지 못했습니다", err));
     return () => {
@@ -52,7 +67,14 @@ function CharacterPage({ onGoTest }: CharacterPageProps) {
 
   const goTypeDex = () => setScreen({ name: "typeDex" });
   const openCharacterDex = (typeId: string) => setScreen({ name: "characterDex", typeId });
-  const openTypeDetail = (typeId: string, from: DexOrigin) => setScreen({ name: "typeDetail", typeId, from });
+
+  // 캐릭터를 연타해도 상세 화면이 여러 번 겹쳐 열리지 않도록, 이미 그 캐릭터의 상세 화면에
+  // 있는 상태에서 같은 캐릭터를 다시 열려는 중복 호출은 무시합니다.
+  const openTypeDetail = (typeId: string, from: DexOrigin) => {
+    setScreen((prev) =>
+      prev.name === "typeDetail" && prev.typeId === typeId ? prev : { name: "typeDetail", typeId, from },
+    );
+  };
   const openRepSetting = (typeId: string, from: DexOrigin) => setScreen({ name: "repSetting", typeId, from });
 
   const handleKakaoShare = () => {
@@ -70,6 +92,7 @@ function CharacterPage({ onGoTest }: CharacterPageProps) {
       {screen.name === "typeDex" && (
         <TypeDexPage
           repTypeId={repTypeId}
+          dexStatus={dexStatusByLocalId}
           onOpenType={openCharacterDex}
           onOpenTypeDetail={(typeId) => openTypeDetail(typeId, "typeDex")}
           onShare={() => setShareTypeId(repTypeId)}
@@ -80,6 +103,7 @@ function CharacterPage({ onGoTest }: CharacterPageProps) {
       {screen.name === "characterDex" && (
         <CharacterDexPage
           type={getType(screen.typeId)}
+          dexStatus={dexStatusByLocalId}
           onShare={() => setShareTypeId(screen.typeId)}
           onOpenDetail={() => openTypeDetail(screen.typeId, "characterDex")}
           onOpenTypeDetail={(typeId) => openTypeDetail(typeId, "characterDex")}
@@ -120,6 +144,7 @@ function CharacterPage({ onGoTest }: CharacterPageProps) {
       {shareTypeId && (
         <DexShareModal
           type={getType(shareTypeId)}
+          dexStatus={dexStatusByLocalId}
           onClose={() => setShareTypeId(null)}
           onShareSns={() => {
             setShareTypeId(null);

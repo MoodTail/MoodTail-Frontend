@@ -219,7 +219,7 @@ export default function TypeDetailPage({
                 }}
               >
                 <span style={{ fontSize: 10.5, fontWeight: 600, color: textColor }}>{label}</span>
-                <span style={{ fontSize: 13, fontWeight: 800, color: textColor }}>
+                <span style={{ fontSize: 17, fontWeight: 800, color: textColor }}>
                   {displayTaste[key]}
                 </span>
               </div>

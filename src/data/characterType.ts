@@ -5,10 +5,24 @@ export interface CharacterType {
   tagline: string;
   description: string;
   detailDescription: string;
+  nameTagColor: string;
+  fontColor: string;
   number?: number;
 }
 
-export const CHARACTER_TYPES: CharacterType[] = [
+// color를 흰색 쪽으로 섞어서 네임태그 배경용 파스텔 톤을 만듭니다.
+// 디자인팀이 확정한 nameTagColor 값이 따로 있으면 아래 CHARACTER_TYPES_BASE에 직접
+// 채워 넣고 이 함수는 안 쓰면 됩니다(지금은 color 기반 임시값입니다).
+function lighten(hex: string, amount: number): string {
+  const num = parseInt(hex.replace("#", ""), 16);
+  const r = (num >> 16) & 0xff;
+  const g = (num >> 8) & 0xff;
+  const b = num & 0xff;
+  const mix = (c: number) => Math.round(c + (255 - c) * amount);
+  return `#${[mix(r), mix(g), mix(b)].map((c) => c.toString(16).padStart(2, "0")).join("")}`;
+}
+
+const CHARACTER_TYPES_BASE: Omit<CharacterType, "nameTagColor" | "fontColor">[] = [
   {
     number: 7,
     id: "fantasist",
@@ -130,6 +144,12 @@ export const CHARACTER_TYPES: CharacterType[] = [
       "균형적인 중재자는 위스키 사워처럼 달고 시고 쓴 게 다 균형 잡힌 타입이에요. 어느 한쪽으로 치우치지 않고, 모든 자리에 자연스럽게 녹아들어요. 뾰족뾰족한 관계를 원만히 이끌고, 분위기를 망치는 법이 없어요. 갈등이 생기면 자연스럽게 가운데서 조율하고 있는 게 이 사람이에요. 가장 무난해 보이지만, 없으면 안 될 타입이에요.",
   },
 ];
+
+export const CHARACTER_TYPES: CharacterType[] = CHARACTER_TYPES_BASE.map((t) => ({
+  ...t,
+  fontColor: t.color,
+  nameTagColor: lighten(t.color, 0.7),
+}));
 
 export function getCharacterType(id: string): CharacterType {
   const found = CHARACTER_TYPES.find((t) => t.id === id);

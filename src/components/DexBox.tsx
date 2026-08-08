@@ -40,7 +40,19 @@ export default function DexBox({
         }}
       >
         <img src={drinkImg} alt="" style={{ width: "90%", height: "70%", objectFit: "contain" }} />
-        <span style={{ fontSize: 12, fontWeight: 700, color: characterType?.color }}>
+        <span
+          style={{
+            fontSize: 11,
+            fontWeight: 700,
+            color: characterType?.color,
+            textAlign: "center",
+            lineHeight: 1.2,
+            display: "-webkit-box",
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: "vertical",
+            overflow: "hidden",
+          }}
+        >
           {characterType?.name}
         </span>
       </button>

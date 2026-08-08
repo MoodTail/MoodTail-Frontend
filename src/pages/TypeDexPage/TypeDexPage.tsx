@@ -25,11 +25,13 @@ import DexBox from "../../components/DexBox";
 
 export default function TypeDexPage({
   repTypeId,
+  dexStatus,
   onOpenTypeDetail,
   onShare,
   onGoTest,
 }: {
   repTypeId: string;
+  dexStatus?: Record<string, { unlocked: boolean; collectionRate: number }>;
   onOpenType: (typeId: string) => void;
   onOpenTypeDetail: (typeId: string) => void;
   onShare: () => void;
@@ -37,6 +39,8 @@ export default function TypeDexPage({
 }) {
   const repType = TYPES.find((t) => t.id === repTypeId)!;
   const repCharacterType = getCharacterType(repTypeId);
+  const repDexEntry = DEX_DATA.find((d) => d.typeId === repTypeId);
+  const repImg = repDexEntry ? drinkImages[repDexEntry.id] : drink0;
   const [lockedName, setLockedName] = useState<string | null>(null);
 
   return (
@@ -83,7 +87,7 @@ export default function TypeDexPage({
             textAlign: "left",
           }}
         >
-          <img src={drink0} alt="" style={{ width: 84, height: 84, objectFit: "contain" }} />
+          <img src={repImg} alt="" style={{ width: 84, height: 84, objectFit: "contain" }} />
           <div style={{ flex: 1 }}>
             <div style={{ fontSize: 14, color: COLORS.inkSoft, fontWeight: 600, marginBottom: 4 }}>
               대표 타입
@@ -100,20 +104,25 @@ export default function TypeDexPage({
             paddingBottom: 20,
           }}
         >
-          {DEX_DATA.map((dex) => (
-            <DexBox
-              key={dex.id}
-              drinkImg={drinkImages[dex.id]}
-              typeId={dex.typeId}
-              unlocked={dex.unlocked}
-              collectionRate={dex.collectionRate}
-              onClick={
-                dex.unlocked
-                  ? () => onOpenTypeDetail(dex.typeId)
-                  : () => setLockedName(dex.name)
-              }
-            />
-          ))}
+          {DEX_DATA.map((dex) => {
+            const status = dexStatus?.[dex.typeId];
+            const unlocked = status?.unlocked ?? dex.unlocked;
+            const collectionRate = status?.collectionRate ?? dex.collectionRate;
+            return (
+              <DexBox
+                key={dex.id}
+                drinkImg={drinkImages[dex.id]}
+                typeId={dex.typeId}
+                unlocked={unlocked}
+                collectionRate={collectionRate}
+                onClick={
+                  unlocked
+                    ? () => onOpenTypeDetail(dex.typeId)
+                    : () => setLockedName(getCharacterType(dex.typeId).name)
+                }
+              />
+            );
+          })}
         </div>
       </div>
 

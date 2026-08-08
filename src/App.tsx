@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import BottomNav from "./components/common/BottomNav";
 import DexBackground from "./components/DexBackground";
 import HistoryPage from "./pages/HistoryPage/HistoryPage";
@@ -21,15 +21,21 @@ import { getMoodTestQuestions, postMoodTestResult } from "./api/mood-tests/moodT
 import type { MoodTestAnswer, MoodTestResult } from "./api/mood-tests/moodTests.types";
 import "./App.css";
 import { parseOauthCallback } from "./utils/oauth";
+import { clearQuizProgress, loadQuizProgress, saveQuizProgress } from "./utils/quizProgress";
 import SocialSignupPage from "./pages/SocialSignupPage/SocialSignupPage";
+
+const RETEST_PROGRESS_KEY = "moodtail-retest-progress";
 
 export type NavKey = "history" | "dictionary" | "home" | "recipe" | "mypage";
 type HistoryView = "calendar" | "photo" | "test-result" | "monthly-report";
 type MyPageView = "main" | "profile-edit" | "inquiry" | "terms";
 
 function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [isGuest, setIsGuest] = useState(false);
+  // 새로고침/백그라운드 복귀 시에도 재로그인 없이 이어서 쓸 수 있도록, 이미 저장된
+  // accessToken이 있으면 로그인 상태를 그대로 복원합니다. 이게 없으면 토큰이 남아있어도
+  // 매번 온보딩/로그인 화면부터 다시 봐야 해서, 테스트 진행 상황 복원도 체감이 안 됩니다.
+  const [isLoggedIn, setIsLoggedIn] = useState(() => !!localStorage.getItem("accessToken"));
+  const [isGuest, setIsGuest] = useState(() => localStorage.getItem("isGuest") === "true");
   const [activeMenu, setActiveMenu] = useState<NavKey>("home");
   const [historyView, setHistoryView] = useState<HistoryView>("calendar");
   const [historyPhotoHasTestResult, setHistoryPhotoHasTestResult] =
@@ -42,18 +48,31 @@ function App() {
   const [recipeNavVisible, setRecipeNavVisible] = useState(true);
   const [goToQuizOnHome, setGoToQuizOnHome] = useState(false);
   const [isTestResultOpen, setIsTestResultOpen] = useState(false);
-  const [isRetestOpen, setIsRetestOpen] = useState(false);
-  const [retestStep, setRetestStep] = useState(0);
+  // 앱이 백그라운드로 갔다가 돌아오거나(탭이 메모리 부족으로 재로드) 새로고침돼도 진행 중이던
+  // 재테스트를 이어할 수 있도록, 시작할 때 sessionStorage에 저장된 진행 상황이 있으면 그대로 복원합니다.
+  // 탭을 완전히 닫으면 sessionStorage가 비워지므로 그땐 자연스럽게 시작 화면(도감/결과 화면)이 보입니다.
+  const [initialRetestProgress] = useState(() => loadQuizProgress(RETEST_PROGRESS_KEY));
+  const [isRetestOpen, setIsRetestOpen] = useState(() => initialRetestProgress !== null);
+  const [retestStep, setRetestStep] = useState(() => initialRetestProgress?.step ?? 0);
   const [retestAnswers, setRetestAnswers] = useState<Record<number, string>>(
-    {},
+    () => initialRetestProgress?.answers ?? {},
   );
-  const [retestQuestions, setRetestQuestions] = useState<QuizQuestion[]>(() =>
-    buildQuizQuestions(),
+  const [retestQuestions, setRetestQuestions] = useState<QuizQuestion[]>(
+    () => initialRetestProgress?.questions ?? buildQuizQuestions(),
   );
   const [quizResult, setQuizResult] = useState<MoodTestResult | null>(null);
   const [oauthCallback, setOauthCallback] = useState(() =>
     parseOauthCallback(),
   );
+
+  useEffect(() => {
+    if (!isRetestOpen) return;
+    saveQuizProgress(RETEST_PROGRESS_KEY, {
+      step: retestStep,
+      answers: retestAnswers,
+      questions: retestQuestions,
+    });
+  }, [isRetestOpen, retestStep, retestAnswers, retestQuestions]);
 
   const startRetest = () => {
     setIsTestResultOpen(false);
@@ -71,6 +90,7 @@ function App() {
     setRetestStep(0);
     setRetestAnswers({});
     setRetestQuestions(buildQuizQuestions());
+    clearQuizProgress(RETEST_PROGRESS_KEY);
   };
 
   const startTestFromHistory = () => {
