@@ -19,6 +19,7 @@ import QuizQuestionPage from "./pages/QuizQuestionPage";
 import { buildQuizQuestions, toQuizQuestions, type QuizQuestion } from "./data/quiz";
 import { getMoodTestQuestions, postMoodTestResult } from "./api/mood-tests/moodTests.api";
 import type { MoodTestAnswer, MoodTestResult } from "./api/mood-tests/moodTests.types";
+import type { HistoryTestResultDetail } from "./api/histories/histories.types";
 import "./App.css";
 import { parseOauthCallback } from "./utils/oauth";
 import SocialSignupPage from "./pages/SocialSignupPage/SocialSignupPage";
@@ -38,6 +39,8 @@ function App() {
   const [historyRecordTab, setHistoryRecordTab] =
     useState<HistoryRecordTab>("photo");
   const [monthlyReportMonth, setMonthlyReportMonth] = useState(new Date());
+  const [historyTestResult, setHistoryTestResult] =
+    useState<HistoryTestResultDetail | null>(null);
   const [mypageView, setMypageView] = useState<MyPageView>("main");
   const [recipeNavVisible, setRecipeNavVisible] = useState(true);
   const [goToQuizOnHome, setGoToQuizOnHome] = useState(false);
@@ -202,11 +205,19 @@ function App() {
           selectedDate={historyPhotoDate}
           initialTab={historyRecordTab}
           onBack={() => setHistoryView("calendar")}
-          onOpenFullResult={() => setHistoryView("test-result")}
+          onOpenFullResult={(result) => {
+            setHistoryTestResult(result);
+            setHistoryView("test-result");
+          }}
           onStartTest={startTestFromHistory}
         />
       ),
-      "test-result": <TestResultPage onBack={() => setHistoryView("photo")} />,
+      "test-result": historyTestResult ? (
+        <TestResultPage
+          result={historyTestResult}
+          onBack={() => setHistoryView("photo")}
+        />
+      ) : null,
       "monthly-report": (
         <MonthlyReportPage
           reportMonth={monthlyReportMonth}
@@ -217,7 +228,7 @@ function App() {
 
     return (
       <div className="app-shell">
-        <main className="app">
+        <main className="app app--history-responsive">
           <section className="app-content app-content--full">
             {historyDetailPage}
           </section>
@@ -322,7 +333,7 @@ function App() {
 
   return (
     <div className="app-shell">
-      <main className="app">
+      <main className={`app${activeMenu === "history" ? " app--history-responsive" : ""}`}>
         {activeMenu === "recipe" && <DexBackground />}
         <section className="app-content">{renderPage()}</section>
 

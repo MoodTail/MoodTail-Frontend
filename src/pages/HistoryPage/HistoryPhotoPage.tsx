@@ -35,7 +35,7 @@ function toDateKey(date: Date) {
 
 interface HistoryPhotoPageProps {
   onBack: () => void
-  onOpenFullResult: () => void
+  onOpenFullResult: (result: HistoryTestResultDetail) => void
   onStartTest: () => void
   hasTestResult: boolean
   selectedDate: Date
@@ -328,7 +328,7 @@ function HistoryPhotoPage({
 
               <HistoryPrimaryButton
                 className="history-test-result__bottom-button"
-                onClick={onOpenFullResult}
+                onClick={() => onOpenFullResult(testResultDetail)}
               >
                 전체 결과보기
               </HistoryPrimaryButton>

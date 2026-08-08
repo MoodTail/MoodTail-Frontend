@@ -1,7 +1,10 @@
 .cocktail-search {
   position: absolute;
-  inset: 0;
+  top: 0;
+  right: 0;
+  left: 0;
   z-index: 30;
+  height: 824px;
   overflow: hidden;
   background: transparent;
 }
@@ -155,4 +158,10 @@
 
 @media (prefers-reduced-motion: reduce) {
   .cocktail-search__item.is-selected > img { animation-duration: 1ms; }
+}
+
+@media (max-width: 392px) {
+  .cocktail-search__input { right: 20px; width: auto; }
+  .cocktail-search__item { width: 100%; }
+  .cocktail-search__save { top: auto; right: 24px; bottom: 32px; left: 24px; width: auto; }
 }

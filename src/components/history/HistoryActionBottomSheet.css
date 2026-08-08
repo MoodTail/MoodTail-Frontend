@@ -1,6 +1,10 @@
 .history-action-overlay {
-  position: absolute;
-  inset: 0;
+  position: fixed;
+  top: 0;
+  bottom: auto;
+  left: max(0px, calc((100vw - 393px) / 2));
+  width: min(393px, 100vw);
+  height: min(824px, 100dvh);
   z-index: 1000;
   background: rgba(0, 0, 0, 0.32);
   animation: history-action-overlay-fade-in 180ms ease-out;
@@ -10,7 +14,7 @@
   position: absolute;
   bottom: 0;
   left: 0;
-  width: 393px;
+  width: 100%;
   height: 310px;
   overflow: hidden;
   background: #fff;
@@ -51,7 +55,8 @@
   position: absolute;
   top: 58px;
   left: 24px;
-  width: 345px;
+  right: 24px;
+  width: auto;
   height: 32px;
   margin: 0;
   color: #171727;
@@ -66,7 +71,8 @@
   top: 106px;
   left: 24px;
   display: flex;
-  width: 345px;
+  right: 24px;
+  width: auto;
   flex-direction: column;
   gap: 8px;
 }
@@ -74,7 +80,7 @@
 .history-action-sheet__action {
   position: relative;
   display: flex;
-  width: 345px;
+  width: 100%;
   height: 52px;
   align-items: center;
   padding: 0 44px 0 60px;
