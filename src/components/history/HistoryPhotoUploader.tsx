@@ -7,6 +7,14 @@ import {
   type ChangeEvent,
   type PointerEvent,
 } from 'react'
+import {
+  deleteHistoryPhoto,
+  uploadHistoryPhoto,
+} from '../../api/histories/histories.api'
+import type {
+  DailyHistoryPhoto,
+  HistoryPhotoSourceType,
+} from '../../api/histories/histories.types'
 import cameraIcon from '../../assets/icons/camera.svg'
 import galleryIcon from '../../assets/icons/gallery.svg'
 import photoEditIcon from '../../assets/icons/photo_edit.svg'
@@ -19,6 +27,7 @@ import './HistoryPhotoUploader.css'
 
 interface PhotoPreview {
   id: string
+  photoId: number
   name: string
   url: string
   originalUrl: string
@@ -28,6 +37,7 @@ interface PhotoToCrop {
   id: string
   name: string
   url: string
+  sourceType: HistoryPhotoSourceType
 }
 
 const MAX_PHOTO_COUNT = 5
@@ -35,6 +45,8 @@ const COLLAPSED_SHEET_OFFSET = 272
 
 interface HistoryPhotoUploaderProps {
   collapsible?: boolean
+  date: string
+  initialPhotos?: DailyHistoryPhoto[]
 }
 
 interface HistoryPhotoUploaderHandle {
@@ -44,12 +56,17 @@ interface HistoryPhotoUploaderHandle {
 const HistoryPhotoUploader = forwardRef<
   HistoryPhotoUploaderHandle,
   HistoryPhotoUploaderProps
->(function HistoryPhotoUploader({ collapsible = false }, ref) {
+>(function HistoryPhotoUploader({
+  collapsible = false,
+  date,
+  initialPhotos = [],
+}, ref) {
   const [photos, setPhotos] = useState<PhotoPreview[]>([])
   const [cropQueue, setCropQueue] = useState<PhotoToCrop[]>([])
   const [editingPhoto, setEditingPhoto] = useState<PhotoPreview>()
   const [deletingPhoto, setDeletingPhoto] = useState<PhotoPreview>()
   const [modalTitle, setModalTitle] = useState<string>()
+  const [isUploading, setIsUploading] = useState(false)
   const [isSheetExpanded, setIsSheetExpanded] = useState(false)
   const [isSheetInstantlyHidden, setIsSheetInstantlyHidden] = useState(false)
   const [sheetDragOffset, setSheetDragOffset] = useState<number>()
@@ -73,6 +90,18 @@ const HistoryPhotoUploader = forwardRef<
     cropQueueRef.current = cropQueue
   }, [cropQueue])
 
+  useEffect(() => {
+    setPhotos(
+      initialPhotos.map((photo) => ({
+        id: `server-${photo.photoId}`,
+        photoId: photo.photoId,
+        name: `사진 ${photo.photoId}`,
+        url: photo.imageUrl,
+        originalUrl: photo.imageUrl,
+      })),
+    )
+  }, [initialPhotos])
+
   useImperativeHandle(ref, () => ({
     collapseSheet: () => {
       setIsSheetExpanded(false)
@@ -91,7 +120,10 @@ const HistoryPhotoUploader = forwardRef<
     [],
   )
 
-  const appendPhotos = (event: ChangeEvent<HTMLInputElement>) => {
+  const appendPhotos = (
+    event: ChangeEvent<HTMLInputElement>,
+    sourceType: HistoryPhotoSourceType,
+  ) => {
     const files = Array.from(event.target.files ?? [])
     if (!files.length) return
 
@@ -104,6 +136,7 @@ const HistoryPhotoUploader = forwardRef<
       id: `${file.name}-${file.lastModified}-${crypto.randomUUID()}`,
       name: file.name,
       url: URL.createObjectURL(file),
+      sourceType,
     }))
 
     if (nextPhotosToCrop.length) {
@@ -115,25 +148,43 @@ const HistoryPhotoUploader = forwardRef<
     event.target.value = ''
   }
 
-  const handleCropSave = (blob: Blob) => {
+  const handleCropSave = async (blob: Blob) => {
     const currentPhoto = cropQueue[0]
-    if (!currentPhoto) return
+    if (!currentPhoto || isUploading) return
 
-    setIsSheetInstantlyHidden(true)
-    setIsSheetExpanded(false)
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => setIsSheetInstantlyHidden(false))
-    })
-    setPhotos((current) => [
-      ...current,
-      {
-        id: `${currentPhoto.id}-cropped`,
-        name: currentPhoto.name,
-        url: URL.createObjectURL(blob),
-        originalUrl: currentPhoto.url,
-      },
-    ])
-    setCropQueue((current) => current.slice(1))
+    try {
+      setIsUploading(true)
+      const image = new File([blob], currentPhoto.name, {
+        type: blob.type || 'image/jpeg',
+      })
+
+      const uploadedPhoto = await uploadHistoryPhoto({
+        date,
+        image,
+      })
+
+      setIsSheetInstantlyHidden(true)
+      setIsSheetExpanded(false)
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => setIsSheetInstantlyHidden(false))
+      })
+      setPhotos((current) => [
+        ...current,
+        {
+          id: `${currentPhoto.id}-cropped`,
+          photoId: uploadedPhoto.photoId,
+          name: currentPhoto.name,
+          url: URL.createObjectURL(blob),
+          originalUrl: currentPhoto.url,
+        },
+      ])
+      setCropQueue((current) => current.slice(1))
+    } catch (error) {
+      console.error(error)
+      setModalTitle('사진 저장에 실패했습니다')
+    } finally {
+      setIsUploading(false)
+    }
   }
 
   const handleEditCropSave = (blob: Blob) => {
@@ -149,16 +200,27 @@ const HistoryPhotoUploader = forwardRef<
     setEditingPhoto(undefined)
   }
 
-  const handleDeletePhoto = () => {
+  const handleDeletePhoto = async () => {
     if (!deletingPhoto) return
 
-    URL.revokeObjectURL(deletingPhoto.url)
-    URL.revokeObjectURL(deletingPhoto.originalUrl)
-    setPhotos((current) =>
-      current.filter((photo) => photo.id !== deletingPhoto.id),
-    )
-    setDeletingPhoto(undefined)
-    setModalTitle('삭제되었습니다')
+    try {
+      await deleteHistoryPhoto(date, deletingPhoto.photoId)
+      if (deletingPhoto.url.startsWith('blob:')) {
+        URL.revokeObjectURL(deletingPhoto.url)
+      }
+      if (deletingPhoto.originalUrl.startsWith('blob:')) {
+        URL.revokeObjectURL(deletingPhoto.originalUrl)
+      }
+      setPhotos((current) =>
+        current.filter((photo) => photo.id !== deletingPhoto.id),
+      )
+      setModalTitle('삭제되었습니다')
+    } catch (error) {
+      console.error(error)
+      setModalTitle('사진을 삭제하지 못했습니다')
+    } finally {
+      setDeletingPhoto(undefined)
+    }
   }
 
   const handlePointerDown = (event: PointerEvent<HTMLDivElement>) => {
@@ -349,7 +411,12 @@ const HistoryPhotoUploader = forwardRef<
               <strong>카메라로 찍기</strong>
               <small>바로 촬영이 가능해요</small>
             </span>
-            <input type="file" accept="image/*" capture="environment" onChange={appendPhotos} />
+            <input
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              capture="environment"
+              onChange={(event) => appendPhotos(event, 'CAMERA')}
+            />
           </label>
 
           <label className="history-photo-uploader__option">
@@ -358,7 +425,12 @@ const HistoryPhotoUploader = forwardRef<
               <strong>갤러리에서 선택</strong>
               <small>사진을 불러올 수 있어요</small>
             </span>
-            <input type="file" accept="image/*" multiple onChange={appendPhotos} />
+            <input
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              multiple
+              onChange={(event) => appendPhotos(event, 'GALLERY')}
+            />
           </label>
         </div>
 

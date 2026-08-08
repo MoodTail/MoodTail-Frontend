@@ -1,5 +1,8 @@
 import { useEffect, useState } from 'react'
-import { getMonthlyHistory } from '../../api/histories/histories.api'
+import {
+  getHistoryTestResult,
+  getMonthlyHistory,
+} from '../../api/histories/histories.api'
 import type {
   HistoryCalendarDay,
   MonthlyHistoryResult,
@@ -16,28 +19,7 @@ import HistoryBackground from '../../components/common/HistoryBackground'
 import '../../styles/HistoryPage.css'
 
 const INITIAL_CALENDAR_DATE = new Date()
-const initialYear = INITIAL_CALENDAR_DATE.getFullYear()
-const initialMonth = String(INITIAL_CALENDAR_DATE.getMonth() + 1).padStart(2, '0')
-
-// TODO: 전체 히스토리 API 응답으로 교체 (date는 YYYY-MM-DD 형식)
-const MOCK_HISTORY_RECORDS: MonthlyTestRecord[] = [
-  { date: `${initialYear}-${initialMonth}-23`, type: '소다', cocktail: '모히토' },
-  { date: `${initialYear}-${initialMonth}-02`, type: '몽상가', cocktail: '블루 라군' },
-  { date: `${initialYear}-${initialMonth}-16`, type: '낭만주의자', cocktail: '마티니' },
-  { date: `${initialYear}-${initialMonth}-04`, type: '피치', cocktail: 'Corpse Reviver #2' },
-  { date: `${initialYear}-${initialMonth}-18`, type: '현실주의자', cocktail: '진 피즈' },
-  { date: `${initialYear}-${initialMonth}-06`, type: '모험가', cocktail: '마이 타이' },
-  { date: `${initialYear}-${initialMonth}-14`, type: '이상주의자', cocktail: '김렛' },
-  { date: `${initialYear}-${initialMonth}-08`, type: '평화주의자', cocktail: '미모사' },
-  { date: `${initialYear}-${initialMonth}-12`, type: '클래식', cocktail: '다이키리' },
-  { date: `${initialYear}-${initialMonth}-10`, type: '분석가', cocktail: '네그로니' },
-]
-
-function toMonthKey(date: Date) {
-  const year = date.getFullYear()
-  const month = String(date.getMonth() + 1).padStart(2, '0')
-  return `${year}-${month}`
-}
+const MAX_HISTORY_DATE = new Date()
 
 function toDateKey(date: Date) {
   const year = date.getFullYear()
@@ -67,13 +49,10 @@ function HistoryPage({
   const [isHistoryDetailOpen, setIsHistoryDetailOpen] = useState(false)
   const [isNoMonthlyReportModalOpen, setIsNoMonthlyReportModalOpen] = useState(false)
   const [monthlyHistory, setMonthlyHistory] = useState<MonthlyHistoryResult>()
+  const [monthlyRecords, setMonthlyRecords] = useState<MonthlyTestRecord[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string>()
 
-  const activeMonthKey = toMonthKey(activeMonth)
-  const monthlyRecords = MOCK_HISTORY_RECORDS.filter((record) =>
-    record.date.startsWith(activeMonthKey),
-  )
   const historyDays = monthlyHistory?.days ?? []
   const markedDates = historyDays
     .filter((day) => day.hasTestResult || day.hasDrinkingRecord)
@@ -93,6 +72,7 @@ function HistoryPage({
       try {
         setIsLoading(true)
         setErrorMessage(undefined)
+        setMonthlyRecords([])
 
         const result = await getMonthlyHistory({
           year: activeMonth.getFullYear(),
@@ -102,11 +82,42 @@ function HistoryPage({
         if (!ignore) {
           setMonthlyHistory(result)
         }
+
+        const detailResults = await Promise.allSettled(
+          result.testResults.map((testResult) =>
+            getHistoryTestResult(testResult.resultId),
+          ),
+        )
+
+        if (!ignore) {
+          const records = detailResults.flatMap((detailResult) => {
+            if (detailResult.status === 'rejected') {
+              console.error(detailResult.reason)
+              return []
+            }
+
+            const detail = detailResult.value
+            const topCocktail = [...detail.recommendedCocktails].sort(
+              (a, b) => a.ranking - b.ranking,
+            )[0]
+
+            return [
+              {
+                date: detail.resultDate,
+                type: detail.moodType.name,
+                cocktail: topCocktail?.cocktailName ?? '추천 칵테일 없음',
+              },
+            ]
+          })
+
+          setMonthlyRecords(records)
+        }
       } catch (error) {
         console.error(error)
 
         if (!ignore) {
           setMonthlyHistory(undefined)
+          setMonthlyRecords([])
           setErrorMessage('히스토리를 불러오지 못했습니다.')
         }
       } finally {
@@ -176,6 +187,7 @@ function HistoryPage({
 
       <HistoryCalendar
         initialDate={INITIAL_CALENDAR_DATE}
+        maxDate={MAX_HISTORY_DATE}
         markedDates={markedDates}
         selectedDate={selectedDate}
         onDateClick={handleDateClick}
