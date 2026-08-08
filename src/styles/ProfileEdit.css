@@ -135,6 +135,13 @@
   cursor: pointer;
 }
 
+.profile-edit__error {
+  margin: 0 0 8px;
+  font-size: 12px;
+  color: #ff4d4f;
+  text-align: center;
+}
+
 .profile-edit__save {
   margin-top: auto;
   width: 100%;
@@ -147,4 +154,9 @@
   font-size: 16px;
   font-weight: 700;
   cursor: pointer;
+}
+
+.profile-edit__save:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }

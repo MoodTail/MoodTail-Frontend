@@ -9,9 +9,15 @@ import CustomRecommend from "../CustomRecommend/CustomRecommend";
 import CustomRecommendResultPage from "../CustomRecommendResultPage/CustomRecommendResultPage";
 import QuizQuestionPage from "../QuizQuestionPage";
 import LoadingPage from "../LoadingPage";
-import { buildQuizQuestions, type QuizQuestion } from "../../data/quiz";
+import { buildQuizQuestions, toQuizQuestions, type QuizQuestion } from "../../data/quiz";
+import { getMoodTestQuestions, postMoodTestResult } from "../../api/mood-tests/moodTests.api";
+import type { MoodTestAnswer, MoodTestResult } from "../../api/mood-tests/moodTests.types";
+import { getTodayCocktail } from "../../api/cocktails/cocktails.api";
+import type {
+  TodayCocktailResult,
+  CustomCocktailResult,
+} from "../../api/cocktails/cocktails.types";
 
-// ui 구현용으로 잔 이미지 하나 무작위로 넣음
 import cocktail from "../../assets/images/glass/glass-1.png";
 
 interface MenuItem {
@@ -27,26 +33,75 @@ interface TasteValues {
   refreshing: number;
 }
 
-type ViewState = "home" | "trend" | "together" | "custom" | "customResult" | "quiz" | "quizLoading";
+type ViewState =
+  | "home"
+  | "trend"
+  | "together"
+  | "custom"
+  | "customResult"
+  | "quiz"
+  | "quizLoading";
 
 interface MainPageProps {
-  onQuizComplete?: () => void;
+  onQuizComplete?: (result: MoodTestResult | null) => void;
   initialView?: "quiz";
   onInitialViewConsumed?: () => void;
 }
 
-const MainPage: FC<MainPageProps> = ({ onQuizComplete, initialView, onInitialViewConsumed }) => {
-  const [view, setView] = useState<ViewState>(initialView === "quiz" ? "quiz" : "home");
+const MainPage: FC<MainPageProps> = ({
+  onQuizComplete,
+  initialView,
+  onInitialViewConsumed,
+}) => {
+  const [view, setView] = useState<ViewState>(
+    initialView === "quiz" ? "quiz" : "home",
+  );
   const [isShareOpen, setIsShareOpen] = useState(false); // TODO: 확인용 임시 코드, 삭제 예정
   const [myTasteValues, setMyTasteValues] = useState<TasteValues | null>(null);
+  const [customResult, setCustomResult] = useState<CustomCocktailResult | null>(
+    null,
+  );
 
   const [quizStep, setQuizStep] = useState(0);
   const [quizAnswers, setQuizAnswers] = useState<Record<number, string>>({});
-  const [quizQuestions, setQuizQuestions] = useState<QuizQuestion[]>(() => buildQuizQuestions());
+  const [quizQuestions, setQuizQuestions] = useState<QuizQuestion[]>(() =>
+    buildQuizQuestions(),
+  );
+  const [quizResult, setQuizResult] = useState<MoodTestResult | null>(null);
+
+  const [todayCocktail, setTodayCocktail] =
+    useState<TodayCocktailResult | null>(null);
 
   useEffect(() => {
     if (initialView === "quiz") onInitialViewConsumed?.();
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // 퀴즈 화면에 들어갈 때마다 실제 문항(/api/v1/tests/questions)을 받아와 교체합니다.
+  // 실패하면 조용히 무시하고 로컬 목데이터(buildQuizQuestions)를 그대로 씁니다.
+  useEffect(() => {
+    if (view !== "quiz") return;
+    let cancelled = false;
+    getMoodTestQuestions()
+      .then(({ questions }) => {
+        if (!cancelled) setQuizQuestions(toQuizQuestions(questions));
+      })
+      .catch((err) => console.error("테스트 질문을 불러오지 못했습니다", err));
+    return () => {
+      cancelled = true;
+    };
+  }, [view]);
+
+  useEffect(() => {
+    const fetchTodayCocktail = async () => {
+      try {
+        const result = await getTodayCocktail();
+        setTodayCocktail(result);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    void fetchTodayCocktail();
   }, []);
 
   const exitQuiz = () => {
@@ -61,7 +116,7 @@ const MainPage: FC<MainPageProps> = ({ onQuizComplete, initialView, onInitialVie
   };
 
   const menuItems: MenuItem[] = [
-    { label: "트렌드집계 확인", onClick: () => setView("trend") },
+    { label: "트렌드집계", onClick: () => setView("trend") },
     { label: "같이 고르기", onClick: () => setView("together") },
     { label: "커스텀 추천", onClick: () => setView("custom") },
   ];
@@ -81,6 +136,27 @@ const MainPage: FC<MainPageProps> = ({ onQuizComplete, initialView, onInitialVie
         onPrevious={quizStep > 0 ? () => setQuizStep((s) => s - 1) : undefined}
         onNext={() => {
           if (isLastStep) {
+            // 로컬 목데이터로 폴백된 상태라면 questionId/optionId가 실제 숫자 id가 아니라서 제출을 건너뜁니다.
+            const answers = quizQuestions
+              .map((q, i) => {
+                const questionId = Number(q.id);
+                const optionId = Number(quizAnswers[i]);
+                if (Number.isNaN(questionId) || Number.isNaN(optionId)) return null;
+                return { questionId, optionId };
+              })
+              .filter((a): a is MoodTestAnswer => a !== null);
+
+            if (answers.length === quizQuestions.length) {
+              postMoodTestResult(answers)
+                .then(setQuizResult)
+                .catch((err) => {
+                  console.error("테스트 결과 제출에 실패했습니다", err);
+                  setQuizResult(null);
+                });
+            } else {
+              setQuizResult(null);
+            }
+
             setView("quizLoading");
           } else {
             setQuizStep((s) => s + 1);
@@ -96,7 +172,7 @@ const MainPage: FC<MainPageProps> = ({ onQuizComplete, initialView, onInitialVie
       <LoadingPage
         onComplete={() => {
           exitQuiz();
-          onQuizComplete?.();
+          onQuizComplete?.(quizResult);
         }}
       />
     );
@@ -114,29 +190,31 @@ const MainPage: FC<MainPageProps> = ({ onQuizComplete, initialView, onInitialVie
     return (
       <CustomRecommend
         onBack={() => setView("home")}
-        onViewResult={(values) => {
+        onViewResult={(values, result) => {
           setMyTasteValues(values);
+          setCustomResult(result);
           setView("customResult");
         }}
       />
     );
   }
 
-  if (view === "customResult" && myTasteValues) {
+  if (view === "customResult" && myTasteValues && customResult) {
     return (
       <CustomRecommendResultPage
         onBack={() => setView("custom")}
         onRetry={() => setView("custom")}
-        cocktailName="피치 하이볼"
-        description="달콤함과 청량감은 살리고 도수는 부담 없이 맞춘 추천이에요."
-        matchPercent={92}
+        cocktailName={customResult.name}
+        description={customResult.description}
+        matchPercent={customResult.matchRate}
+        imageUrl={customResult.imageUrl}
         myValues={myTasteValues}
         cocktailValues={{
-          strength: 40,
-          sweetness: 80,
-          acidity: 60,
-          bitterness: 20,
-          refreshing: 100,
+          strength: customResult.cocktailFigures.alcoholIntensity,
+          sweetness: customResult.cocktailFigures.sweetness,
+          acidity: customResult.cocktailFigures.sourness,
+          bitterness: customResult.cocktailFigures.bitterness,
+          refreshing: customResult.cocktailFigures.refreshing,
         }}
       />
     );
@@ -183,43 +261,44 @@ const MainPage: FC<MainPageProps> = ({ onQuizComplete, initialView, onInitialVie
       {/* 오늘의 추천 칵테일 */}
       <h2 className="main-page__section-title">오늘의 추천 칵테일</h2>
 
-      <div className="main-page__cocktail-card">
-        <div className="main-page__cocktail-thumb">
-          <img
-            src={cocktail}
-            alt="선라이즈 소다"
-            className="main-page__cocktail-image"
-          />
+      <div className="main-page__below-title">
+        <div className="main-page__cocktail-card">
+          <div className="main-page__cocktail-thumb">
+            <img
+              src={todayCocktail?.cocktail.imageUrl || cocktail}
+              alt={todayCocktail?.cocktail.nameKo ?? "오늘의 칵테일"}
+              className="main-page__cocktail-image"
+            />
+          </div>
+
+          <div className="main-page__cocktail-info">
+            <p className="main-page__cocktail-name">
+              {todayCocktail?.cocktail.nameKo ?? "불러오는 중..."}
+            </p>
+            <p className="main-page__cocktail-desc">
+              {todayCocktail?.cocktail.shortDescription}
+            </p>
+          </div>
         </div>
 
-        <div className="main-page__cocktail-info">
-          <p className="main-page__cocktail-name">선라이즈 소다</p>
-          <p className="main-page__cocktail-tags">달콤 · 청량 · 과일향</p>
-          <p className="main-page__cocktail-desc">
-            오렌지 주스 + 소다워터 + 그레나딘으로
-            <br />
-            만드는 상큼한 여름 칵테일이에요.
-          </p>
-        </div>
+        {/* 메뉴 리스트 */}
+        <ul className="main-page__menu-list">
+          {menuItems.map((item) => (
+            <li key={item.label} className="main-page__menu-item">
+              <button
+                type="button"
+                className="main-page__menu-item-button"
+                onClick={item.onClick}
+              >
+                <span className="main-page__menu-item-label">{item.label}</span>
+                <span className="main-page__menu-item-arrow" aria-hidden="true">
+                  ↗
+                </span>
+              </button>
+            </li>
+          ))}
+        </ul>
       </div>
-
-      {/* 메뉴 리스트 */}
-      <ul className="main-page__menu-list">
-        {menuItems.map((item) => (
-          <li key={item.label} className="main-page__menu-item">
-            <button
-              type="button"
-              className="main-page__menu-item-button"
-              onClick={item.onClick}
-            >
-              <span className="main-page__menu-item-label">{item.label}</span>
-              <span className="main-page__menu-item-arrow" aria-hidden="true">
-                ↗
-              </span>
-            </button>
-          </li>
-        ))}
-      </ul>
 
       {isShareOpen && (
         <ShareModal

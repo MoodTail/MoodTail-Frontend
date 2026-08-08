@@ -8,7 +8,7 @@ import TwoButtonModal from '../../components/common/modal/TwoButtonModal'
 import ResultShareModal from '../../components/common/modal/ResultShareModal'
 import ResultSnsShareModal from '../../components/common/modal/ResultSnsShareModal'
 import SaveCompleteToast from '../../components/common/SaveCompleteToast'
-import { RESULT_TYPE_THEMES } from '../../constants/resultTypeThemes'
+import { RESULT_TYPE_THEMES, type ResultTypeTheme } from '../../constants/resultTypeThemes'
 import romanticCharacterImg from '../../assets/images/character/character-12.png'
 import visionaryCharacterImg from '../../assets/images/character-crop/character-crop-11.svg'
 import disciplinarianCharacterImg from '../../assets/images/character-crop/character-crop-2.png'
@@ -16,6 +16,8 @@ import glass1 from '../../assets/images/glass/glass-1.png'
 import glass2 from '../../assets/images/glass/glass-2.png'
 import glass3 from '../../assets/images/glass/glass-3.png'
 import glass4 from '../../assets/images/glass/glass-4.png'
+import { saveMoodTestResult } from '../../api/mood-tests/moodTests.api'
+import type { MoodTestResult } from '../../api/mood-tests/moodTests.types'
 import '../../styles/ResultPage.css'
 
 // TODO: 실제 테스트 결과 API 연동 후 실제 응답으로 대체
@@ -31,18 +33,14 @@ const MOCK_RESULT = {
   matchPercent: 68,
 }
 
-// TODO: 실제 API 연동 전까지, 타입별 배경색/포인트컬러/카피를 디자인팀에게 하나씩 전달받아
-// resultTypeThemes.ts에 채워넣고 여기서 미리보기로 확인하는 용도. 다 모이면 실제 결과의 typeCode로 대체
-const PREVIEW_TYPE_CODE = 'steadfast-principlist'
-const previewTheme = RESULT_TYPE_THEMES[PREVIEW_TYPE_CODE]
+// PREVIEW_TYPE_CODE: 실제 테스트 결과(result prop)가 없을 때(로컬에서 화면 미리보기/작업할 때)만 쓰는 폴백.
+// 실제 결과가 있으면 그 typeCode로 RESULT_TYPE_THEMES를 찾아 씀
+const PREVIEW_TYPE_CODE = 'grounded-realist'
 
 // wrap 안에서는 무늬(backgroundShape) 하나만 가운데 정렬하는 게 아니라, 캐릭터/보조무늬까지
 // 합친 전체 구성(bounding box)이 가운데 오도록 계산함 (캐릭터/보조무늬가 무늬 밖으로
 // 삐져나가는 만큼 무게중심이 한쪽으로 쏠리기 때문)
-const WRAP_WIDTH = previewTheme?.wrapWidth ?? 355
-const WRAP_HEIGHT = previewTheme?.wrapHeight ?? 355
-
-function getContentBounds(theme: typeof previewTheme) {
+function getContentBounds(theme?: ResultTypeTheme) {
   if (!theme?.backgroundShapeWidth || !theme?.backgroundShapeHeight) {
     return { left: 0, top: 0, right: 0, bottom: 0 }
   }
@@ -70,28 +68,6 @@ function getContentBounds(theme: typeof previewTheme) {
   return { left, top, right, bottom }
 }
 
-const CONTENT_BOUNDS = getContentBounds(previewTheme)
-const SHAPE_OFFSET_X =
-  (WRAP_WIDTH - (CONTENT_BOUNDS.right - CONTENT_BOUNDS.left)) / 2 -
-  CONTENT_BOUNDS.left +
-  (previewTheme?.contentOffsetX ?? 0)
-const SHAPE_OFFSET_Y =
-  (WRAP_HEIGHT - (CONTENT_BOUNDS.bottom - CONTENT_BOUNDS.top)) / 2 -
-  CONTENT_BOUNDS.top +
-  (previewTheme?.contentOffsetY ?? 0)
-
-const displayResult = previewTheme
-  ? {
-      ...MOCK_RESULT,
-      characterImage: previewTheme.characterImage,
-      typeName: previewTheme.name,
-      typeDescription: previewTheme.description,
-      shareDescription: previewTheme.description,
-      quote: previewTheme.quote,
-      detailDescription: previewTheme.detailDescription,
-    }
-  : MOCK_RESULT
-
 // TODO: glass-*.png 파일명이 번호로만 되어 있어 모양으로 임의 매핑함. 실제 칵테일-잔 매핑 확정되면 교체
 const MOCK_TOP_COCKTAILS: CocktailTopItem[] = [
   { rank: 1, name: '선셋 피즈', matchRate: 95, glassImage: glass4 },
@@ -116,6 +92,8 @@ type ModalStep = 'none' | 'save-overwrite-warning' | 'login-required' | 'back-co
 
 interface ResultPageProps {
   isLoggedIn?: boolean
+  // 실제 테스트 제출(POST /api/v1/tests/results) 응답. 없으면 목데이터로 보여줍니다.
+  result?: MoodTestResult | null
   // TODO: react-router-dom 도입되면 이 prop 대신 라우팅으로 대체
   onBack?: () => void
   onRetest?: () => void
@@ -124,12 +102,64 @@ interface ResultPageProps {
 
 function ResultPage({
   isLoggedIn = true,
+  result = null,
   onBack,
   onRetest,
   onGoToLogin,
 }: ResultPageProps) {
   // TODO: 실제 저장 상태 API 연동 후 아래 mock state를 실제 값으로 교체
   const [isResultSaved, setIsResultSaved] = useState(false) // 지금 보고 있는 결과를 저장했는지
+
+  // typeCode로 로컬 테마(캐릭터/배경무늬/카피)를 찾음. 실제 결과가 있으면 그 typeCode를,
+  // 없으면(로컬 미리보기) PREVIEW_TYPE_CODE를 씀. 아직 테마가 없는 타입(easygoing-optimist 등)은
+  // theme이 undefined가 되고, 이때는 API 응답값 -> 목데이터 순으로 폴백
+  const typeCode = result?.moodType.typeCode ?? PREVIEW_TYPE_CODE
+  const theme = RESULT_TYPE_THEMES[typeCode]
+
+  const wrapWidth = theme?.wrapWidth ?? 355
+  const wrapHeight = theme?.wrapHeight ?? 355
+  const contentBounds = getContentBounds(theme)
+  const shapeOffsetX =
+    (wrapWidth - (contentBounds.right - contentBounds.left)) / 2 -
+    contentBounds.left +
+    (theme?.contentOffsetX ?? 0)
+  const shapeOffsetY =
+    (wrapHeight - (contentBounds.bottom - contentBounds.top)) / 2 -
+    contentBounds.top +
+    (theme?.contentOffsetY ?? 0)
+
+  // result가 있으면(실제 테스트를 막 완료한 경우) 그 값을, 없으면 목데이터를 사용합니다.
+  // 캐릭터 이미지/이름/문구는 디자인팀에게 받은 로컬 테마(theme)가 있으면 그걸 최우선으로 씁니다.
+  // matchPercent(이 타입이 나온 사용자 비율)는 실제 API에 대응 필드가 없어 목데이터 값을 그대로 씁니다.
+  const characterImage = theme?.characterImage ?? result?.moodType.characterImageUrl ?? MOCK_RESULT.characterImage
+  const typeName = theme?.name ?? result?.moodType.name ?? MOCK_RESULT.typeName
+  const typeDescription = theme?.description ?? result?.moodType.shortDescription ?? MOCK_RESULT.typeDescription
+  const quote = theme?.quote ?? result?.moodType.characterQuote ?? MOCK_RESULT.quote
+  const detailDescription = theme?.detailDescription ?? result?.moodType.shortDescription ?? MOCK_RESULT.detailDescription
+  const shareDescription = theme?.description ?? result?.moodType.shortDescription ?? MOCK_RESULT.shareDescription
+  const matchPercent = MOCK_RESULT.matchPercent
+
+  const topCocktails: CocktailTopItem[] = result
+    ? result.recommendations.map((r) => ({
+        rank: r.ranking,
+        name: r.nameKo,
+        matchRate: r.matchScore,
+        glassImage: r.imageUrl,
+      }))
+    : MOCK_TOP_COCKTAILS
+
+  const myTaste: RadarChartData = result
+    ? {
+        당도: result.displayTasteScores.sweetness,
+        산도: result.displayTasteScores.sourness,
+        쓴맛: result.displayTasteScores.bitterness,
+        청량감: result.displayTasteScores.refreshing,
+        도수: result.displayTasteScores.alcoholIntensity,
+      }
+    : MOCK_MY_TASTE
+
+  const goodMatch = result?.compatibilities.best
+  const badMatch = result?.compatibilities.worst
 
   const [modalStep, setModalStep] = useState<ModalStep>('none')
   const closeModal = () => setModalStep('none')
@@ -138,6 +168,7 @@ function ResultPage({
   const [isSnsModalOpen, setIsSnsModalOpen] = useState(false)
   const [isSaveToastVisible, setIsSaveToastVisible] = useState(false)
   const [isSaveResultToastVisible, setIsSaveResultToastVisible] = useState(false)
+  const [shareUrl, setShareUrl] = useState<string | null>(null)
 
   useEffect(() => {
     if (!isSaveResultToastVisible) return
@@ -172,11 +203,22 @@ function ResultPage({
   }
 
   const performSave = () => {
-    // TODO: 테스트 결과 저장 API 연동
-    console.log('TODO: 테스트 결과 저장')
     setIsResultSaved(true)
     setModalStep('none')
     setIsSaveResultToastVisible(true)
+
+    // 실제 테스트 결과가 있을 때만(직접 완료한 테스트) 저장 API를 호출합니다.
+    // 게스트 등 비로그인 상태거나 실패해도 위 토스트/로컬 상태는 이미 반영되어 있습니다.
+    if (result && result.recommendations.length === 4) {
+      saveMoodTestResult({
+        moodType: { moodTypeId: result.moodType.moodTypeId, typeCode: result.moodType.typeCode },
+        tasteProfile: result.tasteProfile,
+        recommendedCocktails: result.recommendations.map((r) => ({
+          cocktailId: r.cocktailId,
+          matchScore: r.matchScore,
+        })),
+      }).catch((err) => console.error('테스트 결과 저장에 실패했습니다', err))
+    }
   }
 
   const handleSaveResult = () => {
@@ -201,7 +243,8 @@ function ResultPage({
     setIsShareModalOpen(true)
   }
 
-  const handleSnsShare = () => {
+  const handleSnsShare = (generatedShareUrl?: string) => {
+    setShareUrl(generatedShareUrl ?? null)
     setIsSnsModalOpen(true)
   }
 
@@ -220,14 +263,28 @@ function ResultPage({
         <header
           className="result-page__header"
           style={
-            previewTheme
+            theme
               ? ({
-                  background: previewTheme.backgroundColor,
-                  '--color-primary': previewTheme.accentColor,
+                  background: theme.backgroundColor,
+                  '--color-primary': theme.accentColor,
                 } as CSSProperties)
               : undefined
           }
         >
+          {theme?.decorativeSquares?.map((square, index) => (
+            <div
+              key={index}
+              className="result-page__decorative-square"
+              aria-hidden="true"
+              style={{
+                top: `${square.top}px`,
+                left: `${square.left}px`,
+                width: `${square.size}px`,
+                height: `${square.size}px`,
+                transform: `rotate(${square.rotation}deg)`,
+              }}
+            />
+          ))}
           <button
             type="button"
             className="result-page__back"
@@ -239,83 +296,75 @@ function ResultPage({
 
           <div
             className="result-page__character-wrap"
-            style={{ width: `${WRAP_WIDTH}px`, height: `${WRAP_HEIGHT}px` }}
+            style={{ width: `${wrapWidth}px`, height: `${wrapHeight}px` }}
           >
-            {previewTheme?.backgroundShape ? (
+            {theme?.backgroundShape ? (
               <img
                 className="result-page__background-shape"
                 style={{
-                  top: `${SHAPE_OFFSET_Y}px`,
-                  left: `${SHAPE_OFFSET_X}px`,
-                  width: previewTheme.backgroundShapeWidth ? `${previewTheme.backgroundShapeWidth}px` : undefined,
-                  height: previewTheme.backgroundShapeHeight
-                    ? `${previewTheme.backgroundShapeHeight}px`
-                    : undefined,
+                  top: `${shapeOffsetY}px`,
+                  left: `${shapeOffsetX}px`,
+                  width: theme.backgroundShapeWidth ? `${theme.backgroundShapeWidth}px` : undefined,
+                  height: theme.backgroundShapeHeight ? `${theme.backgroundShapeHeight}px` : undefined,
                 }}
-                src={previewTheme.backgroundShape}
+                src={theme.backgroundShape}
                 alt=""
                 aria-hidden="true"
               />
             ) : (
               <div className="result-page__background-circle" aria-hidden="true" />
             )}
-            {previewTheme?.accentShape && (
+            {theme?.accentShape && (
               <img
                 className="result-page__accent-shape"
                 style={{
-                  top: `${SHAPE_OFFSET_Y + (previewTheme.accentShapeTop ?? 0)}px`,
-                  left: `${SHAPE_OFFSET_X + (previewTheme.accentShapeLeft ?? 0)}px`,
-                  width: previewTheme.accentShapeWidth ? `${previewTheme.accentShapeWidth}px` : undefined,
-                  height: previewTheme.accentShapeHeight ? `${previewTheme.accentShapeHeight}px` : undefined,
+                  top: `${shapeOffsetY + (theme.accentShapeTop ?? 0)}px`,
+                  left: `${shapeOffsetX + (theme.accentShapeLeft ?? 0)}px`,
+                  width: theme.accentShapeWidth ? `${theme.accentShapeWidth}px` : undefined,
+                  height: theme.accentShapeHeight ? `${theme.accentShapeHeight}px` : undefined,
                 }}
-                src={previewTheme.accentShape}
+                src={theme.accentShape}
                 alt=""
                 aria-hidden="true"
               />
             )}
             <img
               className={`result-page__character${
-                previewTheme?.characterLayout === 'positioned' ? ' result-page__character--positioned' : ''
+                theme?.characterLayout === 'positioned' ? ' result-page__character--positioned' : ''
               }`}
               style={
-                previewTheme?.characterLayout === 'positioned'
+                theme?.characterLayout === 'positioned'
                   ? {
-                      top: `${SHAPE_OFFSET_Y + (previewTheme.characterPositionTop ?? 0)}px`,
-                      left: `${SHAPE_OFFSET_X + (previewTheme.characterPositionLeft ?? 0)}px`,
-                      width: previewTheme.characterPositionWidth
-                        ? `${previewTheme.characterPositionWidth}px`
-                        : undefined,
-                      height: previewTheme.characterPositionHeight
-                        ? `${previewTheme.characterPositionHeight}px`
-                        : undefined,
-                      filter: previewTheme.characterShadow,
+                      top: `${shapeOffsetY + (theme.characterPositionTop ?? 0)}px`,
+                      left: `${shapeOffsetX + (theme.characterPositionLeft ?? 0)}px`,
+                      width: theme.characterPositionWidth ? `${theme.characterPositionWidth}px` : undefined,
+                      height: theme.characterPositionHeight ? `${theme.characterPositionHeight}px` : undefined,
+                      filter: theme.characterShadow,
                     }
                   : {
-                      ...(previewTheme?.characterWidth
-                        ? { width: `${previewTheme.characterWidth}px` }
-                        : {}),
-                      ...(previewTheme?.characterOffsetX || previewTheme?.characterOffsetY
+                      ...(theme?.characterWidth ? { width: `${theme.characterWidth}px` } : {}),
+                      ...(theme?.characterOffsetX || theme?.characterOffsetY
                         ? {
-                            transform: `translate(${previewTheme?.characterOffsetX ?? 0}px, ${
-                              previewTheme?.characterOffsetY ?? 0
+                            transform: `translate(${theme?.characterOffsetX ?? 0}px, ${
+                              theme?.characterOffsetY ?? 0
                             }px)`,
                           }
                         : {}),
                     }
               }
-              src={displayResult.characterImage}
+              src={characterImage}
               alt=""
             />
           </div>
-          <p className="result-page__type-name">{displayResult.typeName}</p>
-          <p className="result-page__type-description">{displayResult.typeDescription}</p>
-          <p className="result-page__quote">&ldquo;{displayResult.quote}&rdquo;</p>
+          <p className="result-page__type-name">{typeName}</p>
+          <p className="result-page__type-description">{typeDescription}</p>
+          <p className="result-page__quote">&ldquo;{quote}&rdquo;</p>
 
           <div className="result-page__detail-card">
-            <p className="result-page__detail-title">{displayResult.typeName}</p>
-            <p className="result-page__detail-body">{displayResult.detailDescription}</p>
+            <p className="result-page__detail-title">{typeName}</p>
+            <p className="result-page__detail-body">{detailDescription}</p>
             <p className="result-page__detail-percent">
-              사용자의 {displayResult.matchPercent}%가 이 타입이 나왔어요
+              사용자의 {matchPercent}%가 이 타입이 나왔어요
             </p>
           </div>
         </header>
@@ -325,12 +374,12 @@ function ResultPage({
 
           <section className="result-page__section">
             <h2 className="result-page__section-title">나와 일치하는 칵테일 TOP 4</h2>
-            <CocktailTopList items={MOCK_TOP_COCKTAILS} />
+            <CocktailTopList items={topCocktails} />
           </section>
 
           <section className="result-page__section">
             <h2 className="result-page__section-title">나의 취향 분석</h2>
-            <RadarChart myData={MOCK_MY_TASTE} compareData={MOCK_COMPARE_TASTE} />
+            <RadarChart myData={myTaste} compareData={MOCK_COMPARE_TASTE} />
             <div className="taste-chips">
               {TASTE_CHIP_ORDER.map(({ key, label, active }) => (
                 <div
@@ -338,7 +387,7 @@ function ResultPage({
                   className={`taste-chips__item${active ? ' taste-chips__item--active' : ''}`}
                 >
                   <span className="taste-chips__label">{label}</span>
-                  <span className="taste-chips__value">{MOCK_MY_TASTE[key]}</span>
+                  <span className="taste-chips__value">{myTaste[key]}</span>
                 </div>
               ))}
             </div>
@@ -347,15 +396,15 @@ function ResultPage({
           <section className="result-page__match-section">
             <TypeMatchCard
               label="잘 맞는 타입"
-              typeName="환상주의자"
+              typeName={goodMatch?.name ?? "환상주의자"}
               typeNameColor="#fda8a8"
-              image={visionaryCharacterImg}
+              image={goodMatch?.characterImageUrl ?? visionaryCharacterImg}
             />
             <TypeMatchCard
               label="안 맞는 타입"
-              typeName="규칙주의자"
+              typeName={badMatch?.name ?? "규칙주의자"}
               typeNameColor="#6fa8dc"
-              image={disciplinarianCharacterImg}
+              image={badMatch?.characterImageUrl ?? disciplinarianCharacterImg}
             />
           </section>
 
@@ -411,11 +460,12 @@ function ResultPage({
       <ResultShareModal
         isOpen={isShareModalOpen}
         shareCard={{
-          characterImage: displayResult.characterImage,
-          typeName: displayResult.typeName,
-          typeDescription: displayResult.shareDescription,
-          quote: displayResult.quote,
+          characterImage,
+          typeName,
+          typeDescription: shareDescription,
+          quote,
         }}
+        tasteProfile={result?.tasteProfile}
         onClose={() => setIsShareModalOpen(false)}
         onSnsShare={handleSnsShare}
         onImageSaved={handleImageSaved}
@@ -423,7 +473,7 @@ function ResultPage({
 
       <ResultSnsShareModal
         isOpen={isSnsModalOpen}
-        url="https://moodtail.app/share/mock-id"
+        url={shareUrl ?? "https://moodtail.app/share/mock-id"}
         onClose={() => setIsSnsModalOpen(false)}
         onKakaoShare={handleKakaoShare}
       />

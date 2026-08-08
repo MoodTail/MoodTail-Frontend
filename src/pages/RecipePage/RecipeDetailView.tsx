@@ -15,9 +15,10 @@ interface RecipeDetailViewProps {
   recipe: Recipe;
   onBack: () => void;
   saved: boolean;
+  onGoToLogin: () => void;
 }
 
-function RecipeDetailView({ recipe, onBack, saved }: RecipeDetailViewProps) {
+function RecipeDetailView({ recipe, onBack, saved, onGoToLogin }: RecipeDetailViewProps) {
   const [showLoginModal, setShowLoginModal] = useState(false);
 
   return (
@@ -110,10 +111,7 @@ function RecipeDetailView({ recipe, onBack, saved }: RecipeDetailViewProps) {
           leftButton={{
             label: "로그인하기",
             variant: "primary",
-            onClick: () => {
-              // 시험 단계이므로 실제 로그인 화면 이동은 비활성화
-              /* onNavigateToLogin(); */
-            },
+            onClick: onGoToLogin,
           }}
           rightButton={{
             label: "닫기",

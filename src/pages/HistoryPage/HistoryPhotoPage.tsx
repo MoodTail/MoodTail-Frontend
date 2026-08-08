@@ -1,10 +1,16 @@
-import { useCallback, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import {
+  createDrinkingRecord,
+  deleteDrinkingRecord,
+  getDailyHistory,
+  getHistoryTestResult,
+} from '../../api/histories/histories.api'
+import type {
+  DailyHistoryPhoto,
+  HistoryTestResultDetail,
+} from '../../api/histories/histories.types'
 import chevronLeftIcon from '../../assets/icons/chevron-left.svg'
-import resultCharacter from '../../assets/images/history/detail_modal_character.png'
 import emptyResultCharacter from '../../assets/images/history/no_list_character.png'
-import sunsetFizzImage from '../../assets/images/history/sunset-fizz.png'
-import mojitoImage from '../../assets/images/history/mojito.png'
-import pinaColadaImage from '../../assets/images/history/pina-colada.png'
 import ginAndTonicImage from '../../assets/images/history/gin-and-tonic.png'
 import HistoryPhotoUploader, {
   type HistoryPhotoUploaderHandle,
@@ -20,9 +26,16 @@ import './HistoryPhotoPage.css'
 
 type HistoryRecordTab = 'photo' | 'cocktail' | 'result'
 
+function toDateKey(date: Date) {
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
+
 interface HistoryPhotoPageProps {
   onBack: () => void
-  onOpenFullResult: () => void
+  onOpenFullResult: (result: HistoryTestResultDetail) => void
   onStartTest: () => void
   hasTestResult: boolean
   selectedDate: Date
@@ -33,17 +46,79 @@ function HistoryPhotoPage({
   onBack,
   onOpenFullResult,
   onStartTest,
-  hasTestResult,
   selectedDate,
   initialTab = 'photo',
 }: HistoryPhotoPageProps) {
+  const selectedDateKey = toDateKey(selectedDate)
   const [activeTab, setActiveTab] = useState<HistoryRecordTab>(initialTab)
   const [isCocktailSearchOpen, setIsCocktailSearchOpen] = useState(false)
   const [selectedCocktails, setSelectedCocktails] = useState<CocktailSelection[]>([])
   const [isCocktailEditMode, setIsCocktailEditMode] = useState(false)
   const [deletingCocktail, setDeletingCocktail] = useState<CocktailSelection>()
   const [isDeleteToastVisible, setIsDeleteToastVisible] = useState(false)
+  const [isDailyHistoryLoading, setIsDailyHistoryLoading] = useState(false)
+  const [dailyHistoryError, setDailyHistoryError] = useState<string>()
+  const [testResultDetail, setTestResultDetail] =
+    useState<HistoryTestResultDetail>()
+  const [testResultError, setTestResultError] = useState<string>()
+  const [historyPhotos, setHistoryPhotos] = useState<DailyHistoryPhoto[]>([])
   const photoUploaderRef = useRef<HistoryPhotoUploaderHandle>(null)
+
+  const fetchDailyHistory = useCallback(async (signal?: AbortSignal) => {
+    try {
+      setIsDailyHistoryLoading(true)
+      setDailyHistoryError(undefined)
+      setTestResultError(undefined)
+      setTestResultDetail(undefined)
+
+      const result = await getDailyHistory(selectedDateKey, signal)
+      setHistoryPhotos(result.photos)
+      setSelectedCocktails(
+        result.drinkingRecords.map((record) => ({
+          id: record.cocktailId,
+          recordId: record.recordId,
+          name: record.cocktailName,
+          description: record.shortDescription ?? '',
+          temperature:
+            record.alcoholDegree === null ? '-' : `${record.alcoholDegree}°`,
+          image: record.cocktailImageUrl ?? ginAndTonicImage,
+        })),
+      )
+
+      if (result.testResult) {
+        try {
+          const detail = await getHistoryTestResult(
+            result.testResult.resultId,
+            signal,
+          )
+          setTestResultDetail(detail)
+        } catch (error) {
+          if (signal?.aborted) return
+          console.error(error)
+          setTestResultError('테스트 결과를 불러오지 못했습니다.')
+        }
+      }
+    } catch (error) {
+      if (signal?.aborted) return
+      console.error(error)
+      setDailyHistoryError('날짜별 기록을 불러오지 못했습니다.')
+      throw error
+    } finally {
+      if (!signal?.aborted) setIsDailyHistoryLoading(false)
+    }
+  }, [selectedDateKey])
+
+  useEffect(() => {
+    const controller = new AbortController()
+    const timer = window.setTimeout(() => {
+      void fetchDailyHistory(controller.signal).catch(() => undefined)
+    }, 0)
+
+    return () => {
+      window.clearTimeout(timer)
+      controller.abort()
+    }
+  }, [fetchDailyHistory])
 
   const changeTab = (tab: HistoryRecordTab) => {
     photoUploaderRef.current?.collapseSheet()
@@ -52,65 +127,99 @@ function HistoryPhotoPage({
 
   const handleCloseDeleteToast = useCallback(() => setIsDeleteToastVisible(false), [])
 
-  const handleDeleteCocktail = () => {
-    if (!deletingCocktail) return
-    setSelectedCocktails((current) =>
-      current.filter((cocktail) => cocktail.id !== deletingCocktail.id),
+  const handleDeleteCocktail = async () => {
+    if (deletingCocktail?.recordId === undefined) return
+
+    try {
+      await deleteDrinkingRecord(deletingCocktail.recordId)
+      await fetchDailyHistory()
+      setDeletingCocktail(undefined)
+      setIsCocktailEditMode(false)
+      setIsDeleteToastVisible(true)
+    } catch (error) {
+      console.error(error)
+      setDailyHistoryError('칵테일 기록을 삭제하지 못했습니다.')
+      setDeletingCocktail(undefined)
+    }
+  }
+
+  const handleSaveCocktails = async (cocktails: CocktailSelection[]) => {
+    const newCocktails = cocktails.filter(
+      (cocktail) => cocktail.recordId === undefined,
     )
-    setDeletingCocktail(undefined)
-    setIsCocktailEditMode(false)
-    setIsDeleteToastVisible(true)
+
+    if (newCocktails.length === 0) return
+
+    try {
+      await createDrinkingRecord({
+        cocktailIds: newCocktails.map((cocktail) => cocktail.id),
+        recordDate: selectedDateKey,
+      })
+    } finally {
+      await fetchDailyHistory()
+    }
   }
 
   return (
     <div className="history-photo-page">
       <HistoryBackground />
-      <header className="history-photo-page__header">
-        <button
-          type="button"
-          className="history-photo-page__back-button"
-          onClick={onBack}
-          aria-label="히스토리로 돌아가기"
-        >
-          <img src={chevronLeftIcon} alt="" />
-        </button>
-        <h1>히스토리</h1>
-      </header>
+      {!isCocktailSearchOpen && (
+        <header className="history-photo-page__header">
+          <button
+            type="button"
+            className="history-photo-page__back-button"
+            onClick={onBack}
+            aria-label="히스토리로 돌아가기"
+          >
+            <img src={chevronLeftIcon} alt="" />
+          </button>
+          <h1>히스토리</h1>
+        </header>
+      )}
 
-      <p className="history-photo-page__date">
-        {selectedDate.getFullYear()}년 {selectedDate.getMonth() + 1}월{' '}
-        {selectedDate.getDate()}일 기록
-      </p>
+      {!isCocktailSearchOpen && (
+        <>
+          <p className="history-photo-page__date">
+            {selectedDate.getFullYear()}년 {selectedDate.getMonth() + 1}월{' '}
+            {selectedDate.getDate()}일 기록
+          </p>
 
-      <nav className="history-photo-page__tabs" aria-label="히스토리 상세 메뉴">
-        <button
-          type="button"
-          className={`history-photo-page__tab${activeTab === 'photo' ? ' is-active' : ''}`}
-          onClick={() => changeTab('photo')}
-        >
-          사진 추가
-        </button>
-        <button
-          type="button"
-          className={`history-photo-page__tab${activeTab === 'cocktail' ? ' is-active' : ''}`}
-          onClick={() => changeTab('cocktail')}
-        >
-          칵테일 기록
-        </button>
-        <button
-          type="button"
-          className={`history-photo-page__tab${activeTab === 'result' ? ' is-active' : ''}`}
-          onClick={() => changeTab('result')}
-        >
-          테스트 결과
-        </button>
-      </nav>
+          <nav className="history-photo-page__tabs" aria-label="히스토리 상세 메뉴">
+            <button
+              type="button"
+              className={`history-photo-page__tab${activeTab === 'photo' ? ' is-active' : ''}`}
+              onClick={() => changeTab('photo')}
+            >
+              사진 추가
+            </button>
+            <button
+              type="button"
+              className={`history-photo-page__tab${activeTab === 'cocktail' ? ' is-active' : ''}`}
+              onClick={() => changeTab('cocktail')}
+            >
+              칵테일 기록
+            </button>
+            <button
+              type="button"
+              className={`history-photo-page__tab${activeTab === 'result' ? ' is-active' : ''}`}
+              onClick={() => changeTab('result')}
+            >
+              테스트 결과
+            </button>
+          </nav>
+        </>
+      )}
 
       <div hidden={activeTab !== 'photo'}>
-        <HistoryPhotoUploader ref={photoUploaderRef} collapsible />
+        <HistoryPhotoUploader
+          ref={photoUploaderRef}
+          collapsible
+          date={selectedDateKey}
+          initialPhotos={historyPhotos}
+        />
       </div>
 
-      {activeTab === 'cocktail' && (
+      {activeTab === 'cocktail' && !isCocktailSearchOpen && (
         <section className="history-cocktail-record" aria-labelledby="cocktail-record-title">
           <div className="history-cocktail-record__heading">
             <h2 id="cocktail-record-title">먹은 칵테일</h2>
@@ -123,7 +232,15 @@ function HistoryPhotoPage({
             </button>
           </div>
 
-          {selectedCocktails.length === 0 ? (
+          {isDailyHistoryLoading ? (
+            <div className="history-cocktail-record__empty">
+              <strong>칵테일 기록을 불러오는 중...</strong>
+            </div>
+          ) : dailyHistoryError ? (
+            <div className="history-cocktail-record__empty">
+              <strong>{dailyHistoryError}</strong>
+            </div>
+          ) : selectedCocktails.length === 0 ? (
             <div className="history-cocktail-record__empty">
               <strong>아직 선택한 칵테일이 없어요</strong>
               <p>칵테일 기록 버튼을 눌러 선택해보세요</p>
@@ -171,30 +288,39 @@ function HistoryPhotoPage({
 
       {activeTab === 'result' && (
         <section className="history-test-result">
-          {hasTestResult ? (
+          {isDailyHistoryLoading ? (
+            <article className="history-test-result__empty-card">
+              <strong>테스트 결과를 불러오는 중...</strong>
+            </article>
+          ) : testResultError ? (
+            <article className="history-test-result__empty-card">
+              <strong>{testResultError}</strong>
+            </article>
+          ) : testResultDetail ? (
             <>
               <article className="history-test-result__summary">
                 <div className="history-test-result__character-wrap">
-                  <img src={resultCharacter} alt="현실주의자 캐릭터" />
+                  <img
+                    src={testResultDetail.moodType.characterImageUrl}
+                    alt={`${testResultDetail.moodType.name} 캐릭터`}
+                  />
                 </div>
-                <h2>현실주의자</h2>
-                <p>“차분하지만 섬세한 한 잔이 필요했어요.”</p>
+                <h2>{testResultDetail.moodType.name}</h2>
+                <p>“{testResultDetail.moodType.characterQuote}”</p>
               </article>
 
               <section className="history-test-result__recommendations">
                 <h2>추천 칵테일 TOP 4</h2>
                 <div className="history-test-result__grid">
-                  {[
-                    { rank: 1, name: '선셋 피즈', match: 95, image: sunsetFizzImage },
-                    { rank: 2, name: '모히토', match: 75, image: mojitoImage },
-                    { rank: 3, name: '피냐콜라다', match: 55, image: pinaColadaImage },
-                    { rank: 4, name: '진토닉', match: 25, image: ginAndTonicImage },
-                  ].map((cocktail) => (
-                    <article key={cocktail.rank} className="history-test-result__cocktail-card">
-                      <span>{cocktail.rank}위</span>
-                      <img src={cocktail.image} alt="" />
-                      <strong>{cocktail.name}</strong>
-                      <small>일치율 {cocktail.match}%</small>
+                  {testResultDetail.recommendedCocktails.map((cocktail) => (
+                    <article
+                      key={cocktail.cocktailId}
+                      className="history-test-result__cocktail-card"
+                    >
+                      <span>{cocktail.ranking}위</span>
+                      <img src={cocktail.cocktailImageUrl} alt="" />
+                      <strong>{cocktail.cocktailName}</strong>
+                      <small>{cocktail.shortDescription} · {cocktail.matchScore}%</small>
                     </article>
                   ))}
                 </div>
@@ -202,7 +328,7 @@ function HistoryPhotoPage({
 
               <HistoryPrimaryButton
                 className="history-test-result__bottom-button"
-                onClick={onOpenFullResult}
+                onClick={() => onOpenFullResult(testResultDetail)}
               >
                 전체 결과보기
               </HistoryPrimaryButton>
@@ -227,10 +353,8 @@ function HistoryPhotoPage({
       {isCocktailSearchOpen && (
         <CocktailSearchOverlay
           initialCocktails={selectedCocktails}
-          onSave={(cocktails) => {
-            setSelectedCocktails(cocktails)
-            setIsCocktailSearchOpen(false)
-          }}
+          onSave={handleSaveCocktails}
+          onClose={() => setIsCocktailSearchOpen(false)}
         />
       )}
 
@@ -239,7 +363,11 @@ function HistoryPhotoPage({
         title="기록을 삭제하시겠어요?"
         description="삭제된 기록은 복구가 어렵습니다"
         leftButton={{ label: '닫기', variant: 'primary', onClick: () => setDeletingCocktail(undefined) }}
-        rightButton={{ label: '삭제하기', variant: 'secondary', onClick: handleDeleteCocktail }}
+        rightButton={{
+          label: '삭제하기',
+          variant: 'secondary',
+          onClick: () => void handleDeleteCocktail(),
+        }}
         onOverlayClick={() => setDeletingCocktail(undefined)}
       />
     </div>

@@ -1,11 +1,15 @@
 import { useEffect, useState } from 'react'
 import CompleteModal from '../../components/MyPage/CompleteModal'
+import { createInquiry } from '../../api/inquiries/inquiries.api'
 import chevronLeftIcon from '../../assets/icons/chevron-left.svg'
 import '../../styles/Inquiry.css'
 
-const MAX_LENGTH = 500
+const MIN_LENGTH = 10
+const MAX_LENGTH = 1000
 const SAVED_MODAL_DURATION_MS = 1200
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+const EMAIL_REGEX = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/
+// 마이페이지 문의하기는 별도 유형 선택 UI가 없어 ETC(기타)로 고정
+const DEFAULT_INQUIRY_TYPE = 'ETC'
 
 interface InquiryProps {
   // TODO: react-router-dom 도입되면 이 prop 대신 라우팅으로 대체
@@ -17,6 +21,9 @@ function Inquiry({ onBack }: InquiryProps) {
   const [content, setContent] = useState('')
   const [showSavedModal, setShowSavedModal] = useState(false)
   const [isEmailInvalid, setIsEmailInvalid] = useState(false)
+  const [contentError, setContentError] = useState('')
+  const [submitError, setSubmitError] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const handleBack = () => {
     if (onBack) {
@@ -27,15 +34,33 @@ function Inquiry({ onBack }: InquiryProps) {
     console.log('TODO: 마이페이지로 돌아가기')
   }
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!EMAIL_REGEX.test(email)) {
       setIsEmailInvalid(true)
       return
     }
 
-    // TODO: 실제 문의 접수 연동 (외부 링크 연결 또는 API 전송)
-    console.log('TODO: 문의 접수', { email, content })
-    setShowSavedModal(true)
+    const trimmedContent = content.trim()
+    if (trimmedContent.length < MIN_LENGTH) {
+      setContentError(`문의 내용을 ${MIN_LENGTH}자 이상 입력해주세요`)
+      return
+    }
+    setContentError('')
+    setSubmitError('')
+    setIsSubmitting(true)
+
+    try {
+      await createInquiry({
+        inquiryType: DEFAULT_INQUIRY_TYPE,
+        content: trimmedContent,
+        contactEmail: email,
+      })
+      setShowSavedModal(true)
+    } catch {
+      setSubmitError('문의 접수에 실패했습니다. 잠시 후 다시 시도해주세요')
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   const handleEmailChange = (event: { target: { value: string } }) => {
@@ -82,7 +107,10 @@ function Inquiry({ onBack }: InquiryProps) {
         <textarea
           className="inquiry__textarea"
           value={content}
-          onChange={(event) => setContent(event.target.value.slice(0, MAX_LENGTH))}
+          onChange={(event) => {
+            setContent(event.target.value.slice(0, MAX_LENGTH))
+            if (contentError) setContentError('')
+          }}
           placeholder="문의 내용을 입력해주세요..."
           maxLength={MAX_LENGTH}
         />
@@ -90,9 +118,16 @@ function Inquiry({ onBack }: InquiryProps) {
           {content.length} / {MAX_LENGTH}
         </span>
       </div>
+      {contentError && <p className="inquiry__email-error">{contentError}</p>}
+      {submitError && <p className="inquiry__email-error">{submitError}</p>}
 
-      <button type="button" className="inquiry__submit" onClick={handleSubmit}>
-        문의 접수
+      <button
+        type="button"
+        className="inquiry__submit"
+        onClick={handleSubmit}
+        disabled={isSubmitting}
+      >
+        {isSubmitting ? '접수 중...' : '문의 접수'}
       </button>
 
       {showSavedModal && <CompleteModal className="modal--saved" title="접수 완료되었습니다" />}

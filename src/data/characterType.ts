@@ -111,3 +111,50 @@ export function getCharacterType(id: string): CharacterType {
   if (!found) throw new Error(`Unknown character type id: ${id}`);
   return found;
 }
+
+function getCharacterTypeByNumber(number: number): CharacterType {
+  const found = CHARACTER_TYPES.find((t) => t.number === number);
+  if (!found) throw new Error(`Unknown character number: ${number}`);
+  return found;
+}
+
+// 타입 간 특성 벡터 거리 기반 궁합 매핑입니다 (number 기준, 거리가 가까울수록 잘 맞음).
+const MATCH_TABLE: {
+  number: number;
+  goodMatchNumber: number;
+  goodMatchDistance: number;
+  badMatchNumber: number;
+  badMatchDistance: number;
+}[] = [
+  { number: 0, goodMatchNumber: 9, goodMatchDistance: 0.873, badMatchNumber: 4, badMatchDistance: 3.092 },
+  { number: 1, goodMatchNumber: 7, goodMatchDistance: 1.398, badMatchNumber: 5, badMatchDistance: 3.421 },
+  { number: 2, goodMatchNumber: 8, goodMatchDistance: 0.562, badMatchNumber: 3, badMatchDistance: 2.338 },
+  { number: 3, goodMatchNumber: 5, goodMatchDistance: 1.312, badMatchNumber: 2, badMatchDistance: 2.338 },
+  { number: 4, goodMatchNumber: 7, goodMatchDistance: 1.156, badMatchNumber: 0, badMatchDistance: 3.092 },
+  { number: 5, goodMatchNumber: 3, goodMatchDistance: 1.312, badMatchNumber: 1, badMatchDistance: 3.421 },
+  { number: 6, goodMatchNumber: 11, goodMatchDistance: 0.882, badMatchNumber: 10, badMatchDistance: 1.507 },
+  { number: 7, goodMatchNumber: 4, goodMatchDistance: 1.156, badMatchNumber: 11, badMatchDistance: 2.328 },
+  { number: 8, goodMatchNumber: 2, goodMatchDistance: 0.562, badMatchNumber: 9, badMatchDistance: 1.976 },
+  { number: 9, goodMatchNumber: 0, goodMatchDistance: 0.873, badMatchNumber: 8, badMatchDistance: 1.976 },
+  { number: 10, goodMatchNumber: 8, goodMatchDistance: 1.055, badMatchNumber: 6, badMatchDistance: 1.507 },
+  { number: 11, goodMatchNumber: 6, goodMatchDistance: 0.882, badMatchNumber: 7, badMatchDistance: 2.328 },
+];
+
+export interface CharacterMatch {
+  good: CharacterType;
+  goodDistance: number;
+  bad: CharacterType;
+  badDistance: number;
+}
+
+export function getCharacterMatch(id: string): CharacterMatch {
+  const type = getCharacterType(id);
+  const entry = MATCH_TABLE.find((m) => m.number === type.number);
+  if (!entry) throw new Error(`No match data for character id: ${id}`);
+  return {
+    good: getCharacterTypeByNumber(entry.goodMatchNumber),
+    goodDistance: entry.goodMatchDistance,
+    bad: getCharacterTypeByNumber(entry.badMatchNumber),
+    badDistance: entry.badMatchDistance,
+  };
+}

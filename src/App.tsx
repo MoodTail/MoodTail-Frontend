@@ -16,8 +16,13 @@ import Terms from "./pages/MyPage/Terms";
 import LoginPage from "./pages/LoginPage/LoginPage";
 import ResultPage from "./pages/ResultPage/ResultPage";
 import QuizQuestionPage from "./pages/QuizQuestionPage";
-import { buildQuizQuestions, type QuizQuestion } from "./data/quiz";
+import { buildQuizQuestions, toQuizQuestions, type QuizQuestion } from "./data/quiz";
+import { getMoodTestQuestions, postMoodTestResult } from "./api/mood-tests/moodTests.api";
+import type { MoodTestAnswer, MoodTestResult } from "./api/mood-tests/moodTests.types";
+import type { HistoryTestResultDetail } from "./api/histories/histories.types";
 import "./App.css";
+import { parseOauthCallback } from "./utils/oauth";
+import SocialSignupPage from "./pages/SocialSignupPage/SocialSignupPage";
 
 export type NavKey = "history" | "dictionary" | "home" | "recipe" | "mypage";
 type HistoryView = "calendar" | "photo" | "test-result" | "monthly-report";
@@ -34,6 +39,8 @@ function App() {
   const [historyRecordTab, setHistoryRecordTab] =
     useState<HistoryRecordTab>("photo");
   const [monthlyReportMonth, setMonthlyReportMonth] = useState(new Date());
+  const [historyTestResult, setHistoryTestResult] =
+    useState<HistoryTestResultDetail | null>(null);
   const [mypageView, setMypageView] = useState<MyPageView>("main");
   const [recipeNavVisible, setRecipeNavVisible] = useState(true);
   const [goToQuizOnHome, setGoToQuizOnHome] = useState(false);
@@ -43,7 +50,13 @@ function App() {
   const [retestAnswers, setRetestAnswers] = useState<Record<number, string>>(
     {},
   );
-  const [retestQuestions, setRetestQuestions] = useState<QuizQuestion[]>(() => buildQuizQuestions());
+  const [retestQuestions, setRetestQuestions] = useState<QuizQuestion[]>(() =>
+    buildQuizQuestions(),
+  );
+  const [quizResult, setQuizResult] = useState<MoodTestResult | null>(null);
+  const [oauthCallback, setOauthCallback] = useState(() =>
+    parseOauthCallback(),
+  );
 
   const startRetest = () => {
     setIsTestResultOpen(false);
@@ -51,6 +64,9 @@ function App() {
     setRetestAnswers({});
     setRetestQuestions(buildQuizQuestions());
     setIsRetestOpen(true);
+    getMoodTestQuestions()
+      .then(({ questions }) => setRetestQuestions(toQuizQuestions(questions)))
+      .catch((err) => console.error("테스트 질문을 불러오지 못했습니다", err));
   };
 
   const exitRetest = () => {
@@ -58,7 +74,6 @@ function App() {
     setRetestStep(0);
     setRetestAnswers({});
     setRetestQuestions(buildQuizQuestions());
-    setIsRetestOpen(true);
   };
 
   const startTestFromHistory = () => {
@@ -118,13 +133,21 @@ function App() {
       case "home":
         return (
           <MainPage
-            onQuizComplete={() => setIsTestResultOpen(true)}
+            onQuizComplete={(result) => {
+              setQuizResult(result);
+              setIsTestResultOpen(true);
+            }}
             initialView={goToQuizOnHome ? "quiz" : undefined}
             onInitialViewConsumed={() => setGoToQuizOnHome(false)}
           />
         );
       case "recipe":
-        return <RecipePage onNavVisibilityChange={setRecipeNavVisible} />;
+        return (
+          <RecipePage
+            onNavVisibilityChange={setRecipeNavVisible}
+            onGoToLogin={handleGoToLoginScreen}
+          />
+        );
       case "mypage":
         return (
           <MyPage
@@ -140,6 +163,28 @@ function App() {
         return <MainPage />;
     }
   };
+
+  if (oauthCallback) {
+    const redirectUri =
+      oauthCallback.provider === "kakao"
+        ? import.meta.env.VITE_KAKAO_REDIRECT_URI
+        : import.meta.env.VITE_GOOGLE_REDIRECT_URI;
+
+    return (
+      <SocialSignupPage
+        provider={oauthCallback.provider}
+        authorizationCode={oauthCallback.code}
+        stateValue={oauthCallback.state}
+        redirectUri={redirectUri}
+        onSignupComplete={() => {
+          window.history.replaceState({}, "", "/");
+          setOauthCallback(null);
+          setIsGuest(localStorage.getItem("isGuest") === "true");
+          setIsLoggedIn(true);
+        }}
+      />
+    );
+  }
 
   if (!isLoggedIn) {
     return (
@@ -160,11 +205,19 @@ function App() {
           selectedDate={historyPhotoDate}
           initialTab={historyRecordTab}
           onBack={() => setHistoryView("calendar")}
-          onOpenFullResult={() => setHistoryView("test-result")}
+          onOpenFullResult={(result) => {
+            setHistoryTestResult(result);
+            setHistoryView("test-result");
+          }}
           onStartTest={startTestFromHistory}
         />
       ),
-      "test-result": <TestResultPage onBack={() => setHistoryView("photo")} />,
+      "test-result": historyTestResult ? (
+        <TestResultPage
+          result={historyTestResult}
+          onBack={() => setHistoryView("photo")}
+        />
+      ) : null,
       "monthly-report": (
         <MonthlyReportPage
           reportMonth={monthlyReportMonth}
@@ -175,7 +228,7 @@ function App() {
 
     return (
       <div className="app-shell">
-        <main className="app">
+        <main className="app app--history-responsive">
           <section className="app-content app-content--full">
             {historyDetailPage}
           </section>
@@ -204,8 +257,32 @@ function App() {
               }
               onNext={() => {
                 if (isLastStep) {
+                  // 로컬 목데이터로 폴백된 상태라면 id가 실제 숫자 id가 아니라서 제출을 건너뜁니다.
+                  const answers = retestQuestions
+                    .map((q, i) => {
+                      const questionId = Number(q.id);
+                      const optionId = Number(retestAnswers[i]);
+                      if (Number.isNaN(questionId) || Number.isNaN(optionId)) return null;
+                      return { questionId, optionId };
+                    })
+                    .filter((a): a is MoodTestAnswer => a !== null);
+
                   exitRetest();
-                  setIsTestResultOpen(true);
+                  if (answers.length === retestQuestions.length) {
+                    postMoodTestResult(answers)
+                      .then((result) => {
+                        setQuizResult(result);
+                        setIsTestResultOpen(true);
+                      })
+                      .catch((err) => {
+                        console.error("테스트 결과 제출에 실패했습니다", err);
+                        setQuizResult(null);
+                        setIsTestResultOpen(true);
+                      });
+                  } else {
+                    setQuizResult(null);
+                    setIsTestResultOpen(true);
+                  }
                 } else {
                   setRetestStep((s) => s + 1);
                 }
@@ -225,6 +302,7 @@ function App() {
           <section className="app-content app-content--full">
             <ResultPage
               isLoggedIn={!isGuest}
+              result={quizResult}
               onBack={() => setIsTestResultOpen(false)}
               onRetest={startRetest}
               onGoToLogin={handleGoToLoginScreen}
@@ -255,7 +333,7 @@ function App() {
 
   return (
     <div className="app-shell">
-      <main className="app">
+      <main className={`app${activeMenu === "history" ? " app--history-responsive" : ""}`}>
         {activeMenu === "recipe" && <DexBackground />}
         <section className="app-content">{renderPage()}</section>
 

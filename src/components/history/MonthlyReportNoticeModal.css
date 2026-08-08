@@ -12,6 +12,7 @@
 .monthly-report-modal {
   position: relative;
   width: 309px;
+  max-width: calc(100% - 40px);
   height: 224px;
   padding: 0 28px;
   background: #ffffff;
@@ -47,6 +48,13 @@
   display: flex;
   gap: 14px;
   margin: 0;
+}
+
+@media (max-width: 359px) {
+  .monthly-report-modal-overlay { padding: 0 20px; }
+  .monthly-report-modal { width: 100%; max-width: none; padding: 0 20px; }
+  .monthly-report-modal__actions { right: 20px; left: 20px; gap: 10px; }
+  .monthly-report-modal__button { min-width: 0; width: auto; flex: 1; }
 }
 
 .monthly-report-modal__button {

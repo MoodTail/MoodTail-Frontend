@@ -59,3 +59,19 @@
   color: #6b6b6b;
   overflow-y: auto;
 }
+
+.terms__section + .terms__section {
+  margin-top: 24px;
+}
+
+.terms__section-title {
+  margin: 0 0 8px;
+  font-size: 15px;
+  font-weight: 700;
+  color: #1a1a2e;
+}
+
+.terms__section-body {
+  margin: 0;
+  white-space: pre-wrap;
+}

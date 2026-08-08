@@ -4,6 +4,7 @@ import './HistoryCalendar.css'
 
 interface HistoryCalendarProps {
   initialDate?: Date
+  maxDate?: Date
   markedDates?: Date[]
   selectedDate?: Date
   onDateClick?: (date: Date) => void
@@ -20,6 +21,7 @@ function toDateKey(date: Date) {
 
 function HistoryCalendar({
   initialDate = new Date(),
+  maxDate,
   markedDates = [],
   selectedDate,
   onDateClick,
@@ -33,6 +35,7 @@ function HistoryCalendar({
       locale="ko-KR"
       calendarType="gregory"
       defaultActiveStartDate={initialDate}
+      maxDate={maxDate}
       value={selectedDate ?? null}
       onClickDay={(date) => onDateClick?.(date)}
       onActiveStartDateChange={({ activeStartDate, view }) => {

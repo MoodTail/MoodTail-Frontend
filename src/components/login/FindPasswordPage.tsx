@@ -2,6 +2,7 @@ import { useState } from "react";
 import type { FC } from "react";
 import BackgroundBlur from "../../components/common/BackgroundBlur";
 import "../../styles/FindPasswordPage.css";
+import { postPasswordResetCodes } from "../../api/auth/auth.api";
 
 interface FindPasswordPageProps {
   onBack: () => void;
@@ -9,9 +10,25 @@ interface FindPasswordPageProps {
 
 const FindPasswordPage: FC<FindPasswordPageProps> = ({ onBack }) => {
   const [email, setEmail] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [isSent, setIsSent] = useState(false);
 
-  const handleSubmit = (): void => {
-    // 재설정 링크 요청 API 연동
+  const handleSubmit = async (): Promise<void> => {
+    if (!email.trim()) return;
+
+    setIsSubmitting(true);
+    setErrorMessage("");
+
+    try {
+      await postPasswordResetCodes({ email });
+      setIsSent(true);
+    } catch (error) {
+      console.error(error);
+      setErrorMessage("이메일 전송에 실패했어요. 다시 시도해주세요.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -74,12 +91,23 @@ const FindPasswordPage: FC<FindPasswordPageProps> = ({ onBack }) => {
         onChange={(e) => setEmail(e.target.value)}
       />
 
+      {isSent && (
+        <p className="find-password-page__success">
+          재설정 링크를 이메일로 보냈어요. 메일함을 확인해주세요.
+        </p>
+      )}
+
+      {errorMessage && (
+        <p className="find-password-page__error">{errorMessage}</p>
+      )}
+
       <button
         type="button"
         className="find-password-page__submit"
-        onClick={handleSubmit}
+        onClick={() => void handleSubmit()}
+        disabled={isSubmitting}
       >
-        재설정 링크 받기
+        {isSubmitting ? "전송 중..." : "재설정 링크 받기"}
       </button>
     </div>
   );

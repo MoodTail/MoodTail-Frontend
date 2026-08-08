@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { COLORS } from "../theme/colors";
 import PhoneFrame from "../components/PhoneFrame";
 import TypeDetailBackground from "../components/TypeDetailBackground";
@@ -7,10 +7,14 @@ import ellipseGlow from "../assets/images/ellipse/Ellipse.png";
 const LOADING_DURATION_MS = 5000;
 
 export default function LoadingPage({ onComplete }: { onComplete: () => void }) {
+  // onComplete가 렌더마다 새로 생성되는 클로저(예: 최신 API 응답을 캡처한 콜백)일 수 있으므로,
+  // ref로 항상 최신 함수를 참조하게 해서 5초 타이머가 마운트 시점의 오래된 값을 부르지 않게 합니다.
+  const onCompleteRef = useRef(onComplete);
+  onCompleteRef.current = onComplete;
+
   useEffect(() => {
-    const timer = setTimeout(onComplete, LOADING_DURATION_MS);
+    const timer = setTimeout(() => onCompleteRef.current(), LOADING_DURATION_MS);
     return () => clearTimeout(timer);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

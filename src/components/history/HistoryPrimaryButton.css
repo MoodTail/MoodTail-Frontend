@@ -1,5 +1,6 @@
 .history-primary-button {
-  width: 337px;
+  width: calc(100% - 56px);
+  max-width: 337px;
   height: 50px;
   padding: 0;
   border: 0;
