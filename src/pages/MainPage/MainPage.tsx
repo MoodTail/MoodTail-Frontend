@@ -9,9 +9,19 @@ import CustomRecommend from "../CustomRecommend/CustomRecommend";
 import CustomRecommendResultPage from "../CustomRecommendResultPage/CustomRecommendResultPage";
 import QuizQuestionPage from "../QuizQuestionPage";
 import LoadingPage from "../LoadingPage";
-import { buildQuizQuestions, toQuizQuestions, type QuizQuestion } from "../../data/quiz";
-import { getMoodTestQuestions, postMoodTestResult } from "../../api/mood-tests/moodTests.api";
-import type { MoodTestAnswer, MoodTestResult } from "../../api/mood-tests/moodTests.types";
+import {
+  buildQuizQuestions,
+  toQuizQuestions,
+  type QuizQuestion,
+} from "../../data/quiz";
+import {
+  getMoodTestQuestions,
+  postMoodTestResult,
+} from "../../api/mood-tests/moodTests.api";
+import type {
+  MoodTestAnswer,
+  MoodTestResult,
+} from "../../api/mood-tests/moodTests.types";
 import { getTodayCocktail } from "../../api/cocktails/cocktails.api";
 import type {
   TodayCocktailResult,
@@ -49,12 +59,14 @@ interface MainPageProps {
   onQuizComplete?: (result: MoodTestResult | null) => void;
   initialView?: "quiz";
   onInitialViewConsumed?: () => void;
+  onNavVisibilityChange?: (visible: boolean) => void;
 }
 
 const MainPage: FC<MainPageProps> = ({
   onQuizComplete,
   initialView,
   onInitialViewConsumed,
+  onNavVisibilityChange,
 }) => {
   // 앱이 백그라운드로 갔다가 돌아오거나 새로고침돼도 진행 중이던 테스트를 이어할 수 있도록,
   // sessionStorage에 저장된 진행 상황이 있으면 그대로 복원합니다. 탭을 완전히 닫으면
@@ -129,6 +141,10 @@ const MainPage: FC<MainPageProps> = ({
     void fetchTodayCocktail();
   }, []);
 
+  useEffect(() => {
+    onNavVisibilityChange?.(view !== "together");
+  }, [view, onNavVisibilityChange]);
+
   const exitQuiz = () => {
     setView("home");
     setQuizStep(0);
@@ -169,7 +185,8 @@ const MainPage: FC<MainPageProps> = ({
               .map((q, i) => {
                 const questionId = Number(q.id);
                 const optionId = Number(quizAnswers[i]);
-                if (Number.isNaN(questionId) || Number.isNaN(optionId)) return null;
+                if (Number.isNaN(questionId) || Number.isNaN(optionId))
+                  return null;
                 return { questionId, optionId };
               })
               .filter((a): a is MoodTestAnswer => a !== null);

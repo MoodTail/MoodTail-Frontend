@@ -10,8 +10,8 @@ import OnboardingPage from "../OnboardingPage/OnboardingPage";
 import FindPasswordPage from "../../components/login/FindPasswordPage";
 import SignupPage from "../SignupPage/SignupPage";
 import PostLoginScreen from "../PostLoginScreen/PostLoginScreen";
-import { postGuestLogin } from "../../api/auth/auth.api";
-import { postLoginLocal } from "../../api/auth/auth.api";
+import { postGuestLogin } from "../../api/auth/auth.api.ts";
+import { postLoginLocal } from "../../api/auth/auth.api.ts";
 
 interface LoginPageProps {
   onLogin: () => void;

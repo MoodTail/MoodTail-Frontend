@@ -16,9 +16,19 @@ import Terms from "./pages/MyPage/Terms";
 import LoginPage from "./pages/LoginPage/LoginPage";
 import ResultPage from "./pages/ResultPage/ResultPage";
 import QuizQuestionPage from "./pages/QuizQuestionPage";
-import { buildQuizQuestions, toQuizQuestions, type QuizQuestion } from "./data/quiz";
-import { getMoodTestQuestions, postMoodTestResult } from "./api/mood-tests/moodTests.api";
-import type { MoodTestAnswer, MoodTestResult } from "./api/mood-tests/moodTests.types";
+import {
+  buildQuizQuestions,
+  toQuizQuestions,
+  type QuizQuestion,
+} from "./data/quiz";
+import {
+  getMoodTestQuestions,
+  postMoodTestResult,
+} from "./api/mood-tests/moodTests.api";
+import type {
+  MoodTestAnswer,
+  MoodTestResult,
+} from "./api/mood-tests/moodTests.types";
 import type { HistoryTestResultDetail } from "./api/histories/histories.types";
 import "./App.css";
 import { parseOauthCallback } from "./utils/oauth";
@@ -32,6 +42,7 @@ type HistoryView = "calendar" | "photo" | "test-result" | "monthly-report";
 type MyPageView = "main" | "profile-edit" | "inquiry" | "terms";
 
 function App() {
+  const [mainNavVisible, setMainNavVisible] = useState(true);
   // 새로고침/백그라운드 복귀 시에도 재로그인 없이 이어서 쓸 수 있도록, 이미 저장된
   // accessToken이 있으면 로그인 상태를 그대로 복원합니다. 이게 없으면 토큰이 남아있어도
   // 매번 온보딩/로그인 화면부터 다시 봐야 해서, 테스트 진행 상황 복원도 체감이 안 됩니다.
@@ -159,6 +170,7 @@ function App() {
             }}
             initialView={goToQuizOnHome ? "quiz" : undefined}
             onInitialViewConsumed={() => setGoToQuizOnHome(false)}
+            onNavVisibilityChange={setMainNavVisible}
           />
         );
       case "recipe":
@@ -283,7 +295,8 @@ function App() {
                     .map((q, i) => {
                       const questionId = Number(q.id);
                       const optionId = Number(retestAnswers[i]);
-                      if (Number.isNaN(questionId) || Number.isNaN(optionId)) return null;
+                      if (Number.isNaN(questionId) || Number.isNaN(optionId))
+                        return null;
                       return { questionId, optionId };
                     })
                     .filter((a): a is MoodTestAnswer => a !== null);
@@ -354,13 +367,16 @@ function App() {
 
   return (
     <div className="app-shell">
-      <main className={`app${activeMenu === "history" ? " app--history-responsive" : ""}`}>
+      <main
+        className={`app${activeMenu === "history" ? " app--history-responsive" : ""}`}
+      >
         {activeMenu === "recipe" && <DexBackground />}
         <section className="app-content">{renderPage()}</section>
 
-        {(activeMenu !== "recipe" || recipeNavVisible) && (
-          <BottomNav activeMenu={activeMenu} onChangeMenu={setActiveMenu} />
-        )}
+        {(activeMenu !== "recipe" || recipeNavVisible) &&
+          (activeMenu !== "home" || mainNavVisible) && (
+            <BottomNav activeMenu={activeMenu} onChangeMenu={setActiveMenu} />
+          )}
       </main>
     </div>
   );

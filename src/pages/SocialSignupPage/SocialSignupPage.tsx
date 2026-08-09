@@ -3,7 +3,12 @@ import type { FC } from "react";
 import "../../styles/SocialSignupPage.css";
 import { getTerms } from "../../api/terms/terms.api";
 import type { Term } from "../../api/terms/terms.types";
-import { postKakaoLogin, postGoogleLogin } from "../../api/auth/auth.api";
+import {
+  postKakaoLogin,
+  postGoogleLogin,
+  postSignupSocial,
+} from "../../api/auth/auth.api";
+import TermViewModal from "../../components/Modal/TermViewModal";
 
 interface SocialSignupPageProps {
   provider: "kakao" | "google";
@@ -13,6 +18,8 @@ interface SocialSignupPageProps {
   onSignupComplete?: () => void;
 }
 
+type Phase = "checking" | "signup-required" | "error";
+
 const SocialSignupPage: FC<SocialSignupPageProps> = ({
   provider,
   authorizationCode,
@@ -20,11 +27,15 @@ const SocialSignupPage: FC<SocialSignupPageProps> = ({
   redirectUri,
   onSignupComplete,
 }) => {
+  const [phase, setPhase] = useState<Phase>("checking");
+  const [signupToken, setSignupToken] = useState<string | null>(null);
   const [nickname, setNickname] = useState("");
   const [agreeTerms1, setAgreeTerms1] = useState(false);
   const [agreeTerms2, setAgreeTerms2] = useState(false);
   const [agreePrivacy, setAgreePrivacy] = useState(false);
   const [terms, setTerms] = useState<Term[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [viewingTerm, setViewingTerm] = useState<Term | null>(null);
 
   useEffect(() => {
     const fetchTerms = async () => {
@@ -36,6 +47,39 @@ const SocialSignupPage: FC<SocialSignupPageProps> = ({
       }
     };
     void fetchTerms();
+  }, []);
+
+  useEffect(() => {
+    const checkOauth = async () => {
+      try {
+        const oauthFn = provider === "kakao" ? postKakaoLogin : postGoogleLogin;
+        const result = await oauthFn({
+          authorizationCode,
+          redirectUri,
+          state: stateValue,
+        });
+
+        if (result.status === "LOGIN_COMPLETED" && result.accessToken) {
+          localStorage.setItem("accessToken", result.accessToken);
+          onSignupComplete?.();
+          return;
+        }
+
+        if (result.status === "SIGNUP_REQUIRED" && result.signupToken) {
+          setSignupToken(result.signupToken);
+          setPhase("signup-required");
+          return;
+        }
+
+        setPhase("error");
+      } catch (error) {
+        console.error(error);
+        setPhase("error");
+      }
+    };
+
+    void checkOauth();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const agreeAll = agreeTerms1 && agreeTerms2 && agreePrivacy;
@@ -51,8 +95,9 @@ const SocialSignupPage: FC<SocialSignupPageProps> = ({
   };
 
   const handleSubmit = async (): Promise<void> => {
-    if (!isFormValid) return;
+    if (!isFormValid || !signupToken) return;
 
+    setIsSubmitting(true);
     try {
       const serviceTermId = terms.find((t) => t.termType === "SERVICE")?.termId;
       const privacyTermId = terms.find((t) => t.termType === "PRIVACY")?.termId;
@@ -67,25 +112,42 @@ const SocialSignupPage: FC<SocialSignupPageProps> = ({
         { termId: privacyTermId, agreed: agreePrivacy },
       ];
 
-      const requestBody = {
-        authorizationCode,
-        redirectUri,
-        state: stateValue,
+      const result = await postSignupSocial({
+        signupToken,
         nickname,
         agreements,
-      };
+      });
 
-      const result =
-        provider === "kakao"
-          ? await postKakaoLogin(requestBody)
-          : await postGoogleLogin(requestBody);
-
-      localStorage.setItem("accessToken", result.accessToken);
+      if (result.accessToken) {
+        localStorage.setItem("accessToken", result.accessToken);
+      }
       onSignupComplete?.();
     } catch (error) {
       console.error(error);
+    } finally {
+      setIsSubmitting(false);
     }
   };
+
+  if (phase === "checking") {
+    return (
+      <div className="social-signup-page">
+        <p className="social-signup-page__title">MoodTail</p>
+        <p className="social-signup-page__subtitle">로그인 확인 중...</p>
+      </div>
+    );
+  }
+
+  if (phase === "error") {
+    return (
+      <div className="social-signup-page">
+        <p className="social-signup-page__title">MoodTail</p>
+        <p className="social-signup-page__subtitle">
+          로그인에 실패했어요. 다시 시도해주세요.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="social-signup-page">
@@ -180,6 +242,9 @@ const SocialSignupPage: FC<SocialSignupPageProps> = ({
         <button
           type="button"
           className="social-signup-page__terms-view social-signup-page__terms-view--terms2"
+          onClick={() =>
+            setViewingTerm(terms.find((t) => t.termType === "SERVICE") ?? null)
+          }
         >
           보기
         </button>
@@ -190,6 +255,9 @@ const SocialSignupPage: FC<SocialSignupPageProps> = ({
         <button
           type="button"
           className="social-signup-page__terms-view social-signup-page__terms-view--privacy"
+          onClick={() =>
+            setViewingTerm(terms.find((t) => t.termType === "PRIVACY") ?? null)
+          }
         >
           보기
         </button>
@@ -199,10 +267,18 @@ const SocialSignupPage: FC<SocialSignupPageProps> = ({
         type="button"
         className="social-signup-page__submit"
         onClick={() => void handleSubmit()}
-        disabled={!isFormValid}
+        disabled={!isFormValid || isSubmitting}
       >
-        회원가입 완료
+        {isSubmitting ? "처리 중..." : "회원가입 완료"}
       </button>
+
+      {viewingTerm && (
+        <TermViewModal
+          title={viewingTerm.title}
+          content={viewingTerm.content}
+          onClose={() => setViewingTerm(null)}
+        />
+      )}
     </div>
   );
 };

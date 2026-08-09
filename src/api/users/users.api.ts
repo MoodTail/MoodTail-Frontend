@@ -5,6 +5,7 @@ import type {
   UpdateProfileRequest,
   UpdateProfileResponse,
   UpdateProfileResult,
+  PostInviteCodeResponse,
 } from "./users.types";
 
 export const getMyPage = async (): Promise<MyPageResult> => {
@@ -19,5 +20,13 @@ export const updateProfile = async (
     "/api/v1/users/me",
     payload,
   );
+  return response.data.result;
+};
+
+export const postInviteCode = async () => {
+  const response = await apiClient.post<PostInviteCodeResponse>(
+    "/api/v1/users/invite-code",
+  );
+
   return response.data.result;
 };

@@ -144,3 +144,155 @@ export interface PostCustomCocktailResponse {
   message: string;
   result: CustomCocktailResult;
 }
+
+export interface PairCompromiseProfile {
+  alcoholIntensity: number;
+  sweetness: number;
+  sourness: number;
+  refreshing: number;
+  bitterness: number;
+}
+
+export interface PairRecommendationItem {
+  ranking: number;
+  cocktailId: number;
+  nameKo: string;
+  nameEn: string;
+  matchScore: number;
+  myMatchScore: number;
+  partnerMatchScore: number;
+}
+
+export interface PairTasteContribution {
+  metric: string;
+  metricNameKo: string;
+  dominantSide: "ME" | "PARTNER";
+}
+
+export interface PairRecommendationResult {
+  myNickname: string;
+  partnerNickname: string;
+  myProfile: PairCompromiseProfile;
+  partnerProfile: PairCompromiseProfile;
+  compromiseProfile: PairCompromiseProfile;
+  recommendations: PairRecommendationItem[];
+  tasteContributions: PairTasteContribution[];
+}
+
+export interface GetPairRecommendationResponse {
+  timestamp: string;
+  code: string;
+  message: string;
+  result: PairRecommendationResult;
+}
+
+export interface PairShareRecommendationItem {
+  ranking: number;
+  cocktailId: number;
+  matchScore: number;
+}
+
+export interface PostPairShareRequest {
+  compromiseProfile: PairCompromiseProfile;
+  recommendations: PairShareRecommendationItem[];
+  myMatchScore: number;
+  partnerMatchScore: number;
+  thumbnailImageUrl: string;
+}
+
+export interface PairShareResult {
+  shareToken: string;
+  shareUrl: string;
+}
+
+export interface PostPairShareResponse {
+  timestamp: string;
+  code: string;
+  message: string;
+  result: PairShareResult;
+}
+
+export interface PostPairShareImageResult {
+  shareImageUrl: string;
+}
+
+export interface PostPairShareImageResponse {
+  timestamp: string;
+  code: string;
+  message: string;
+  result: PostPairShareImageResult;
+}
+
+export interface SharedPairRecommendationItem {
+  ranking: number;
+  cocktailId: number;
+  nameKo: string;
+  nameEn: string;
+  matchScore: number;
+}
+
+export interface SharedPairRecommendationResult {
+  compromiseProfile: PairCompromiseProfile;
+  recommendations: SharedPairRecommendationItem[];
+  myMatchScore: number;
+  partnerMatchScore: number;
+  thumbnailImageUrl: string;
+}
+
+export interface GetSharedPairRecommendationResponse {
+  timestamp: string;
+  code: string;
+  message: string;
+  result: SharedPairRecommendationResult;
+}
+
+export interface PopularMoodType {
+  ranking: number;
+  moodTypeId: number;
+  typeCode: string;
+  name: string;
+  resultCount: number;
+  ratio: number;
+}
+
+export interface TrendTasteProfile {
+  alcoholIntensity: number;
+  sweetness: number;
+  sourness: number;
+  refreshing: number;
+  bitterness: number;
+}
+
+export interface PopularCocktailTrend {
+  ranking: number;
+  cocktailId: number;
+  nameKo: string;
+  nameEn: string;
+  shortDescription: string;
+  ratio: number;
+  recordCount: number;
+  rankChange: number;
+}
+
+export interface RankChangeCocktail {
+  cocktailId: number;
+  nameKo: string;
+  nameEn: string;
+  rankChange: number;
+  changeDirection: "UP" | "DOWN";
+}
+
+export interface CocktailTrendResult {
+  popularMoodTypes: PopularMoodType[];
+  averageTasteProfile: TrendTasteProfile;
+  displayAverageTasteScores: TrendTasteProfile;
+  popularCocktails: PopularCocktailTrend[];
+  rankChangeCocktails: RankChangeCocktail[];
+}
+
+export interface GetCocktailTrendResponse {
+  timestamp: string;
+  code: string;
+  message: string;
+  result: CocktailTrendResult;
+}

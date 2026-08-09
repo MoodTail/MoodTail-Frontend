@@ -13,12 +13,13 @@ import type {
   PostPasswordResetCodesResponse,
   PostPasswordResetVerifyRequest,
   PostPasswordResetVerifyResponse,
-  SocialLoginRequest,
-  SocialLoginResponse,
+  PostSocialOauthRequest,
+  PostSocialOauthResponse,
+  PostSignupSocialRequest,
+  PostSignupSocialResponse,
   PostOauthStateResponse,
 } from "./auth.types";
 
-// TODO: 로그인 API 연동 후 accessToken이 실제로 발급되면 end-to-end 테스트 필요
 export const logout = async (): Promise<void> => {
   await apiClient.post<BaseVoidResponse>("/api/v1/auth/logout");
 };
@@ -43,17 +44,25 @@ export const postSignupLocal = async (body: PostSignupLocalRequest) => {
   return response.data.result;
 };
 
-export const postKakaoLogin = async (body: SocialLoginRequest) => {
-  const response = await apiClient.post<SocialLoginResponse>(
+export const postKakaoLogin = async (body: PostSocialOauthRequest) => {
+  const response = await apiClient.post<PostSocialOauthResponse>(
     "/api/v1/auth/kakao",
     body,
   );
   return response.data.result;
 };
 
-export const postGoogleLogin = async (body: SocialLoginRequest) => {
-  const response = await apiClient.post<SocialLoginResponse>(
+export const postGoogleLogin = async (body: PostSocialOauthRequest) => {
+  const response = await apiClient.post<PostSocialOauthResponse>(
     "/api/v1/auth/google",
+    body,
+  );
+  return response.data.result;
+};
+
+export const postSignupSocial = async (body: PostSignupSocialRequest) => {
+  const response = await apiClient.post<PostSignupSocialResponse>(
+    "/api/v1/auth/signup/social",
     body,
   );
   return response.data.result;

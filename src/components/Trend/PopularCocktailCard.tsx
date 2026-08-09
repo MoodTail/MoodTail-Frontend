@@ -1,64 +1,21 @@
 import CocktailRankItem from "./CocktailRankItem";
 import "../../styles/PopularCocktailCard.css";
+import type { PopularCocktailTrend } from "../../api/cocktails/cocktails.types";
 
-interface CocktailData {
-  rank: number;
-  name: string;
-  description: string;
-  percent: number;
-  color: string;
-}
-
-const POPULAR_COCKTAILS: CocktailData[] = [
-  {
-    rank: 1,
-    name: "피치 하이볼",
-    description: "달콤하고 청량한 추천",
-    percent: 21,
-    color: "#FF613D",
-  },
-  {
-    rank: 2,
-    name: "선라이즈 소다",
-    description: "과일향 중심의 추천",
-    percent: 18,
-    color: "#FFC92C",
-  },
-  {
-    rank: 3,
-    name: "모히토",
-    description: "상쾌한 민트 추천",
-    percent: 15,
-    color: "#34DBCE",
-  },
-  {
-    rank: 4,
-    name: "진 토닉",
-    description: "깔끔한 쓴맛 추천",
-    percent: 12,
-    color: "#1564FE",
-  },
-  {
-    rank: 5,
-    name: "위스키 사워",
-    description: "산미 있는 클래식",
-    percent: 9,
-    color: "#35334F",
-  },
-];
+const RANK_COLORS = ["#FF613D", "#FFC92C", "#34DBCE", "#1564FE", "#35334F"];
 
 interface PopularCocktailCardProps {
+  cocktails: PopularCocktailTrend[];
   isExpanded: boolean;
   onToggle: () => void;
 }
 
 function PopularCocktailCard({
+  cocktails,
   isExpanded,
   onToggle,
 }: PopularCocktailCardProps) {
-  const visibleCocktails = isExpanded
-    ? POPULAR_COCKTAILS
-    : POPULAR_COCKTAILS.slice(0, 1);
+  const visibleCocktails = isExpanded ? cocktails : cocktails.slice(0, 1);
 
   return (
     <section
@@ -70,7 +27,14 @@ function PopularCocktailCard({
       </p>
       <div className="popular-cocktail-card__list">
         {visibleCocktails.map((cocktail) => (
-          <CocktailRankItem key={cocktail.rank} {...cocktail} />
+          <CocktailRankItem
+            key={cocktail.cocktailId}
+            rank={cocktail.ranking}
+            name={cocktail.nameKo}
+            description={cocktail.shortDescription}
+            percent={cocktail.ratio}
+            color={RANK_COLORS[(cocktail.ranking - 1) % RANK_COLORS.length]}
+          />
         ))}
       </div>
       <button
