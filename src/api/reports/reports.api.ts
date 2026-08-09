@@ -2,6 +2,8 @@ import { apiClient } from "../client";
 import type {
   GetMonthlyReportParams,
   GetMonthlyReportResponse,
+  GetSharedMonthlyReportResponse,
+  GetSharedMonthlyReportResult,
   MonthlyReportResult,
   UploadMonthlyReportShareImageParams,
   UploadMonthlyReportShareImageResponse,
@@ -39,6 +41,18 @@ export const uploadMonthlyReportShareImage = async ({
         params: { year, month },
       },
     );
+
+  return response.data.result;
+};
+
+export const getSharedMonthlyReport = async (
+  shareToken: string,
+  signal?: AbortSignal,
+): Promise<GetSharedMonthlyReportResult> => {
+  const response = await apiClient.get<GetSharedMonthlyReportResponse>(
+    `/api/v1/reports/monthly/shares/${encodeURIComponent(shareToken)}`,
+    { signal },
+  );
 
   return response.data.result;
 };

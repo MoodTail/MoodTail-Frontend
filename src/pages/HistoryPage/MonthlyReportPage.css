@@ -108,13 +108,15 @@
 }
 
 .monthly-report-page__summary .monthly-report-page__summary-type {
-  width: 121px;
+  width: 100%;
+  max-width: 147px;
   height: 34px;
   margin: 9px 0 0;
   font-size: 24px;
   font-weight: 800;
   line-height: 34px;
   white-space: nowrap;
+  overflow: hidden;
 }
 
 .monthly-report-page__summary-description {
@@ -567,29 +569,34 @@
   height: min(824px, 100dvh);
   transform: translateX(-50%);
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
-  padding: 24px;
+  padding: 10px;
+  overflow-y: auto;
   background: rgba(20, 20, 20, 0.34);
 }
 
 .monthly-report-share-modal {
   position: relative;
-  width: 345px;
+  box-sizing: border-box;
+  width: 365px;
   max-width: 100%;
-  height: 770px;
-  max-height: calc(100dvh - 48px);
-  overflow: hidden;
+  height: auto;
+  max-height: calc(100dvh - 32px);
+  padding: 44px 10px 16px;
+  overflow-y: auto;
   border-radius: 23px;
   background: linear-gradient(180deg, #fff 0%, #fffaf8 58%, #f7fffc 100%);
   box-shadow: 0 18px 45px rgba(30, 24, 21, 0.18);
 }
 
 .monthly-report-share-modal__close {
-  position: absolute;
+  position: sticky;
   z-index: 2;
-  top: 12px;
-  right: 14px;
+  top: 0;
+  float: right;
+  margin-top: -32px;
+  margin-right: -2px;
   width: 28px;
   height: 28px;
   padding: 0;
@@ -618,88 +625,41 @@
 }
 
 .monthly-report-share-modal__preview {
-  position: absolute;
-  top: 102px;
-  left: 18px;
-  width: 309px;
+  position: static;
+  width: 100%;
   display: flex;
   flex-direction: column;
   gap: 16px;
 }
 
 .monthly-report-share-modal__preview .monthly-report-page__box {
-  width: 309px;
+  width: 345px;
   margin-top: 0;
 }
 
 .monthly-report-share-modal__preview .monthly-report-page__summary {
-  height: 184px;
-}
-
-.monthly-report-share-modal__preview .monthly-report-page__summary-character {
-  top: 23px;
-  left: 8px;
-  width: 134px;
-  height: 134px;
-}
-
-.monthly-report-share-modal__preview .monthly-report-page__summary-copy {
-  top: 33px;
-  left: 150px;
-  width: 145px;
-}
-
-.monthly-report-share-modal__preview .monthly-report-page__summary .monthly-report-page__summary-type {
-  font-size: 22px;
-}
-
-.monthly-report-share-modal__preview .monthly-report-page__summary-description {
-  font-size: 10px;
+  height: 189px;
 }
 
 .monthly-report-share-modal__preview .monthly-report-page__cocktails {
-  height: 291px;
-}
-
-.monthly-report-share-modal__preview .monthly-report-page__cocktails > h2,
-.monthly-report-share-modal__preview .monthly-report-page__cocktails-description {
-  left: 18px;
-}
-
-.monthly-report-share-modal__preview .monthly-report-page__cocktail-list {
-  left: 9px;
-}
-
-.monthly-report-share-modal__preview .monthly-report-page__cocktail-card {
-  width: 289px;
+  height: 310px;
 }
 
 .monthly-report-share-modal__preview .monthly-report-page__activity {
   height: 70px;
 }
 
-.monthly-report-share-modal__preview .monthly-report-page__activity > h2 {
-  left: 18px;
-}
-
-.monthly-report-share-modal__preview .monthly-report-page__activity-count--test {
-  left: 130px;
-}
-
-.monthly-report-share-modal__preview .monthly-report-page__activity-count--record {
-  left: 235px;
-}
-
 .monthly-report-share-modal__actions {
-  position: absolute;
-  top: 705px;
-  left: 16px;
+  position: static;
   display: flex;
   gap: 14.26px;
+  margin-top: 16px;
 }
 
 .monthly-report-share-modal__actions .monthly-report-share-modal__button {
-  width: 149.37px;
+  width: auto;
+  min-width: 0;
+  flex: 1;
   height: 48.39px;
   padding: 0;
   border-radius: 24.2px;
@@ -722,11 +682,8 @@
 }
 
 .monthly-report-share-modal__error {
-  position: absolute;
-  top: 680px;
-  right: 20px;
-  left: 20px;
-  margin: 0;
+  position: static;
+  margin: 10px 4px 0;
   color: #e97857;
   font-size: 11px;
   text-align: center;
