@@ -78,7 +78,7 @@ export default function DexBox({
       }}
     >
       <div style={{ fontSize: 18, fontWeight: 700, color: "#323232" }}>타입명</div>
-      <div style={{ fontSize: 11, fontWeight: 600, color: "#8E8A88" }}>수집률 {collectionRate}%</div>
+      <div style={{ fontSize: 11, fontWeight: 600, color: "#8E8A88" }}>수집률 {collectionRate ?? 0}%</div>
     </button>
   );
 }

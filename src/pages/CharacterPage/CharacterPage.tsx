@@ -27,6 +27,7 @@ function CharacterPage({ onGoTest }: CharacterPageProps) {
   const [repTypeId, setRepTypeId] = useState("idealist");
   const [shareTypeId, setShareTypeId] = useState<string | null>(null);
   const [snsModalOpen, setSnsModalOpen] = useState(false);
+  const [snsShareUrl, setSnsShareUrl] = useState<string | null>(null);
   const [showSavedToast, setShowSavedToast] = useState(false);
   const [moodTypeIdByLocalId, setMoodTypeIdByLocalId] = useState<Record<string, number>>({});
   const [dexStatusByLocalId, setDexStatusByLocalId] = useState<
@@ -146,8 +147,9 @@ function CharacterPage({ onGoTest }: CharacterPageProps) {
           type={getType(shareTypeId)}
           dexStatus={dexStatusByLocalId}
           onClose={() => setShareTypeId(null)}
-          onShareSns={() => {
+          onShareSns={(shareUrl) => {
             setShareTypeId(null);
+            setSnsShareUrl(shareUrl ?? null);
             setSnsModalOpen(true);
           }}
           onSaveImage={() => setShowSavedToast(true)}
@@ -156,7 +158,7 @@ function CharacterPage({ onGoTest }: CharacterPageProps) {
 
       <ResultSnsShareModal
         isOpen={snsModalOpen}
-        url="https://moodtail.app/share/mock-id"
+        url={snsShareUrl ?? "https://moodtail.app/share/mock-id"}
         onClose={() => setSnsModalOpen(false)}
         onKakaoShare={handleKakaoShare}
       />

@@ -32,8 +32,11 @@ import type {
 import type { HistoryTestResultDetail } from "./api/histories/histories.types";
 import "./App.css";
 import { parseOauthCallback } from "./utils/oauth";
+import { parseSharedRoute } from "./utils/shareRoute";
 import { clearQuizProgress, loadQuizProgress, saveQuizProgress } from "./utils/quizProgress";
 import SocialSignupPage from "./pages/SocialSignupPage/SocialSignupPage";
+import SharedResultPage from "./pages/SharedResultPage/SharedResultPage";
+import SharedCollectionPage from "./pages/SharedCollectionPage/SharedCollectionPage";
 
 const RETEST_PROGRESS_KEY = "moodtail-retest-progress";
 
@@ -78,6 +81,12 @@ function App() {
   const [oauthCallback, setOauthCallback] = useState(() =>
     parseOauthCallback(),
   );
+  // 공유 링크(카카오톡 미리보기 등)로 들어온 경우 로그인 여부와 무관하게 바로 공유 콘텐츠를 보여줍니다.
+  const [sharedRoute, setSharedRoute] = useState(() => parseSharedRoute());
+  const exitSharedRoute = () => {
+    window.history.replaceState({}, "", "/");
+    setSharedRoute(null);
+  };
 
   useEffect(() => {
     if (!isRetestOpen) return;
@@ -216,6 +225,22 @@ function App() {
           setIsLoggedIn(true);
         }}
       />
+    );
+  }
+
+  if (sharedRoute) {
+    return (
+      <div className="app-shell">
+        <main className="app">
+          <section className="app-content app-content--full">
+            {sharedRoute.type === "result" ? (
+              <SharedResultPage shareToken={sharedRoute.shareToken} onGoHome={exitSharedRoute} />
+            ) : (
+              <SharedCollectionPage shareToken={sharedRoute.shareToken} onGoHome={exitSharedRoute} />
+            )}
+          </section>
+        </main>
+      </div>
     );
   }
 
