@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { FC } from "react";
 import "../../styles/SocialSignupPage.css";
 import { getTerms } from "../../api/terms/terms.api";
@@ -36,6 +36,7 @@ const SocialSignupPage: FC<SocialSignupPageProps> = ({
   const [terms, setTerms] = useState<Term[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [viewingTerm, setViewingTerm] = useState<Term | null>(null);
+  const hasCheckedOauth = useRef(false);
 
   useEffect(() => {
     const fetchTerms = async () => {
@@ -50,6 +51,12 @@ const SocialSignupPage: FC<SocialSignupPageProps> = ({
   }, []);
 
   useEffect(() => {
+    // React StrictMode(개발 모드)에서 이 effect가 두 번 실행되는데,
+    // 구글/카카오 인가 코드는 1회용이라 두 번째 호출은 반드시 실패한다.
+    // ref 플래그로 실제 API 호출은 최초 1회만 나가도록 막는다.
+    if (hasCheckedOauth.current) return;
+    hasCheckedOauth.current = true;
+
     const checkOauth = async () => {
       try {
         const oauthFn = provider === "kakao" ? postKakaoLogin : postGoogleLogin;

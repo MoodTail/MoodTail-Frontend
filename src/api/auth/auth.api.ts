@@ -18,6 +18,7 @@ import type {
   PostSignupSocialRequest,
   PostSignupSocialResponse,
   PostOauthStateResponse,
+  PatchPasswordRequest,
 } from "./auth.types";
 
 export const logout = async (): Promise<void> => {
@@ -114,4 +115,10 @@ export const postOauthState = async (provider: string) => {
     {},
   );
   return response.data.result;
+};
+
+export const patchPassword = async (
+  body: PatchPasswordRequest,
+): Promise<void> => {
+  await apiClient.patch<BaseVoidResponse>("/api/v1/auth/password", body);
 };

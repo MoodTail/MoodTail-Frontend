@@ -1,18 +1,37 @@
 import { useState } from "react";
 import type { FC } from "react";
+import type { AxiosError } from "axios";
 import BackgroundBlur from "../../components/common/BackgroundBlur";
+import VerifyCodePage from "./VerifyCodePage";
+import ResetPasswordPage from "./ResetPasswordPage";
 import "../../styles/FindPasswordPage.css";
-import { postPasswordResetCodes } from "../../api/auth/auth.api";
+import {
+  postPasswordResetCodes,
+  postPasswordResetVerify,
+  patchPassword,
+} from "../../api/auth/auth.api";
+import type { PatchPasswordRequest } from "../../api/auth/auth.types";
 
 interface FindPasswordPageProps {
   onBack: () => void;
 }
 
+type FindPasswordStep = "email" | "verify" | "reset";
+
+const MAX_SESSION_REVOKE_RETRIES = 2;
+
 const FindPasswordPage: FC<FindPasswordPageProps> = ({ onBack }) => {
+  const [step, setStep] = useState<FindPasswordStep>("email");
   const [email, setEmail] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  const [isSent, setIsSent] = useState(false);
+
+  const [isVerifying, setIsVerifying] = useState(false);
+  const [verifyError, setVerifyError] = useState("");
+  const [resetToken, setResetToken] = useState("");
+
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
+  const [changePasswordError, setChangePasswordError] = useState("");
 
   const handleSubmit = async (): Promise<void> => {
     if (!email.trim()) return;
@@ -22,7 +41,7 @@ const FindPasswordPage: FC<FindPasswordPageProps> = ({ onBack }) => {
 
     try {
       await postPasswordResetCodes({ email });
-      setIsSent(true);
+      setStep("verify");
     } catch (error) {
       console.error(error);
       setErrorMessage("이메일 전송에 실패했어요. 다시 시도해주세요.");
@@ -30,6 +49,92 @@ const FindPasswordPage: FC<FindPasswordPageProps> = ({ onBack }) => {
       setIsSubmitting(false);
     }
   };
+
+  const handleVerifySubmit = async (code: string): Promise<void> => {
+    setIsVerifying(true);
+    setVerifyError("");
+
+    try {
+      const result = await postPasswordResetVerify({ email, code });
+      setResetToken(result.resetToken);
+      setStep("reset");
+    } catch (error) {
+      console.error(error);
+      setVerifyError("인증 코드가 올바르지 않아요. 다시 확인해주세요.");
+    } finally {
+      setIsVerifying(false);
+    }
+  };
+
+  const handleResend = async (): Promise<void> => {
+    try {
+      await postPasswordResetCodes({ email });
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleChangePassword = async (newPassword: string): Promise<void> => {
+    setIsChangingPassword(true);
+    setChangePasswordError("");
+
+    const body: PatchPasswordRequest = {
+      resetToken,
+      newPassword,
+      newPasswordConfirm: newPassword,
+    };
+
+    let attempt = 0;
+
+    while (attempt <= MAX_SESSION_REVOKE_RETRIES) {
+      try {
+        await patchPassword(body);
+        setIsChangingPassword(false);
+        onBack();
+        return;
+      } catch (error) {
+        const errorCode = (error as AxiosError<{ code?: string }>).response
+          ?.data?.code;
+
+        if (errorCode === "AUTH042" && attempt < MAX_SESSION_REVOKE_RETRIES) {
+          attempt += 1;
+          continue;
+        }
+
+        console.error(error);
+        setChangePasswordError(
+          errorCode === "AUTH042"
+            ? "비밀번호는 변경됐지만 기존 로그인 세션 정리에 실패했어요. 다시 로그인해주세요."
+            : "비밀번호 변경에 실패했어요. 다시 시도해주세요.",
+        );
+        setIsChangingPassword(false);
+        return;
+      }
+    }
+  };
+
+  if (step === "reset") {
+    return (
+      <ResetPasswordPage
+        onBack={() => setStep("verify")}
+        onSubmit={(newPassword) => void handleChangePassword(newPassword)}
+        isSubmitting={isChangingPassword}
+        submitError={changePasswordError}
+      />
+    );
+  }
+
+  if (step === "verify") {
+    return (
+      <VerifyCodePage
+        onBack={() => setStep("email")}
+        onSubmit={(code) => void handleVerifySubmit(code)}
+        onResend={() => void handleResend()}
+        isSubmitting={isVerifying}
+        errorMessage={verifyError}
+      />
+    );
+  }
 
   return (
     <div className="find-password-page">
@@ -90,12 +195,6 @@ const FindPasswordPage: FC<FindPasswordPageProps> = ({ onBack }) => {
         value={email}
         onChange={(e) => setEmail(e.target.value)}
       />
-
-      {isSent && (
-        <p className="find-password-page__success">
-          재설정 링크를 이메일로 보냈어요. 메일함을 확인해주세요.
-        </p>
-      )}
 
       {errorMessage && (
         <p className="find-password-page__error">{errorMessage}</p>

@@ -119,6 +119,8 @@ function TogetherPickPage({
     }
   };
 
+  const toPercent = (rawScore: number): number => (rawScore / 5) * 100;
+
   if (step === "compare" && pairResult) {
     const first =
       pairResult.recommendations.find((item) => item.ranking === 1) ??
@@ -128,20 +130,20 @@ function TogetherPickPage({
       <TasteComparePage
         onBack={() => setStep("input")}
         onViewResult={() => setStep("result")}
-        matchPercent={first?.matchScore ?? 0} // TODO: 전체 취향 일치율 필드가 따로 없어 1위 칵테일 매치율로 대체
+        matchPercent={first?.matchScore ?? 0}
         myValues={[
-          pairResult.myProfile.alcoholIntensity,
-          pairResult.myProfile.sweetness,
-          pairResult.myProfile.sourness,
-          pairResult.myProfile.bitterness,
-          pairResult.myProfile.refreshing,
+          toPercent(pairResult.myProfile.alcoholIntensity),
+          toPercent(pairResult.myProfile.refreshing),
+          toPercent(pairResult.myProfile.bitterness),
+          toPercent(pairResult.myProfile.sourness),
+          toPercent(pairResult.myProfile.sweetness),
         ]}
         partnerValues={[
-          pairResult.partnerProfile.alcoholIntensity,
-          pairResult.partnerProfile.sweetness,
-          pairResult.partnerProfile.sourness,
-          pairResult.partnerProfile.bitterness,
-          pairResult.partnerProfile.refreshing,
+          toPercent(pairResult.partnerProfile.alcoholIntensity),
+          toPercent(pairResult.partnerProfile.refreshing),
+          toPercent(pairResult.partnerProfile.bitterness),
+          toPercent(pairResult.partnerProfile.sourness),
+          toPercent(pairResult.partnerProfile.sweetness),
         ]}
       />
     );
