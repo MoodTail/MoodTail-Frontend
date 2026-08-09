@@ -9,9 +9,19 @@ import CustomRecommend from "../CustomRecommend/CustomRecommend";
 import CustomRecommendResultPage from "../CustomRecommendResultPage/CustomRecommendResultPage";
 import QuizQuestionPage from "../QuizQuestionPage";
 import LoadingPage from "../LoadingPage";
-import { buildQuizQuestions, toQuizQuestions, type QuizQuestion } from "../../data/quiz";
-import { getMoodTestQuestions, postMoodTestResult } from "../../api/mood-tests/moodTests.api";
-import type { MoodTestAnswer, MoodTestResult } from "../../api/mood-tests/moodTests.types";
+import {
+  buildQuizQuestions,
+  toQuizQuestions,
+  type QuizQuestion,
+} from "../../data/quiz";
+import {
+  getMoodTestQuestions,
+  postMoodTestResult,
+} from "../../api/mood-tests/moodTests.api";
+import type {
+  MoodTestAnswer,
+  MoodTestResult,
+} from "../../api/mood-tests/moodTests.types";
 import { getTodayCocktail } from "../../api/cocktails/cocktails.api";
 import type {
   TodayCocktailResult,
@@ -46,12 +56,14 @@ interface MainPageProps {
   onQuizComplete?: (result: MoodTestResult | null) => void;
   initialView?: "quiz";
   onInitialViewConsumed?: () => void;
+  onNavVisibilityChange?: (visible: boolean) => void;
 }
 
 const MainPage: FC<MainPageProps> = ({
   onQuizComplete,
   initialView,
   onInitialViewConsumed,
+  onNavVisibilityChange,
 }) => {
   const [view, setView] = useState<ViewState>(
     initialView === "quiz" ? "quiz" : "home",
@@ -104,6 +116,10 @@ const MainPage: FC<MainPageProps> = ({
     void fetchTodayCocktail();
   }, []);
 
+  useEffect(() => {
+    onNavVisibilityChange?.(view !== "together");
+  }, [view, onNavVisibilityChange]);
+
   const exitQuiz = () => {
     setView("home");
     setQuizStep(0);
@@ -141,7 +157,8 @@ const MainPage: FC<MainPageProps> = ({
               .map((q, i) => {
                 const questionId = Number(q.id);
                 const optionId = Number(quizAnswers[i]);
-                if (Number.isNaN(questionId) || Number.isNaN(optionId)) return null;
+                if (Number.isNaN(questionId) || Number.isNaN(optionId))
+                  return null;
                 return { questionId, optionId };
               })
               .filter((a): a is MoodTestAnswer => a !== null);
