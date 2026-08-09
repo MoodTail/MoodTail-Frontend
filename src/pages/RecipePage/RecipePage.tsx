@@ -10,6 +10,7 @@ import {
 import RecipeCard from "./RecipeCard";
 import RecipeDetailView from "./RecipeDetailView";
 import SavedRecipesView from "./SavedRecipesView";
+import TwoButtonModal from "../../components/common/modal/TwoButtonModal";
 import "../../styles/RecipePage.css";
 
 // taste.도수는 이제 실제 ABV(%) 값이라 버튼 라벨의 도수 구간과 그대로 맞춥니다.
@@ -20,9 +21,6 @@ const FILTERS: { label: string; test: (recipe: Recipe) => boolean }[] = [
   { label: "25도 이상", test: (r) => r.taste.도수 > 25 },
 ];
 const SELECT_ANIMATION_MS = 700;
-
-// 저장된 레시피 화면 데모용 초기값입니다. 실제로는 로그인한 사용자의 저장 목록을 API로 받아와야 합니다.
-const INITIAL_SAVED_IDS = ["mojito", "gin-fizz", "black-russian", "cosmopolitan"];
 
 function filterAndSortBySimilarity(recipes: Recipe[], query: string): Recipe[] {
   if (!query.trim()) return recipes;
@@ -37,15 +35,17 @@ type View = { name: "list" } | { name: "detail"; id: string } | { name: "saved" 
 
 interface RecipePageProps {
   onNavVisibilityChange?: (visible: boolean) => void;
+  isLoggedIn: boolean;
   onGoToLogin: () => void;
 }
 
-function RecipePage({ onNavVisibilityChange, onGoToLogin }: RecipePageProps) {
+function RecipePage({ onNavVisibilityChange, isLoggedIn, onGoToLogin }: RecipePageProps) {
   const [view, setView] = useState<View>({ name: "list" });
   const [activeFilter, setActiveFilter] = useState(FILTERS[0].label);
   const [query, setQuery] = useState("");
   const [selectingId, setSelectingId] = useState<string | null>(null);
-  const [savedIds, setSavedIds] = useState<Set<string>>(() => new Set(INITIAL_SAVED_IDS));
+  const [savedIds, setSavedIds] = useState<Set<string>>(() => new Set());
+  const [showLoginModal, setShowLoginModal] = useState(false);
   const [recipes, setRecipes] = useState<Recipe[]>(RECIPES);
   const [cocktailIdByRecipeId, setCocktailIdByRecipeId] = useState<Record<string, number>>({});
   const [liveDetail, setLiveDetail] = useState<Record<string, { ingredients: string[]; steps: string[] }>>({});
@@ -86,9 +86,13 @@ function RecipePage({ onNavVisibilityChange, onGoToLogin }: RecipePageProps) {
     };
   }, []);
 
-  // 저장(즐겨찾기) 목록도 실제 API(/api/v1/cocktails/favorites)에서 받아옵니다.
-  // 인증이 안 된 상태(게스트 등)면 실패하므로, 그 경우 기존 로컬 목데이터를 그대로 씁니다.
+  // 저장(즐겨찾기) 목록은 실제 API(/api/v1/cocktails/favorites)에서만 받아옵니다.
+  // 로그인 상태가 아니면 애초에 저장된 게 없으므로 빈 목록을 유지합니다.
   useEffect(() => {
+    if (!isLoggedIn) {
+      setSavedIds(new Set());
+      return;
+    }
     let cancelled = false;
     getFavoriteCocktails()
       .then(({ cocktails }) => {
@@ -102,7 +106,7 @@ function RecipePage({ onNavVisibilityChange, onGoToLogin }: RecipePageProps) {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [isLoggedIn]);
 
   const detailId = view.name === "detail" ? view.id : null;
 
@@ -154,6 +158,11 @@ function RecipePage({ onNavVisibilityChange, onGoToLogin }: RecipePageProps) {
   };
 
   const toggleSaved = (id: string) => {
+    if (!isLoggedIn) {
+      setShowLoginModal(true);
+      return;
+    }
+
     const wasSaved = savedIds.has(id);
     setSavedIds((prev) => {
       const next = new Set(prev);
@@ -170,6 +179,28 @@ function RecipePage({ onNavVisibilityChange, onGoToLogin }: RecipePageProps) {
     request.catch((err) => console.error("즐겨찾기 반영에 실패했습니다", err));
   };
 
+  const loginModal = (
+    <TwoButtonModal
+      isOpen={showLoginModal}
+      title="로그인하고 기록을 저장해요"
+      description="테스트 결과, 도감, 즐겨찾기를 이어서 사용할 수 있어요."
+      leftButton={{
+        label: "로그인하기",
+        variant: "primary",
+        onClick: () => {
+          setShowLoginModal(false);
+          onGoToLogin();
+        },
+      }}
+      rightButton={{
+        label: "닫기",
+        variant: "secondary",
+        onClick: () => setShowLoginModal(false),
+      }}
+      onOverlayClick={() => setShowLoginModal(false)}
+    />
+  );
+
   if (view.name === "detail") {
     const recipe = recipes.find((r) => r.id === view.id);
     if (recipe) {
@@ -180,6 +211,8 @@ function RecipePage({ onNavVisibilityChange, onGoToLogin }: RecipePageProps) {
           recipe={displayRecipe}
           onBack={() => setView({ name: "list" })}
           saved={savedIds.has(recipe.id)}
+          isLoggedIn={isLoggedIn}
+          onToggleSave={() => toggleSaved(recipe.id)}
           onGoToLogin={onGoToLogin}
         />
       );
@@ -188,11 +221,14 @@ function RecipePage({ onNavVisibilityChange, onGoToLogin }: RecipePageProps) {
 
   if (view.name === "saved") {
     return (
-      <SavedRecipesView
-        recipes={savedRecipes}
-        onBack={() => setView({ name: "list" })}
-        onUnsave={toggleSaved}
-      />
+      <>
+        <SavedRecipesView
+          recipes={savedRecipes}
+          onBack={() => setView({ name: "list" })}
+          onUnsave={toggleSaved}
+        />
+        {loginModal}
+      </>
     );
   }
 
@@ -264,6 +300,7 @@ function RecipePage({ onNavVisibilityChange, onGoToLogin }: RecipePageProps) {
           ))}
         </div>
       )}
+      {loginModal}
     </div>
   );
 }

@@ -2,14 +2,16 @@
   width: 100%;
   min-height: 100vh;
   display: flex;
+  align-items: center;
   justify-content: center;
   background: #f7f7f7;
 }
 
 .app {
   position: relative;
-  width: 393px;
-  height: 824px;
+  width: min(393px, 100vw, calc(100vh * 393 / 824));
+  height: auto;
+  aspect-ratio: 393 / 824;
   background: #ffffff;
   overflow: hidden;
 }

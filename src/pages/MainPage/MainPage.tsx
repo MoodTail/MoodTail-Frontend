@@ -1,4 +1,4 @@
-import { useEffect, useState, type FC } from "react";
+import { useEffect, useRef, useState, type FC } from "react";
 import "../../styles/MainPage.css";
 import Button from "../../components/Button/Button";
 import BackgroundBlur from "../../components/common/BackgroundBlur";
@@ -9,16 +9,29 @@ import CustomRecommend from "../CustomRecommend/CustomRecommend";
 import CustomRecommendResultPage from "../CustomRecommendResultPage/CustomRecommendResultPage";
 import QuizQuestionPage from "../QuizQuestionPage";
 import LoadingPage from "../LoadingPage";
-import { buildQuizQuestions, toQuizQuestions, type QuizQuestion } from "../../data/quiz";
-import { getMoodTestQuestions, postMoodTestResult } from "../../api/mood-tests/moodTests.api";
-import type { MoodTestAnswer, MoodTestResult } from "../../api/mood-tests/moodTests.types";
+import {
+  buildQuizQuestions,
+  toQuizQuestions,
+  type QuizQuestion,
+} from "../../data/quiz";
+import {
+  getMoodTestQuestions,
+  postMoodTestResult,
+} from "../../api/mood-tests/moodTests.api";
+import type {
+  MoodTestAnswer,
+  MoodTestResult,
+} from "../../api/mood-tests/moodTests.types";
 import { getTodayCocktail } from "../../api/cocktails/cocktails.api";
 import type {
   TodayCocktailResult,
   CustomCocktailResult,
 } from "../../api/cocktails/cocktails.types";
+import { clearQuizProgress, loadQuizProgress, saveQuizProgress } from "../../utils/quizProgress";
 
 import cocktail from "../../assets/images/glass/glass-1.png";
+
+const MAIN_QUIZ_PROGRESS_KEY = "moodtail-main-quiz-progress";
 
 interface MenuItem {
   label: string;
@@ -46,15 +59,21 @@ interface MainPageProps {
   onQuizComplete?: (result: MoodTestResult | null) => void;
   initialView?: "quiz";
   onInitialViewConsumed?: () => void;
+  onNavVisibilityChange?: (visible: boolean) => void;
 }
 
 const MainPage: FC<MainPageProps> = ({
   onQuizComplete,
   initialView,
   onInitialViewConsumed,
+  onNavVisibilityChange,
 }) => {
+  // 앱이 백그라운드로 갔다가 돌아오거나 새로고침돼도 진행 중이던 테스트를 이어할 수 있도록,
+  // sessionStorage에 저장된 진행 상황이 있으면 그대로 복원합니다. 탭을 완전히 닫으면
+  // sessionStorage가 비워지므로 그땐 자연스럽게 홈(시작) 화면이 보입니다.
+  const [initialQuizProgress] = useState(() => loadQuizProgress(MAIN_QUIZ_PROGRESS_KEY));
   const [view, setView] = useState<ViewState>(
-    initialView === "quiz" ? "quiz" : "home",
+    initialView === "quiz" || initialQuizProgress ? "quiz" : "home",
   );
   const [isShareOpen, setIsShareOpen] = useState(false); // TODO: 확인용 임시 코드, 삭제 예정
   const [myTasteValues, setMyTasteValues] = useState<TasteValues | null>(null);
@@ -62,10 +81,12 @@ const MainPage: FC<MainPageProps> = ({
     null,
   );
 
-  const [quizStep, setQuizStep] = useState(0);
-  const [quizAnswers, setQuizAnswers] = useState<Record<number, string>>({});
-  const [quizQuestions, setQuizQuestions] = useState<QuizQuestion[]>(() =>
-    buildQuizQuestions(),
+  const [quizStep, setQuizStep] = useState(() => initialQuizProgress?.step ?? 0);
+  const [quizAnswers, setQuizAnswers] = useState<Record<number, string>>(
+    () => initialQuizProgress?.answers ?? {},
+  );
+  const [quizQuestions, setQuizQuestions] = useState<QuizQuestion[]>(
+    () => initialQuizProgress?.questions ?? buildQuizQuestions(),
   );
   const [quizResult, setQuizResult] = useState<MoodTestResult | null>(null);
 
@@ -79,8 +100,15 @@ const MainPage: FC<MainPageProps> = ({
 
   // 퀴즈 화면에 들어갈 때마다 실제 문항(/api/v1/tests/questions)을 받아와 교체합니다.
   // 실패하면 조용히 무시하고 로컬 목데이터(buildQuizQuestions)를 그대로 씁니다.
+  // 다만 복원된 진행 상황이 있는 첫 진입 시에는 건너뜁니다 — 이미 답변한 문항 구성을
+  // 실제 서버 문항으로 바꿔치기하면 답변 인덱스가 어긋나 버립니다.
+  const skipNextFetchRef = useRef(initialQuizProgress !== null);
   useEffect(() => {
     if (view !== "quiz") return;
+    if (skipNextFetchRef.current) {
+      skipNextFetchRef.current = false;
+      return;
+    }
     let cancelled = false;
     getMoodTestQuestions()
       .then(({ questions }) => {
@@ -91,6 +119,15 @@ const MainPage: FC<MainPageProps> = ({
       cancelled = true;
     };
   }, [view]);
+
+  useEffect(() => {
+    if (view !== "quiz") return;
+    saveQuizProgress(MAIN_QUIZ_PROGRESS_KEY, {
+      step: quizStep,
+      answers: quizAnswers,
+      questions: quizQuestions,
+    });
+  }, [view, quizStep, quizAnswers, quizQuestions]);
 
   useEffect(() => {
     const fetchTodayCocktail = async () => {
@@ -104,14 +141,21 @@ const MainPage: FC<MainPageProps> = ({
     void fetchTodayCocktail();
   }, []);
 
+  useEffect(() => {
+    onNavVisibilityChange?.(view !== "together");
+  }, [view, onNavVisibilityChange]);
+
   const exitQuiz = () => {
     setView("home");
     setQuizStep(0);
     setQuizAnswers({});
+    clearQuizProgress(MAIN_QUIZ_PROGRESS_KEY);
   };
 
   const startQuiz = () => {
     setQuizQuestions(buildQuizQuestions());
+    setQuizStep(0);
+    setQuizAnswers({});
     setView("quiz");
   };
 
@@ -141,7 +185,8 @@ const MainPage: FC<MainPageProps> = ({
               .map((q, i) => {
                 const questionId = Number(q.id);
                 const optionId = Number(quizAnswers[i]);
-                if (Number.isNaN(questionId) || Number.isNaN(optionId)) return null;
+                if (Number.isNaN(questionId) || Number.isNaN(optionId))
+                  return null;
                 return { questionId, optionId };
               })
               .filter((a): a is MoodTestAnswer => a !== null);
@@ -158,6 +203,7 @@ const MainPage: FC<MainPageProps> = ({
             }
 
             setView("quizLoading");
+            clearQuizProgress(MAIN_QUIZ_PROGRESS_KEY);
           } else {
             setQuizStep((s) => s + 1);
           }

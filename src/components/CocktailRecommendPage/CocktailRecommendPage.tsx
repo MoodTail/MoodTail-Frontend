@@ -15,6 +15,7 @@ interface RankEntry {
 interface CocktailRecommendPageProps {
   onBack?: () => void;
   onRetry?: () => void;
+  onShare?: () => Promise<{ shareUrl: string; shareImageUrl: string } | null>;
   topPick: {
     tagline: string;
     name: string;
@@ -38,6 +39,7 @@ interface CocktailRecommendPageProps {
 const CocktailRecommendPage: FC<CocktailRecommendPageProps> = ({
   onBack,
   onRetry,
+  onShare,
   topPick,
   tasteAttribution,
   ranking,
@@ -46,6 +48,9 @@ const CocktailRecommendPage: FC<CocktailRecommendPageProps> = ({
   partnerAvatarUrl,
 }) => {
   const [showShareModal, setShowShareModal] = useState(false);
+  const [shareUrl, setShareUrl] = useState<string | null>(null);
+  const [shareImageUrl, setShareImageUrl] = useState<string | null>(null);
+  const [isSharing, setIsSharing] = useState(false);
 
   useEffect(() => {
     document.body.classList.add("hide-bottom-nav");
@@ -54,8 +59,20 @@ const CocktailRecommendPage: FC<CocktailRecommendPageProps> = ({
     };
   }, []);
 
-  const handleShareSns = () => {
-    // TODO: SNS 공유 연동
+  const handleOpenShare = async () => {
+    if (onShare) {
+      setIsSharing(true);
+      try {
+        const shareData = await onShare();
+        if (shareData) {
+          setShareUrl(shareData.shareUrl);
+          setShareImageUrl(shareData.shareImageUrl);
+        }
+      } finally {
+        setIsSharing(false);
+      }
+    }
+    setShowShareModal(true);
   };
 
   const handleSaveImage = () => {
@@ -171,9 +188,10 @@ const CocktailRecommendPage: FC<CocktailRecommendPageProps> = ({
       <button
         type="button"
         className="cocktail-recommend-page__share"
-        onClick={() => setShowShareModal(true)}
+        onClick={handleOpenShare}
+        disabled={isSharing}
       >
-        결과 공유
+        {isSharing ? "준비 중..." : "결과 공유"}
       </button>
       <button
         type="button"
@@ -186,9 +204,15 @@ const CocktailRecommendPage: FC<CocktailRecommendPageProps> = ({
       {showShareModal && (
         <ShareResultModal
           onClose={() => setShowShareModal(false)}
-          onShareSns={handleShareSns}
           onSaveImage={handleSaveImage}
-          shareUrl={window.location.href}
+          shareUrl={shareUrl ?? window.location.href}
+          kakaoShare={{
+            title: `MoodTail - ${topPick.name}`,
+            description: topPick.description,
+            imageUrl: shareImageUrl ?? "",
+            webUrl: shareUrl ?? window.location.href,
+            buttonTitle: "결과 확인하기",
+          }}
           topPick={topPick}
           ranking={ranking}
           matchPercent={matchPercent}

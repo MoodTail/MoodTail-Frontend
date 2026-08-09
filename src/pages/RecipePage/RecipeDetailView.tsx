@@ -15,10 +15,19 @@ interface RecipeDetailViewProps {
   recipe: Recipe;
   onBack: () => void;
   saved: boolean;
+  isLoggedIn: boolean;
+  onToggleSave: () => void;
   onGoToLogin: () => void;
 }
 
-function RecipeDetailView({ recipe, onBack, saved, onGoToLogin }: RecipeDetailViewProps) {
+function RecipeDetailView({
+  recipe,
+  onBack,
+  saved,
+  isLoggedIn,
+  onToggleSave,
+  onGoToLogin,
+}: RecipeDetailViewProps) {
   const [showLoginModal, setShowLoginModal] = useState(false);
 
   return (
@@ -51,7 +60,7 @@ function RecipeDetailView({ recipe, onBack, saved, onGoToLogin }: RecipeDetailVi
         <button
           type="button"
           className="recipe-detail__bookmark"
-          onClick={() => setShowLoginModal(true)}
+          onClick={() => (isLoggedIn ? onToggleSave() : setShowLoginModal(true))}
           aria-label={saved ? "저장 해제" : "저장"}
           style={{ marginLeft: "auto" }}
         >

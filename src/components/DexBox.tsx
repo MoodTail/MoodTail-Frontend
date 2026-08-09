@@ -1,21 +1,22 @@
-import { COLORS } from "../theme/colors";
-import { CHARACTER_TYPES } from "../data/characterType";
+import { getCharacterType } from "../data/characterType";
 
 export default function DexBox({
   drinkImg,
-  type,
+  typeId,
   collectionRate,
   unlocked,
   onClick,
 }: {
   drinkImg: string;
-  type: number;
+  typeId: string;
   collectionRate?: number;
   unlocked: boolean;
   onClick?: () => void;
 }) {
   if (unlocked) {
-    const characterType = CHARACTER_TYPES.find((t) => t.number === type);
+    // number가 아니라 typeId로 직접 찾습니다 — number는 characterType.ts에서 중복될 수 있어서
+    // (예: realist/straightforward가 둘 다 number 3) number 기준 조회는 틀린 항목을 찾을 수 있습니다.
+    const characterType = getCharacterType(typeId);
 
     return (
       <button
@@ -38,7 +39,19 @@ export default function DexBox({
         }}
       >
         <img src={drinkImg} alt="" style={{ width: "90%", height: "70%", objectFit: "contain" }} />
-        <span style={{ fontSize: 12, fontWeight: 700, color: characterType?.color }}>
+        <span
+          style={{
+            fontSize: 11,
+            fontWeight: 700,
+            color: characterType?.color,
+            textAlign: "center",
+            lineHeight: 1.2,
+            display: "-webkit-box",
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: "vertical",
+            overflow: "hidden",
+          }}
+        >
           {characterType?.name}
         </span>
       </button>
@@ -65,7 +78,7 @@ export default function DexBox({
       }}
     >
       <div style={{ fontSize: 18, fontWeight: 700, color: "#323232" }}>타입명</div>
-      <div style={{ fontSize: 11, fontWeight: 600, color: "#8E8A88" }}>수집률 {collectionRate}%</div>
+      <div style={{ fontSize: 11, fontWeight: 600, color: "#8E8A88" }}>수집률 {collectionRate ?? 0}%</div>
     </button>
   );
 }

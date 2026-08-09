@@ -59,3 +59,10 @@
 .rank-change-item--down .rank-change-item__text {
   color: #ff4f58;
 }
+
+.rank-change-card__empty {
+  color: #9b9b9b;
+  font-size: 14px;
+  text-align: center;
+  padding: 24px 0;
+}

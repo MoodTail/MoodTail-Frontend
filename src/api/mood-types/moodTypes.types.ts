@@ -32,7 +32,7 @@ export interface MoodTypeDetailResult {
   typeCode: string;
   name: string;
   shortDescription: string;
-  description: string;
+  detailDescription: string;
   catchphrase: string;
   characterImageUrl: string;
   unlocked: boolean;
