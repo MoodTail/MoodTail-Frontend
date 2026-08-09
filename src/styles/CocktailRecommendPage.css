@@ -146,13 +146,16 @@
   top: 21px;
   width: 329px;
   height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }
 .cocktail-recommend-page__taste-row--second {
   top: 63px;
 }
 
 .cocktail-recommend-page__taste-pill {
-  position: absolute;
   padding: 0 12px;
   display: flex;
   align-items: center;
@@ -160,10 +163,9 @@
   font-size: 13px;
   font-weight: 700;
   box-sizing: border-box;
+  white-space: nowrap;
 }
 .cocktail-recommend-page__taste-pill--taste {
-  left: 26px;
-  top: 0px;
   width: 75px;
   height: 29.26px;
   border-radius: 14.63px;
@@ -173,41 +175,35 @@
 }
 .cocktail-recommend-page__taste-pill--owner-a,
 .cocktail-recommend-page__taste-pill--owner-b {
-  left: 129px;
-  top: 2px;
-  width: 34.48px;
   height: 26px;
   border-radius: 13px;
+  padding: 0 10px;
 }
 .cocktail-recommend-page__taste-pill--owner-a {
+  width: 34.48px;
   background: #e8f2ff;
   border: 1px solid #a6c2ff;
   color: #216bff;
 }
 .cocktail-recommend-page__taste-pill--owner-b {
+  width: auto;
+  min-width: 58px;
   background: #e5fbf7;
   border: 1px solid #8ce5db;
   color: #30c9bd;
 }
 
 .cocktail-recommend-page__taste-word {
-  position: absolute;
   font-family: "Pretendard", sans-serif;
   color: #1b1c30;
   white-space: nowrap;
   margin: 0;
 }
 .cocktail-recommend-page__taste-word--eun {
-  left: 105px;
-  top: 6px;
-  width: 14.94px;
   font-size: 14px;
   font-weight: 400;
 }
 .cocktail-recommend-page__taste-word--desc {
-  left: 168px;
-  top: 6px;
-  width: 137.9px;
   font-size: 16px;
   font-weight: 500;
 }
@@ -371,4 +367,9 @@ body.hide-bottom-nav .bottom-nav {
 
 *::-webkit-scrollbar {
   display: none;
+}
+
+.cocktail-recommend-page__taste-row--second
+  .cocktail-recommend-page__taste-word--desc {
+  left: 196px;
 }

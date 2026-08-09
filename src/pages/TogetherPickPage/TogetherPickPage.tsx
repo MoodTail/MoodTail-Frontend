@@ -8,9 +8,14 @@ import LoginRequiredModal from "../../components/TogetherPick/LoginRequiredModal
 import TasteComparePage from "../TasteComparePage/TasteComparePage";
 import CocktailRecommendPage from "../../components/CocktailRecommendPage/CocktailRecommendPage";
 import Button from "../../components/Button/Button";
-import { postPairRecommendation } from "../../api/cocktails/cocktails.api";
 import type { PairRecommendationResult } from "../../api/cocktails/cocktails.types";
 import { postInviteCode } from "../../api/users/users.api";
+import {
+  getPairRecommendation,
+  postPairShare,
+  postPairShareImage,
+} from "../../api/cocktails/cocktails.api";
+import cocktailFallbackImage from "../../assets/images/glass/glass-1.png";
 import "../../styles/TogetherPickPage.css";
 
 type TogetherPickStep = "input" | "compare" | "result";
@@ -19,8 +24,6 @@ interface TogetherPickPageProps {
   onBack?: () => void;
   onLogin?: () => void;
   isLoggedIn?: boolean;
-  myResultId?: number;
-  myResultShareToken?: string;
 }
 
 const RANKING_COLORS = ["#FF613D", "#34DBCE", "#1564FE", "#FFC107"];
@@ -29,8 +32,6 @@ function TogetherPickPage({
   onBack,
   onLogin,
   isLoggedIn = true,
-  myResultId,
-  myResultShareToken,
 }: TogetherPickPageProps) {
   const [step, setStep] = useState<TogetherPickStep>("input");
   const [inviteCode, setInviteCode] = useState("");
@@ -62,11 +63,7 @@ function TogetherPickPage({
   const handleStart = async () => {
     setIsLoading(true);
     try {
-      const result = await postPairRecommendation({
-        resultId: myResultId,
-        resultShareToken: myResultShareToken,
-        partnerShareToken: partnerCode,
-      });
+      const result = await getPairRecommendation(partnerCode);
       setPairResult(result);
       setIsError(false);
       setStep("compare");
@@ -85,14 +82,67 @@ function TogetherPickPage({
     onLogin?.();
   };
 
-  if (step === "compare") {
+  const handleShare = async (): Promise<{
+    shareUrl: string;
+    shareImageUrl: string;
+  } | null> => {
+    if (!pairResult) return null;
+    const first =
+      pairResult.recommendations.find((item) => item.ranking === 1) ??
+      pairResult.recommendations[0];
+
+    try {
+      const imageResponse = await fetch(cocktailFallbackImage);
+      const rawBlob = await imageResponse.blob();
+      const imageBlob = new Blob([rawBlob], { type: "image/png" });
+      const { shareImageUrl } = await postPairShareImage(
+        partnerCode,
+        imageBlob,
+      );
+
+      const { shareUrl } = await postPairShare({
+        compromiseProfile: pairResult.compromiseProfile,
+        recommendations: pairResult.recommendations.map((item) => ({
+          ranking: item.ranking,
+          cocktailId: item.cocktailId,
+          matchScore: item.matchScore,
+        })),
+        myMatchScore: first?.myMatchScore ?? 0,
+        partnerMatchScore: first?.partnerMatchScore ?? 0,
+        thumbnailImageUrl: shareImageUrl,
+      });
+
+      return { shareUrl, shareImageUrl };
+    } catch (error) {
+      console.error(error);
+      return null;
+    }
+  };
+
+  if (step === "compare" && pairResult) {
+    const first =
+      pairResult.recommendations.find((item) => item.ranking === 1) ??
+      pairResult.recommendations[0];
+
     return (
       <TasteComparePage
         onBack={() => setStep("input")}
         onViewResult={() => setStep("result")}
-        matchPercent={70} // 개별 취향 비교 API 필요
-        myValues={[80, 65, 40, 55, 70]} // 개별 취향 비교 API 필요
-        partnerValues={[60, 75, 55, 45, 50]} // 개별 취향 비교 API 필요
+        matchPercent={first?.matchScore ?? 0} // TODO: 전체 취향 일치율 필드가 따로 없어 1위 칵테일 매치율로 대체
+        myValues={[
+          pairResult.myProfile.alcoholIntensity,
+          pairResult.myProfile.sweetness,
+          pairResult.myProfile.sourness,
+          pairResult.myProfile.bitterness,
+          pairResult.myProfile.refreshing,
+        ]}
+        partnerValues={[
+          pairResult.partnerProfile.alcoholIntensity,
+          pairResult.partnerProfile.sweetness,
+          pairResult.partnerProfile.sourness,
+          pairResult.partnerProfile.bitterness,
+          pairResult.partnerProfile.refreshing,
+        ]}
       />
     );
   }
@@ -101,24 +151,26 @@ function TogetherPickPage({
     const first =
       pairResult.recommendations.find((item) => item.ranking === 1) ??
       pairResult.recommendations[0];
+    const [dominant, secondary] = pairResult.tasteContributions;
 
     return (
       <CocktailRecommendPage
         onBack={() => setStep("compare")}
         onRetry={() => setStep("input")}
+        onShare={handleShare}
         matchPercent={first?.matchScore ?? 0}
         topPick={{
           tagline: "둘의 최적 타협점",
           name: first?.nameKo ?? "",
-          description: "", // API에 설명 텍스트 없음
-          myMatchPercent: first?.matchScore ?? 0,
-          partnerMatchPercent: first?.matchScore ?? 0,
+          description: "", // TODO: API에 설명 텍스트 없음
+          myMatchPercent: first?.myMatchScore ?? 0,
+          partnerMatchPercent: first?.partnerMatchScore ?? 0,
         }}
         tasteAttribution={{
-          dominant: "달달함", // compromiseProfile 기반 계산 필요
-          dominantOwner: "A",
-          secondary: "씁쓸함",
-          secondaryOwner: "B",
+          dominant: dominant?.metricNameKo ?? "",
+          dominantOwner: "나",
+          secondary: secondary?.metricNameKo ?? "",
+          secondaryOwner: "상대방",
         }}
         ranking={pairResult.recommendations.map((item) => ({
           rank: item.ranking,
