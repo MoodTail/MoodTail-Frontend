@@ -72,7 +72,8 @@ export interface UploadMonthlyReportShareImageParams {
 }
 
 export interface UploadMonthlyReportShareImageResult {
-  shareImageUrl: string;
+  shareToken: string;
+  shareUrl: string;
 }
 
 export interface UploadMonthlyReportShareImageResponse {
@@ -80,4 +81,17 @@ export interface UploadMonthlyReportShareImageResponse {
   code: string;
   message: string;
   result: UploadMonthlyReportShareImageResult;
+}
+
+export interface GetSharedMonthlyReportResult {
+  year: number;
+  month: number;
+  shareImageUrl: string;
+}
+
+export interface GetSharedMonthlyReportResponse {
+  timestamp: string;
+  code: string;
+  message: string;
+  result: GetSharedMonthlyReportResult;
 }
