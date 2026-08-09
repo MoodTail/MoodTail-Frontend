@@ -1,17 +1,6 @@
 
 import { useState } from "react";
 import drink0 from "../../assets/drinks/0.png";
-import drink1 from "../../assets/drinks/1.png";
-import drink2 from "../../assets/drinks/2.png";
-import drink3 from "../../assets/drinks/3.png";
-import drink4 from "../../assets/drinks/4.png";
-import drink5 from "../../assets/drinks/5.png";
-import drink6 from "../../assets/drinks/6.png";
-import drink7 from "../../assets/drinks/7.png";
-import drink8 from "../../assets/drinks/8.png";
-import drink9 from "../../assets/drinks/9.png";
-import drink10 from "../../assets/drinks/10.png";
-import drink11 from "../../assets/drinks/11.png";
 import drinkImages from "../../assets/drinks";
 import { COLORS } from "../../theme/colors";
 import { TYPES } from "../../data/types";

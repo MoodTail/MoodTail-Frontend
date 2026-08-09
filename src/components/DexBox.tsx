@@ -1,4 +1,3 @@
-import { COLORS } from "../theme/colors";
 import { getCharacterType } from "../data/characterType";
 
 export default function DexBox({
