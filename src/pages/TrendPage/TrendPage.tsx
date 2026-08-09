@@ -1,11 +1,12 @@
-import { useState } from "react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import BackgroundBlur from "../../components/common/BackgroundBlur";
 import TrendHeader from "../../components/Trend/TrendHeader";
 import TopTypeCard from "../../components/Trend/TopTypeCard";
 import TasteAverageCard from "../../components/Trend/TasteAverageCard";
 import PopularCocktailCard from "../../components/Trend/PopularCocktailCard";
 import RankChangeCard from "../../components/Trend/RankChangeCard";
+import { getCocktailTrend } from "../../api/cocktails/cocktails.api";
+import type { CocktailTrendResult } from "../../api/cocktails/cocktails.types";
 import "../../styles/TrendPage.css";
 
 interface TrendPageProps {
@@ -14,12 +15,25 @@ interface TrendPageProps {
 
 function TrendPage({ onBack }: TrendPageProps) {
   const [isCocktailExpanded, setIsCocktailExpanded] = useState(false);
+  const [trend, setTrend] = useState<CocktailTrendResult | null>(null);
 
   useEffect(() => {
     document.body.classList.add("hide-bottom-nav");
     return () => {
       document.body.classList.remove("hide-bottom-nav");
     };
+  }, []);
+
+  useEffect(() => {
+    getCocktailTrend()
+      .then((data) => {
+        console.log(
+          "popularCocktails:",
+          JSON.stringify(data.popularCocktails, null, 2),
+        );
+        setTrend(data);
+      })
+      .catch((error) => console.error(error));
   }, []);
 
   return (
@@ -40,13 +54,18 @@ function TrendPage({ onBack }: TrendPageProps) {
         description="지난달과 이번달의 도수, 당도, 산도 변화를 한눈에 비교해요"
         onBack={onBack}
       />
-      <TopTypeCard />
-      <TasteAverageCard />
-      <PopularCocktailCard
-        isExpanded={isCocktailExpanded}
-        onToggle={() => setIsCocktailExpanded((prev) => !prev)}
-      />
-      <RankChangeCard />
+      {trend && (
+        <>
+          <TopTypeCard items={trend.popularMoodTypes} />
+          <TasteAverageCard scores={trend.displayAverageTasteScores} />
+          <PopularCocktailCard
+            cocktails={trend.popularCocktails}
+            isExpanded={isCocktailExpanded}
+            onToggle={() => setIsCocktailExpanded((prev) => !prev)}
+          />
+          <RankChangeCard items={trend.rankChangeCocktails} />
+        </>
+      )}
     </div>
   );
 }

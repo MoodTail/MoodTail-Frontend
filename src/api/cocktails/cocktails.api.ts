@@ -16,6 +16,7 @@ import type {
   PostPairShareResponse,
   PostPairShareImageResponse,
   GetSharedPairRecommendationResponse,
+  GetCocktailTrendResponse,
 } from "./cocktails.types";
 
 export interface GetCocktailsParams {
@@ -128,6 +129,14 @@ export const postPairShareImage = async (
 export const getSharedPairRecommendation = async (shareToken: string) => {
   const response = await apiClient.get<GetSharedPairRecommendationResponse>(
     `/api/v1/share/pair-recommendations/${shareToken}`,
+  );
+
+  return response.data.result;
+};
+
+export const getCocktailTrend = async () => {
+  const response = await apiClient.get<GetCocktailTrendResponse>(
+    "/api/v1/cocktails/trend",
   );
 
   return response.data.result;
