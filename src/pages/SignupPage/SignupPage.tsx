@@ -1,10 +1,10 @@
 import type { FC, ChangeEvent } from "react";
 import "../../styles/SignupPage.css";
 import { useEffect, useState } from "react";
-import { postSignupLocal } from "../../api/auth/auth.api";
-import { getTerms } from "../../api/terms/terms.api";
-import type { Term } from "../../api/terms/terms.types";
-import { getLocalEmailAvailability } from "../../api/auth/auth.api";
+import { postSignupLocal } from "../../api/auth/auth.api.ts";
+import { getTerms } from "../../api/terms/terms.api.ts";
+import type { Term } from "../../api/terms/terms.types.ts";
+import { getLocalEmailAvailability } from "../../api/auth/auth.api.ts";
 
 function PasswordToggleIcon({ visible }: { visible: boolean }) {
   return (

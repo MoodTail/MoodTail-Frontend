@@ -145,12 +145,6 @@ export interface PostCustomCocktailResponse {
   result: CustomCocktailResult;
 }
 
-export interface PostPairRecommendationRequest {
-  resultId?: number;
-  resultShareToken?: string;
-  partnerShareToken: string;
-}
-
 export interface PairCompromiseProfile {
   alcoholIntensity: number;
   sweetness: number;
@@ -165,17 +159,66 @@ export interface PairRecommendationItem {
   nameKo: string;
   nameEn: string;
   matchScore: number;
+  myMatchScore: number;
+  partnerMatchScore: number;
+}
+
+export interface PairTasteContribution {
+  metric: string;
+  metricNameKo: string;
+  dominantSide: "ME" | "PARTNER";
 }
 
 export interface PairRecommendationResult {
-  recommendationSaved: boolean;
+  myNickname: string;
+  partnerNickname: string;
+  myProfile: PairCompromiseProfile;
+  partnerProfile: PairCompromiseProfile;
   compromiseProfile: PairCompromiseProfile;
   recommendations: PairRecommendationItem[];
+  tasteContributions: PairTasteContribution[];
 }
 
-export interface PostPairRecommendationResponse {
+export interface GetPairRecommendationResponse {
   timestamp: string;
   code: string;
   message: string;
   result: PairRecommendationResult;
+}
+
+export interface PairShareRecommendationItem {
+  ranking: number;
+  cocktailId: number;
+  matchScore: number;
+}
+
+export interface PostPairShareRequest {
+  compromiseProfile: PairCompromiseProfile;
+  recommendations: PairShareRecommendationItem[];
+  myMatchScore: number;
+  partnerMatchScore: number;
+  thumbnailImageUrl: string;
+}
+
+export interface PairShareResult {
+  shareToken: string;
+  shareUrl: string;
+}
+
+export interface PostPairShareResponse {
+  timestamp: string;
+  code: string;
+  message: string;
+  result: PairShareResult;
+}
+
+export interface PostPairShareImageResult {
+  shareImageUrl: string;
+}
+
+export interface PostPairShareImageResponse {
+  timestamp: string;
+  code: string;
+  message: string;
+  result: PostPairShareImageResult;
 }

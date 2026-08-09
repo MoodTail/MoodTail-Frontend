@@ -14,11 +14,19 @@ interface RankEntry {
   color: string;
 }
 
+interface KakaoShareData {
+  title: string;
+  description: string;
+  imageUrl: string;
+  webUrl: string;
+  buttonTitle: string;
+}
+
 interface ShareResultModalProps {
   onClose: () => void;
-  onShareSns: () => void; // 카카오 공유 등 실제 공유 실행 콜백으로 사용
   onSaveImage: () => void;
-  shareUrl: string; // 추가: SNS 모달에서 복사/공유할 URL
+  shareUrl: string;
+  kakaoShare: KakaoShareData;
   topPick: {
     tagline: string;
     name: string;
@@ -35,9 +43,9 @@ interface ShareResultModalProps {
 
 const ShareResultModal: FC<ShareResultModalProps> = ({
   onClose,
-  onShareSns,
   onSaveImage,
   shareUrl,
+  kakaoShare,
   topPick,
   ranking,
   matchPercent,
@@ -155,7 +163,7 @@ const ShareResultModal: FC<ShareResultModalProps> = ({
           isOpen={isSnsModalOpen}
           url={shareUrl}
           onClose={() => setIsSnsModalOpen(false)}
-          onKakaoShare={onShareSns}
+          kakaoShare={kakaoShare}
         />
       </div>
     </div>

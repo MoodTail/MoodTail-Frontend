@@ -2,8 +2,8 @@ import { useState, useEffect } from "react";
 import type { FC } from "react";
 import TasteSlider from "../../components/CustomRecommend/TasteSlider";
 import "../../styles/CustomRecommend.css";
-import { postCustomCocktail } from "../../api/cocktails/cocktails.api";
-import type { CustomCocktailResult } from "../../api/cocktails/cocktails.types";
+import { postCustomCocktail } from "../../api/cocktails/cocktails.api.ts";
+import type { CustomCocktailResult } from "../../api/cocktails/cocktails.types.ts";
 
 interface TasteValues {
   strength: number;

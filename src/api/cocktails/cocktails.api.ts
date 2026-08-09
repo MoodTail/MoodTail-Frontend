@@ -11,8 +11,11 @@ import type {
   GetTodayCocktailResponse,
   PostCustomCocktailRequest,
   PostCustomCocktailResponse,
-  PostPairRecommendationRequest,
-  PostPairRecommendationResponse,
+  GetPairRecommendationResponse,
+  PostPairShareRequest,
+  PostPairShareResponse,
+  PostPairShareImageResponse,
+  GetSharedPairRecommendationResponse,
 } from "./cocktails.types";
 
 export interface GetCocktailsParams {
@@ -85,12 +88,46 @@ export const postCustomCocktail = async (body: PostCustomCocktailRequest) => {
   return response.data.result;
 };
 
-export const postPairRecommendation = async (
-  body: PostPairRecommendationRequest,
-) => {
-  const response = await apiClient.post<PostPairRecommendationResponse>(
+export const getPairRecommendation = async (partnerInviteCode: string) => {
+  const response = await apiClient.get<GetPairRecommendationResponse>(
     "/api/v1/cocktails/recommends/pair",
+    { params: { partnerInviteCode } },
+  );
+
+  return response.data.result;
+};
+
+export const postPairShare = async (body: PostPairShareRequest) => {
+  const response = await apiClient.post<PostPairShareResponse>(
+    "/api/v1/cocktails/recommends/pair/share",
     body,
+  );
+
+  return response.data.result;
+};
+
+export const postPairShareImage = async (
+  partnerInviteCode: string,
+  image: Blob,
+) => {
+  const formData = new FormData();
+  formData.append("image", image, "thumbnail.png"); // 파일명 추가
+
+  const response = await apiClient.post<PostPairShareImageResponse>(
+    "/api/v1/cocktails/recommends/pair/share-image",
+    formData,
+    {
+      params: { partnerInviteCode },
+      headers: { "Content-Type": "multipart/form-data" },
+    },
+  );
+
+  return response.data.result;
+};
+
+export const getSharedPairRecommendation = async (shareToken: string) => {
+  const response = await apiClient.get<GetSharedPairRecommendationResponse>(
+    `/api/v1/share/pair-recommendations/${shareToken}`,
   );
 
   return response.data.result;

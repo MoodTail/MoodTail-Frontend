@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import type { FC } from "react";
 import "../../styles/SocialSignupPage.css";
-import { getTerms } from "../../api/terms/terms.api";
-import type { Term } from "../../api/terms/terms.types";
-import { postKakaoLogin, postGoogleLogin } from "../../api/auth/auth.api";
+import { getTerms } from "../../api/terms/terms.api.ts";
+import type { Term } from "../../api/terms/terms.types.ts";
+import { postKakaoLogin, postGoogleLogin } from "../../api/auth/auth.api.ts";
 
 interface SocialSignupPageProps {
   provider: "kakao" | "google";
