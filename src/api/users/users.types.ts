@@ -38,3 +38,14 @@ export interface UpdateProfileResponse {
   message: string;
   result: UpdateProfileResult;
 }
+
+export interface InviteCodeResult {
+  inviteCode: string;
+}
+
+export interface PostInviteCodeResponse {
+  timestamp: string;
+  code: string;
+  message: string;
+  result: InviteCodeResult;
+}

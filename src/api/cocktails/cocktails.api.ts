@@ -11,6 +11,8 @@ import type {
   GetTodayCocktailResponse,
   PostCustomCocktailRequest,
   PostCustomCocktailResponse,
+  PostPairRecommendationRequest,
+  PostPairRecommendationResponse,
 } from "./cocktails.types";
 
 export interface GetCocktailsParams {
@@ -22,7 +24,10 @@ export interface GetCocktailsParams {
 export const getCocktails = async (
   params?: GetCocktailsParams,
 ): Promise<GetCocktailsResult> => {
-  const response = await apiClient.get<GetCocktailsResponse>("/api/v1/cocktails", { params });
+  const response = await apiClient.get<GetCocktailsResponse>(
+    "/api/v1/cocktails",
+    { params },
+  );
   return response.data.result;
 };
 
@@ -56,12 +61,13 @@ export const removeFavoriteCocktail = async (
 };
 
 // 인증 필요. 게스트 토큰으로는 AUTH027("기록을 저장하려면 로그인하세요")이 반환됩니다.
-export const getFavoriteCocktails = async (): Promise<GetFavoriteCocktailsResult> => {
-  const response = await apiClient.get<GetFavoriteCocktailsResponse>(
-    "/api/v1/cocktails/favorites",
-  );
-  return response.data.result;
-};
+export const getFavoriteCocktails =
+  async (): Promise<GetFavoriteCocktailsResult> => {
+    const response = await apiClient.get<GetFavoriteCocktailsResponse>(
+      "/api/v1/cocktails/favorites",
+    );
+    return response.data.result;
+  };
 
 export const getTodayCocktail = async () => {
   const response = await apiClient.get<GetTodayCocktailResponse>(
@@ -73,6 +79,17 @@ export const getTodayCocktail = async () => {
 export const postCustomCocktail = async (body: PostCustomCocktailRequest) => {
   const response = await apiClient.post<PostCustomCocktailResponse>(
     "/api/v1/cocktails/custom",
+    body,
+  );
+
+  return response.data.result;
+};
+
+export const postPairRecommendation = async (
+  body: PostPairRecommendationRequest,
+) => {
+  const response = await apiClient.post<PostPairRecommendationResponse>(
+    "/api/v1/cocktails/recommends/pair",
     body,
   );
 

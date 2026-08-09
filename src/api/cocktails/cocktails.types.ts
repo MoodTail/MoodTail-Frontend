@@ -144,3 +144,38 @@ export interface PostCustomCocktailResponse {
   message: string;
   result: CustomCocktailResult;
 }
+
+export interface PostPairRecommendationRequest {
+  resultId?: number;
+  resultShareToken?: string;
+  partnerShareToken: string;
+}
+
+export interface PairCompromiseProfile {
+  alcoholIntensity: number;
+  sweetness: number;
+  sourness: number;
+  refreshing: number;
+  bitterness: number;
+}
+
+export interface PairRecommendationItem {
+  ranking: number;
+  cocktailId: number;
+  nameKo: string;
+  nameEn: string;
+  matchScore: number;
+}
+
+export interface PairRecommendationResult {
+  recommendationSaved: boolean;
+  compromiseProfile: PairCompromiseProfile;
+  recommendations: PairRecommendationItem[];
+}
+
+export interface PostPairRecommendationResponse {
+  timestamp: string;
+  code: string;
+  message: string;
+  result: PairRecommendationResult;
+}

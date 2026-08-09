@@ -16,9 +16,19 @@ import Terms from "./pages/MyPage/Terms";
 import LoginPage from "./pages/LoginPage/LoginPage";
 import ResultPage from "./pages/ResultPage/ResultPage";
 import QuizQuestionPage from "./pages/QuizQuestionPage";
-import { buildQuizQuestions, toQuizQuestions, type QuizQuestion } from "./data/quiz";
-import { getMoodTestQuestions, postMoodTestResult } from "./api/mood-tests/moodTests.api";
-import type { MoodTestAnswer, MoodTestResult } from "./api/mood-tests/moodTests.types";
+import {
+  buildQuizQuestions,
+  toQuizQuestions,
+  type QuizQuestion,
+} from "./data/quiz";
+import {
+  getMoodTestQuestions,
+  postMoodTestResult,
+} from "./api/mood-tests/moodTests.api";
+import type {
+  MoodTestAnswer,
+  MoodTestResult,
+} from "./api/mood-tests/moodTests.types";
 import type { HistoryTestResultDetail } from "./api/histories/histories.types";
 import "./App.css";
 import { parseOauthCallback } from "./utils/oauth";
@@ -29,6 +39,7 @@ type HistoryView = "calendar" | "photo" | "test-result" | "monthly-report";
 type MyPageView = "main" | "profile-edit" | "inquiry" | "terms";
 
 function App() {
+  const [mainNavVisible, setMainNavVisible] = useState(true);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isGuest, setIsGuest] = useState(false);
   const [activeMenu, setActiveMenu] = useState<NavKey>("home");
@@ -139,6 +150,7 @@ function App() {
             }}
             initialView={goToQuizOnHome ? "quiz" : undefined}
             onInitialViewConsumed={() => setGoToQuizOnHome(false)}
+            onNavVisibilityChange={setMainNavVisible}
           />
         );
       case "recipe":
@@ -262,7 +274,8 @@ function App() {
                     .map((q, i) => {
                       const questionId = Number(q.id);
                       const optionId = Number(retestAnswers[i]);
-                      if (Number.isNaN(questionId) || Number.isNaN(optionId)) return null;
+                      if (Number.isNaN(questionId) || Number.isNaN(optionId))
+                        return null;
                       return { questionId, optionId };
                     })
                     .filter((a): a is MoodTestAnswer => a !== null);
@@ -333,13 +346,16 @@ function App() {
 
   return (
     <div className="app-shell">
-      <main className={`app${activeMenu === "history" ? " app--history-responsive" : ""}`}>
+      <main
+        className={`app${activeMenu === "history" ? " app--history-responsive" : ""}`}
+      >
         {activeMenu === "recipe" && <DexBackground />}
         <section className="app-content">{renderPage()}</section>
 
-        {(activeMenu !== "recipe" || recipeNavVisible) && (
-          <BottomNav activeMenu={activeMenu} onChangeMenu={setActiveMenu} />
-        )}
+        {(activeMenu !== "recipe" || recipeNavVisible) &&
+          (activeMenu !== "home" || mainNavVisible) && (
+            <BottomNav activeMenu={activeMenu} onChangeMenu={setActiveMenu} />
+          )}
       </main>
     </div>
   );
