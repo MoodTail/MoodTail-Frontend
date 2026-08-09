@@ -11,15 +11,17 @@
 .share-result-modal {
   position: relative;
   width: 326px;
-  height: 795px;
+  max-height: 85vh;
+  overflow-y: auto;
+  box-sizing: border-box;
   border-radius: 23px;
   background: #fff;
-  overflow: hidden;
+  padding: 76px 0 24px;
 }
 
 .share-result-modal__close {
   position: absolute;
-  left: 285px;
+  right: 11px;
   top: 15px;
   width: 30px;
   height: 30px;
@@ -30,43 +32,45 @@
 }
 
 .share-result-modal__brand {
-  position: absolute;
-  left: 0;
-  top: 76px;
-  width: 100%;
-  margin: 0;
+  margin: 0 0 15.5px;
   font-size: 32px;
   font-weight: 700;
   text-align: center;
   color: #ff6f4f;
 }
 
+/* 설명 텍스트 길이가 바뀌면 카드 높이도 자연스럽게 늘어나야 해서
+   절대좌표 대신 margin 기반 흐름으로 구성했다. */
 .share-result-modal__top-card {
-  position: absolute;
-  left: 16px;
-  top: 129.5px;
-  width: 294px;
-  height: 196px;
   box-sizing: border-box;
+  width: 294px;
+  margin: 0 auto;
+  padding: 20px 14px 20px 17.64px;
   border-radius: 22px;
   background: rgba(255, 255, 255, 0.92);
   border: 1px solid #efe4d9;
   box-shadow: 6px 6px 20px 0 rgba(140, 56, 33, 0.08);
 }
 
+.share-result-modal__top-main {
+  display: flex;
+  align-items: center;
+  gap: 13.43px;
+}
+
 .share-result-modal__top-image {
-  position: absolute;
-  left: 17.64px;
-  top: 38.41px;
+  flex-shrink: 0;
   width: 73.98px;
   height: 117.77px;
   object-fit: contain;
 }
 
+.share-result-modal__top-text {
+  flex: 1;
+  min-width: 0;
+}
+
 .share-result-modal__top-tagline {
-  position: absolute;
-  left: 105.05px;
-  top: 20.5px;
   margin: 0;
   font-size: 14px;
   font-weight: 600;
@@ -74,30 +78,30 @@
 }
 
 .share-result-modal__top-name {
-  position: absolute;
-  left: 105.05px;
-  top: 49.5px;
-  margin: 0;
+  margin: 6px 0 0;
   font-size: 26px;
   font-weight: 700;
   color: #17182f;
 }
 
 .share-result-modal__top-desc {
-  position: absolute;
-  left: 105.05px;
-  top: 89.5px;
-  width: 170px;
-  margin: 0;
+  margin: 8px 0 0;
   font-size: 14px;
   font-weight: 500;
   line-height: 20px;
   color: #6f6d68;
+  word-break: keep-all;
+}
+
+.share-result-modal__top-badges {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 7px;
+  margin-top: 12px;
 }
 
 .share-result-modal__top-badge {
-  position: absolute;
-  top: 147px;
+  flex-shrink: 0;
   width: 84px;
   height: 30px;
   border-radius: 15px;
@@ -105,33 +109,26 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 0 4px;
+  box-sizing: border-box;
   color: #fff;
   font-size: 8px;
   font-weight: 600;
-  text-align: center;
-}
-.share-result-modal__top-badge--mine {
-  left: 105px;
-}
-.share-result-modal__top-badge--friend {
-  left: 196px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .share-result-modal__rank-title {
-  position: absolute;
-  left: 25px;
-  top: 342px;
-  margin: 0;
+  margin: 16.5px 0 0 25px;
   font-size: 18px;
   font-weight: 700;
   color: #17182f;
 }
 
 .share-result-modal__rank-list {
-  position: absolute;
-  left: 18.5px;
-  top: 375.5px;
   width: 289px;
+  margin: 11.5px auto 0;
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -169,7 +166,7 @@
   margin-left: 12px;
 }
 .share-result-modal__rank-name {
-  margin: 0;
+  margin: 2px 0 0;
   font-size: 17px;
   font-weight: 700;
   color: #17182f;
@@ -179,6 +176,7 @@
   font-size: 12px;
   font-weight: 500;
   color: #6f6d68;
+  word-break: keep-all;
 }
 .share-result-modal__rank-percent {
   flex-shrink: 0;
@@ -188,23 +186,18 @@
 }
 
 .share-result-modal__match-wrap {
-  position: absolute;
-  left: 18.5px;
-  top: 590.5px;
+  margin: 16px 0 0 18.5px;
 }
 
 .share-result-modal__actions {
-  position: absolute;
-  left: 20px;
-  top: 722.6px;
   width: 286px;
-  height: 48.39px;
+  margin: 20px auto 0;
   display: flex;
   gap: 13px;
 }
 
 .share-result-modal__sns {
-  width: 136.49px;
+  flex: 1;
   height: 48.39px;
   border: none;
   border-radius: 24.2px;
@@ -216,7 +209,7 @@
 }
 
 .share-result-modal__save {
-  width: 136.49px;
+  flex: 1;
   height: 48.39px;
   border: 0.79px solid #fff;
   border-radius: 24.2px;

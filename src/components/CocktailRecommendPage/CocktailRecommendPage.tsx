@@ -75,8 +75,39 @@ const CocktailRecommendPage: FC<CocktailRecommendPageProps> = ({
     setShowShareModal(true);
   };
 
-  const handleSaveImage = () => {
-    // TODO: 이미지 저장(캡처) 연동
+  const handleSaveImage = async (): Promise<void> => {
+    const imageSrc = topPick.imageUrl || cocktail;
+    const fileName = `moodtail-${topPick.name || "result"}.png`;
+
+    try {
+      const response = await fetch(imageSrc);
+      const blob = await response.blob();
+      const file = new File([blob], fileName, {
+        type: blob.type || "image/png",
+      });
+
+      // 모바일: 공유 시트를 열어서 "사진에 저장"을 고를 수 있게 함
+      if (
+        typeof navigator.share === "function" &&
+        typeof navigator.canShare === "function" &&
+        navigator.canShare({ files: [file] })
+      ) {
+        await navigator.share({ files: [file], title: topPick.name });
+        return;
+      }
+
+      // 데스크톱(또는 공유 API 미지원 브라우저): 바로 다운로드
+      const objectUrl = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = objectUrl;
+      link.download = fileName;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(objectUrl);
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (
@@ -102,109 +133,123 @@ const CocktailRecommendPage: FC<CocktailRecommendPageProps> = ({
         두 사람의 결과를 평균이 아닌 취향 차이까지 반영했어요.
       </p>
 
-      <div className="cocktail-recommend-page__top-card">
-        <img
-          src={topPick.imageUrl || cocktail}
-          alt={topPick.name}
-          className="cocktail-recommend-page__top-image"
-        />
-        <p className="cocktail-recommend-page__top-tagline">
-          {topPick.tagline}
-        </p>
-        <p className="cocktail-recommend-page__top-name">{topPick.name}</p>
-        <p className="cocktail-recommend-page__top-desc">
-          {topPick.description}
-        </p>
-        <span className="cocktail-recommend-page__top-badge cocktail-recommend-page__top-badge--mine">
-          나와의 일치율 {topPick.myMatchPercent}%
-        </span>
-        <span className="cocktail-recommend-page__top-badge cocktail-recommend-page__top-badge--friend">
-          친구와의 일치율 {topPick.partnerMatchPercent}%
-        </span>
-      </div>
-
-      <div className="cocktail-recommend-page__taste-card">
-        <div className="cocktail-recommend-page__taste-row">
-          <span className="cocktail-recommend-page__taste-pill cocktail-recommend-page__taste-pill--taste">
-            {tasteAttribution.dominant}
-          </span>
-          <span className="cocktail-recommend-page__taste-word cocktail-recommend-page__taste-word--eun">
-            은
-          </span>
-          <span className="cocktail-recommend-page__taste-pill cocktail-recommend-page__taste-pill--owner-a">
-            {tasteAttribution.dominantOwner}
-          </span>
-          <span className="cocktail-recommend-page__taste-word cocktail-recommend-page__taste-word--desc">
-            의 취향이 반영됐어요.
-          </span>
-        </div>
-        <div className="cocktail-recommend-page__taste-row cocktail-recommend-page__taste-row--second">
-          <span className="cocktail-recommend-page__taste-pill cocktail-recommend-page__taste-pill--taste">
-            {tasteAttribution.secondary}
-          </span>
-          <span className="cocktail-recommend-page__taste-word cocktail-recommend-page__taste-word--eun">
-            은
-          </span>
-          <span className="cocktail-recommend-page__taste-pill cocktail-recommend-page__taste-pill--owner-b">
-            {tasteAttribution.secondaryOwner}
-          </span>
-          <span className="cocktail-recommend-page__taste-word cocktail-recommend-page__taste-word--desc">
-            의 취향이 반영됐어요.
-          </span>
-        </div>
-      </div>
-
-      <p className="cocktail-recommend-page__rank-title">추천 순위</p>
-      <div className="cocktail-recommend-page__rank-list">
-        {ranking.map((item) => (
-          <div key={item.rank} className="cocktail-recommend-page__rank-item">
-            <span
-              className="cocktail-recommend-page__rank-badge"
-              style={{ background: item.color }}
-            >
-              {item.rank}
-            </span>
-            <div className="cocktail-recommend-page__rank-info">
-              <p className="cocktail-recommend-page__rank-name">{item.name}</p>
-              <p className="cocktail-recommend-page__rank-desc">
-                {item.description}
+      <div className="cocktail-recommend-page__content">
+        <div className="cocktail-recommend-page__top-card">
+          <div className="cocktail-recommend-page__top-main">
+            <img
+              src={topPick.imageUrl || cocktail}
+              alt={topPick.name}
+              className="cocktail-recommend-page__top-image"
+            />
+            <div className="cocktail-recommend-page__top-text">
+              <p className="cocktail-recommend-page__top-tagline">
+                {topPick.tagline}
               </p>
+              <p className="cocktail-recommend-page__top-name">
+                {topPick.name}
+              </p>
+              <p className="cocktail-recommend-page__top-desc">
+                {topPick.description}
+              </p>
+              <div className="cocktail-recommend-page__top-badges">
+                <span className="cocktail-recommend-page__top-badge cocktail-recommend-page__top-badge--mine">
+                  나와의 일치율 {topPick.myMatchPercent}%
+                </span>
+                <span className="cocktail-recommend-page__top-badge cocktail-recommend-page__top-badge--friend">
+                  친구와의 일치율 {topPick.partnerMatchPercent}%
+                </span>
+              </div>
             </div>
-            <span className="cocktail-recommend-page__rank-percent">
-              {item.percent}%
+          </div>
+        </div>
+
+        <div className="cocktail-recommend-page__taste-card">
+          <div className="cocktail-recommend-page__taste-row">
+            <span className="cocktail-recommend-page__taste-pill cocktail-recommend-page__taste-pill--taste">
+              {tasteAttribution.dominant}
+            </span>
+            <span className="cocktail-recommend-page__taste-word cocktail-recommend-page__taste-word--eun">
+              은
+            </span>
+            <span className="cocktail-recommend-page__taste-pill cocktail-recommend-page__taste-pill--owner-a">
+              {tasteAttribution.dominantOwner}
+            </span>
+            <span className="cocktail-recommend-page__taste-word cocktail-recommend-page__taste-word--desc">
+              의 취향이 반영됐어요.
             </span>
           </div>
-        ))}
-      </div>
+          <div className="cocktail-recommend-page__taste-row cocktail-recommend-page__taste-row--second">
+            <span className="cocktail-recommend-page__taste-pill cocktail-recommend-page__taste-pill--taste">
+              {tasteAttribution.secondary}
+            </span>
+            <span className="cocktail-recommend-page__taste-word cocktail-recommend-page__taste-word--eun">
+              은
+            </span>
+            <span className="cocktail-recommend-page__taste-pill cocktail-recommend-page__taste-pill--owner-b">
+              {tasteAttribution.secondaryOwner}
+            </span>
+            <span className="cocktail-recommend-page__taste-word cocktail-recommend-page__taste-word--desc">
+              의 취향이 반영됐어요.
+            </span>
+          </div>
+        </div>
 
-      <div className="cocktail-recommend-page__match-wrap">
-        <MatchSummaryCard
-          matchPercent={matchPercent}
-          myAvatarUrl={myAvatarUrl}
-          partnerAvatarUrl={partnerAvatarUrl}
-        />
-      </div>
+        <p className="cocktail-recommend-page__rank-title">추천 순위</p>
+        <div className="cocktail-recommend-page__rank-list">
+          {ranking.map((item) => (
+            <div key={item.rank} className="cocktail-recommend-page__rank-item">
+              <span
+                className="cocktail-recommend-page__rank-badge"
+                style={{ background: item.color }}
+              >
+                {item.rank}
+              </span>
+              <div className="cocktail-recommend-page__rank-info">
+                <p className="cocktail-recommend-page__rank-name">
+                  {item.name}
+                </p>
+                <p className="cocktail-recommend-page__rank-desc">
+                  {item.description}
+                </p>
+              </div>
+              <span className="cocktail-recommend-page__rank-percent">
+                {item.percent}%
+              </span>
+            </div>
+          ))}
+        </div>
 
-      <button
-        type="button"
-        className="cocktail-recommend-page__share"
-        onClick={handleOpenShare}
-        disabled={isSharing}
-      >
-        {isSharing ? "준비 중..." : "결과 공유"}
-      </button>
-      <button
-        type="button"
-        className="cocktail-recommend-page__retry"
-        onClick={onRetry}
-      >
-        다시 함께 고르기
-      </button>
+        <div className="cocktail-recommend-page__match-wrap">
+          <MatchSummaryCard
+            matchPercent={matchPercent}
+            myAvatarUrl={myAvatarUrl}
+            partnerAvatarUrl={partnerAvatarUrl}
+          />
+        </div>
+
+        <div className="cocktail-recommend-page__actions">
+          <button
+            type="button"
+            className="cocktail-recommend-page__share"
+            onClick={handleOpenShare}
+            disabled={isSharing}
+          >
+            {isSharing ? "준비 중..." : "결과 공유"}
+          </button>
+          <button
+            type="button"
+            className="cocktail-recommend-page__retry"
+            onClick={onRetry}
+          >
+            다시 함께 고르기
+          </button>
+        </div>
+      </div>
 
       {showShareModal && (
         <ShareResultModal
           onClose={() => setShowShareModal(false)}
-          onSaveImage={handleSaveImage}
+          onSaveImage={() => void handleSaveImage()}
           shareUrl={shareUrl ?? window.location.href}
           kakaoShare={{
             title: `MoodTail - ${topPick.name}`,
