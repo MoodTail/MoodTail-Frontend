@@ -3,6 +3,7 @@ import "../../styles/SignupPage.css";
 import { useEffect, useState } from "react";
 import { postSignupLocal } from "../../api/auth/auth.api.ts";
 import { getTerms } from "../../api/terms/terms.api.ts";
+import TermViewModal from "../../components/Modal/TermViewModal";
 import type { Term } from "../../api/terms/terms.types.ts";
 import { getLocalEmailAvailability } from "../../api/auth/auth.api.ts";
 
@@ -52,6 +53,7 @@ const SignupPage: FC<SignupPageProps> = ({ onSignupComplete }) => {
   const [agreeTerms2, setAgreeTerms2] = useState(false);
   const [agreePrivacy, setAgreePrivacy] = useState(false);
   const [terms, setTerms] = useState<Term[]>([]);
+  const [viewingTerm, setViewingTerm] = useState<Term | null>(null);
 
   useEffect(() => {
     const fetchTerms = async () => {
@@ -262,7 +264,10 @@ const SignupPage: FC<SignupPageProps> = ({ onSignupComplete }) => {
         </p>
         <button
           type="button"
-          className="signup-page__terms-view signup-page__terms-view--terms2"
+          className="signup-page__terms-view signup-page__terms-view--privacy"
+          onClick={() =>
+            setViewingTerm(terms.find((t) => t.termType === "PRIVACY") ?? null)
+          }
         >
           보기
         </button>
@@ -280,7 +285,10 @@ const SignupPage: FC<SignupPageProps> = ({ onSignupComplete }) => {
         </p>
         <button
           type="button"
-          className="signup-page__terms-view signup-page__terms-view--privacy"
+          className="signup-page__terms-view signup-page__terms-view--terms2"
+          onClick={() =>
+            setViewingTerm(terms.find((t) => t.termType === "SERVICE") ?? null)
+          }
         >
           보기
         </button>
@@ -294,6 +302,13 @@ const SignupPage: FC<SignupPageProps> = ({ onSignupComplete }) => {
       >
         회원가입 완료
       </button>
+      {viewingTerm && (
+        <TermViewModal
+          title={viewingTerm.title}
+          content={viewingTerm.content}
+          onClose={() => setViewingTerm(null)}
+        />
+      )}
     </div>
   );
 };

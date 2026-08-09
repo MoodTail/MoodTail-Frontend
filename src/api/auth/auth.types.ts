@@ -117,32 +117,54 @@ export interface PostPasswordResetVerifyResponse {
   result: PasswordResetVerifyResult;
 }
 
-export interface SocialLoginAgreement {
-  termId: number;
-  agreed: boolean;
+export type SocialAuthStatus =
+  | "LOGIN_COMPLETED"
+  | "SIGNUP_REQUIRED"
+  | "SIGNUP_COMPLETED";
+
+export interface SocialAuthResult {
+  status: SocialAuthStatus;
+  userId: number | null;
+  email: string;
+  nickname: string | null;
+  provider: string;
+  signupToken: string | null;
+  signupTokenExpiresInSeconds: number | null;
+  grantType: string | null;
+  accessToken: string | null;
 }
-export interface SocialLoginRequest {
+
+export interface PostSocialOauthRequest {
   authorizationCode: string;
   redirectUri: string;
   state: string;
-  nickname: string;
-  agreements: SocialLoginAgreement[];
 }
-export interface SocialLoginResult {
-  userId: number;
-  email: string;
-  nickname: string;
-  provider: string;
-  isNewUser: boolean;
-  grantType: string;
-  accessToken: string;
-}
-export interface SocialLoginResponse {
+
+export interface PostSocialOauthResponse {
   timestamp: string;
   code: string;
   message: string;
-  result: SocialLoginResult;
+  result: SocialAuthResult;
 }
+
+export interface SignupSocialAgreement {
+  termId: number;
+  agreed: boolean;
+}
+
+export interface PostSignupSocialRequest {
+  signupToken: string;
+  nickname: string;
+  agreements: SignupSocialAgreement[];
+}
+
+export interface PostSignupSocialResponse {
+  timestamp: string;
+  code: string;
+  message: string;
+  result: SocialAuthResult;
+}
+
 export interface OauthStateResult {
   state: string;
   codeChallenge: string;
