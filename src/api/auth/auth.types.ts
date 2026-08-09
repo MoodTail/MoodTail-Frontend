@@ -177,3 +177,9 @@ export interface PostOauthStateResponse {
   message: string;
   result: OauthStateResult;
 }
+
+export interface PatchPasswordRequest {
+  resetToken: string;
+  newPassword: string;
+  newPasswordConfirm: string;
+}
