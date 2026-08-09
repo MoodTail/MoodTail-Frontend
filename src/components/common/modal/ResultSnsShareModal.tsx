@@ -2,16 +2,18 @@ import { useState } from 'react'
 import copyIcon from '../../../assets/icons/copy.svg'
 import kakaoIcon from '../../../assets/icons/kakao.svg'
 import closeIcon from '../../../assets/icons/close-gray.svg'
+import { shareToKakao, type KakaoShareOptions } from '../../../utils/kakaoShare'
 import '../../../styles/ResultSnsShareModal.css'
 
 interface ResultSnsShareModalProps {
   isOpen: boolean
   url: string
   onClose: () => void
-  onKakaoShare: () => void
+  onKakaoShare?: () => void
+  kakaoShare?: KakaoShareOptions
 }
 
-function ResultSnsShareModal({ isOpen, url, onClose, onKakaoShare }: ResultSnsShareModalProps) {
+function ResultSnsShareModal({ isOpen, url, onClose, onKakaoShare, kakaoShare }: ResultSnsShareModalProps) {
   const [copied, setCopied] = useState(false)
 
   if (!isOpen) return null
@@ -21,6 +23,15 @@ function ResultSnsShareModal({ isOpen, url, onClose, onKakaoShare }: ResultSnsSh
     await navigator.clipboard.writeText(url)
     setCopied(true)
     setTimeout(() => setCopied(false), 1500)
+  }
+
+  const handleKakaoShare = () => {
+    try {
+      if (kakaoShare) shareToKakao(kakaoShare)
+      else onKakaoShare?.()
+    } catch (error) {
+      console.error('카카오톡 공유를 시작하지 못했습니다.', error)
+    }
   }
 
   return (
@@ -43,7 +54,7 @@ function ResultSnsShareModal({ isOpen, url, onClose, onKakaoShare }: ResultSnsSh
           <img src={copyIcon} alt="" aria-hidden="true" />
         </button>
 
-        <button type="button" className="result-sns-share-modal__kakao-button" onClick={onKakaoShare}>
+        <button type="button" className="result-sns-share-modal__kakao-button" onClick={handleKakaoShare}>
           <span>카카오톡으로 공유하기</span>
           <img src={kakaoIcon} alt="" aria-hidden="true" />
         </button>

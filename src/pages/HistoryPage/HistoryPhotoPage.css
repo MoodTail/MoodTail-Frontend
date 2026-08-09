@@ -3,7 +3,11 @@
   isolation: isolate;
   width: 100%;
   height: 100%;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
   background: transparent;
   color: #151522;
 }
@@ -292,4 +296,28 @@
   width: 345px;
   height: 52px;
   border-radius: 26px;
+}
+
+.history-photo-page::-webkit-scrollbar { display: none; }
+
+/* Absolute-positioned tab contents need an explicit scroll extent on short phones. */
+.history-photo-page::after {
+  display: block;
+  width: 1px;
+  height: 824px;
+  content: '';
+  pointer-events: none;
+}
+
+/* Keep the 393px design proportions while allowing narrower mobile screens. */
+@media (max-width: 392px) {
+  .history-cocktail-record__heading button { right: 20px; left: auto; }
+  .history-cocktail-record__empty,
+  .history-cocktail-record__selected-list,
+  .history-test-result__summary,
+  .history-test-result__recommendations,
+  .history-test-result__empty-card { right: 20px; width: auto; }
+  .history-cocktail-record__selected-item { width: 100%; }
+  .history-cocktail-record__add-button,
+  .history-test-result__bottom-button { right: 24px; left: 24px; width: auto; }
 }

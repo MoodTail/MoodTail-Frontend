@@ -1,42 +1,38 @@
 import chevronLeftIcon from '../../assets/icons/chevron-left.svg'
-import characterImage from '../../assets/images/history/detail_modal_character.png'
-import glass1 from '../../assets/images/glass/glass-1.png'
-import glass2 from '../../assets/images/glass/glass-2.png'
-import glass3 from '../../assets/images/glass/glass-3.png'
-import glass4 from '../../assets/images/glass/glass-4.png'
-import Button from '../../components/Button/Button'
+import type { HistoryTestResultDetail } from '../../api/histories/histories.types'
 import RadarChart, { type RadarChartData } from '../../components/ResultPage/RadarChart'
 import MonthlyReportBackground from '../../components/common/MonthlyReportBackground'
 import './TestResultPage.css'
 
-const TOP_COCKTAILS = [
-  { rank: 1, name: '선셋 피즈', taste: '청량·과일', image: glass4 },
-  { rank: 2, name: '모히토', taste: '청량·과일', image: glass3 },
-  { rank: 3, name: '피나콜라다', taste: '청량·과일', image: glass2 },
-  { rank: 4, name: '진토닉', taste: '청량·과일', image: glass1 },
-]
-
-const TASTE_DATA: RadarChartData = {
-  당도: 30,
-  산도: 70,
-  쓴맛: 20,
-  청량감: 90,
-  도수: 45,
-}
-
-const TASTE_ITEMS = [
-  { label: '도수', value: 45, active: true },
-  { label: '당도', value: 30, active: false },
-  { label: '산도', value: 70, active: true },
-  { label: '쓴맛', value: 20, active: false },
-  { label: '청량감', value: 90, active: true },
-]
-
 interface TestResultPageProps {
   onBack: () => void
+  result: HistoryTestResultDetail
 }
 
-function TestResultPage({ onBack }: TestResultPageProps) {
+function toRadarData(scores: HistoryTestResultDetail['displayTasteScores']): RadarChartData {
+  return {
+    당도: scores.sweetness,
+    산도: scores.sourness,
+    쓴맛: scores.bitterness,
+    청량감: scores.refreshing,
+    도수: scores.alcoholIntensity,
+  }
+}
+
+function TestResultPage({ onBack, result }: TestResultPageProps) {
+  const myTaste = toRadarData(result.displayTasteScores)
+  const moodTypeTaste = toRadarData(result.moodType.displayTasteScores)
+  const tasteItems = [
+    { label: '도수', value: result.displayTasteScores.alcoholIntensity, active: true },
+    { label: '당도', value: result.displayTasteScores.sweetness, active: false },
+    { label: '산도', value: result.displayTasteScores.sourness, active: true },
+    { label: '쓴맛', value: result.displayTasteScores.bitterness, active: false },
+    { label: '청량감', value: result.displayTasteScores.refreshing, active: true },
+  ]
+  const cocktails = [...result.recommendedCocktails].sort(
+    (a, b) => a.ranking - b.ranking,
+  )
+
   return (
     <div className="history-full-result-page">
       <div className="history-full-result-page__canvas">
@@ -52,16 +48,16 @@ function TestResultPage({ onBack }: TestResultPageProps) {
 
         <img
           className="history-full-result-page__character"
-          src={characterImage}
-          alt="낭만주의자 캐릭터"
+          src={result.moodType.characterImageUrl}
+          alt={`${result.moodType.name} 캐릭터`}
         />
 
-        <h1 className="history-full-result-page__type">낭만주의자</h1>
+        <h1 className="history-full-result-page__type">{result.moodType.name}</h1>
         <p className="history-full-result-page__description">
-          작은 순간도 특별한 추억으로 만드는 타입
+          {result.moodType.shortDescription}
         </p>
         <div className="history-full-result-page__quote">
-          “재밌으면 그걸로 충분한거 아닐까?!”
+          “{result.moodType.characterQuote}”
         </div>
 
         <section className="history-full-result-page__sheet" aria-label="상세 테스트 결과">
@@ -70,12 +66,12 @@ function TestResultPage({ onBack }: TestResultPageProps) {
           <section className="history-full-result-page__cocktails">
             <h2>나와 일치하는 칵테일 TOP 4</h2>
             <div className="history-full-result-page__cocktail-grid">
-              {TOP_COCKTAILS.map((cocktail) => (
-                <article key={cocktail.rank} className="history-full-result-page__cocktail-card">
-                  <span>{cocktail.rank}위</span>
-                  <img src={cocktail.image} alt="" />
-                  <strong>{cocktail.name}</strong>
-                  <small>{cocktail.taste}</small>
+              {cocktails.map((cocktail) => (
+                <article key={cocktail.cocktailId} className="history-full-result-page__cocktail-card">
+                  <span>{cocktail.ranking}위</span>
+                  <img src={cocktail.cocktailImageUrl} alt="" />
+                  <strong>{cocktail.cocktailName}</strong>
+                  <small>{cocktail.shortDescription} · {cocktail.matchScore}%</small>
                 </article>
               ))}
             </div>
@@ -84,10 +80,10 @@ function TestResultPage({ onBack }: TestResultPageProps) {
           <section className="history-full-result-page__taste-analysis">
             <h2>나의 취향 분석</h2>
             <div className="history-full-result-page__radar">
-              <RadarChart myData={TASTE_DATA} />
+              <RadarChart myData={myTaste} compareData={moodTypeTaste} />
             </div>
             <div className="history-full-result-page__taste-values">
-              {TASTE_ITEMS.map((item) => (
+              {tasteItems.map((item) => (
                 <div
                   key={item.label}
                   className={`history-full-result-page__taste-value${item.active ? ' is-active' : ''}`}
@@ -102,18 +98,14 @@ function TestResultPage({ onBack }: TestResultPageProps) {
           <section className="history-full-result-page__type-matches">
             <article className="history-full-result-page__type-match is-compatible">
               <h2>잘 맞는 타입</h2>
-              <div>이상주의자</div>
+              <div>{result.compatibilities.best?.name ?? '궁합 정보 없음'}</div>
             </article>
             <article className="history-full-result-page__type-match is-incompatible">
               <h2>안 맞는 타입</h2>
-              <div>현실주의자</div>
+              <div>{result.compatibilities.worst?.name ?? '궁합 정보 없음'}</div>
             </article>
           </section>
 
-          <div className="history-full-result-page__actions">
-            <Button type="button" variant="primary">결과 공유하기</Button>
-            <Button type="button" variant="result">히스토리 저장</Button>
-          </div>
         </section>
       </div>
     </div>

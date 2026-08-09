@@ -16,6 +16,12 @@
   overflow: hidden;
 }
 
+.app.app--history-responsive {
+  width: min(100%, 393px);
+  height: min(824px, 100dvh);
+  min-height: 568px;
+}
+
 .app-content {
   position: relative;
   z-index: 1;

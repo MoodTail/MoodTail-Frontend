@@ -1,31 +1,19 @@
-import { useMemo, useState } from 'react'
-import ginAndTonicImage from '../../assets/images/history/gin-and-tonic.png'
-import pinaColadaImage from '../../assets/images/history/pina-colada.png'
-import sunsetFizzImage from '../../assets/images/history/sunset-fizz.png'
-import mojitoImage from '../../assets/images/history/mojito.png'
+import { useEffect, useState } from 'react'
+import { getCocktails } from '../../api/histories/histories.api'
+import type { CocktailSummary } from '../../api/histories/histories.types'
 import HistoryPrimaryButton from './HistoryPrimaryButton'
 import SaveCompleteModal from '../Modal/SaveCompleteModal'
 import './CocktailSearchOverlay.css'
 
-const cocktailSamples = [
-  { name: '진 토닉', description: '청량하고 쌉쌀한 클래식 칵테일', temperature: '0°', image: ginAndTonicImage },
-  { name: '피냐 콜라다', description: '달콤하고 부드러운 트로피컬 칵테일', temperature: '20°', image: pinaColadaImage },
-  { name: '선셋 피즈', description: '상큼하고 청량한 과일 칵테일', temperature: '24°', image: sunsetFizzImage },
-  { name: '모히토', description: '민트와 라임의 청량한 만남', temperature: '24°', image: mojitoImage },
-] as const
-
-const mockCocktails = Array.from({ length: 16 }, (_, index) => ({
-  ...cocktailSamples[index % cocktailSamples.length],
-  id: `mock-cocktail-${index}`,
-}))
-
 interface CocktailSearchOverlayProps {
   initialCocktails?: CocktailSelection[]
-  onSave: (cocktails: CocktailSelection[]) => void
+  onSave: (cocktails: CocktailSelection[]) => Promise<void>
+  onClose: () => void
 }
 
 interface CocktailSelection {
-  id: string
+  id: number
+  recordId?: number
   name: string
   description: string
   temperature: string
@@ -35,32 +23,85 @@ interface CocktailSelection {
 function CocktailSearchOverlay({
   initialCocktails = [],
   onSave,
+  onClose,
 }: CocktailSearchOverlayProps) {
   const [query, setQuery] = useState('')
-  const [selectedIds, setSelectedIds] = useState<Set<string>>(
-    () => new Set(initialCocktails.map((cocktail) => cocktail.id)),
+  const [cocktails, setCocktails] = useState<CocktailSummary[]>([])
+  const [selectedCocktails, setSelectedCocktails] = useState<
+    Map<number, CocktailSelection>
+  >(
+    () => new Map(initialCocktails.map((cocktail) => [cocktail.id, cocktail])),
   )
+  const [isLoading, setIsLoading] = useState(false)
+  const [errorMessage, setErrorMessage] = useState<string>()
+  const [saveErrorMessage, setSaveErrorMessage] = useState<string>()
+  const [isSaving, setIsSaving] = useState(false)
   const [isSaveCompleteOpen, setIsSaveCompleteOpen] = useState(false)
-  const filteredCocktails = useMemo(() => {
-    const normalizedQuery = query.trim().toLowerCase()
-    if (!normalizedQuery) return mockCocktails
-    return mockCocktails.filter((cocktail) =>
-      cocktail.name.toLowerCase().includes(normalizedQuery),
-    )
+
+  useEffect(() => {
+    const controller = new AbortController()
+    const timer = window.setTimeout(async () => {
+      try {
+        setIsLoading(true)
+        setErrorMessage(undefined)
+
+        const result = await getCocktails(
+          query.trim() ? { keyword: query.trim() } : {},
+          controller.signal,
+        )
+        setCocktails(result.cocktails)
+      } catch (error) {
+        if (controller.signal.aborted) return
+        console.error(error)
+        setCocktails([])
+        setErrorMessage('칵테일을 불러오지 못했습니다.')
+      } finally {
+        if (!controller.signal.aborted) setIsLoading(false)
+      }
+    }, 250)
+
+    return () => {
+      window.clearTimeout(timer)
+      controller.abort()
+    }
   }, [query])
 
-  const toggleCocktail = (id: string) => {
-    setSelectedIds((current) => {
-      const next = new Set(current)
-      if (next.has(id)) next.delete(id)
-      else next.add(id)
+  const toSelection = (cocktail: CocktailSummary): CocktailSelection => ({
+    id: cocktail.cocktailId,
+    name: cocktail.nameKo || cocktail.nameEn,
+    description: cocktail.description,
+    temperature: `${cocktail.alcoholDegree}°`,
+    image: cocktail.imageUrl,
+  })
+
+  const toggleCocktail = (cocktail: CocktailSummary) => {
+    setSelectedCocktails((current) => {
+      const next = new Map(current)
+      const selectedCocktail = next.get(cocktail.cocktailId)
+      if (selectedCocktail?.recordId !== undefined) return current
+      if (selectedCocktail) next.delete(cocktail.cocktailId)
+      else next.set(cocktail.cocktailId, toSelection(cocktail))
       return next
     })
   }
 
+  const handleSave = async () => {
+    try {
+      setIsSaving(true)
+      setSaveErrorMessage(undefined)
+      await onSave(Array.from(selectedCocktails.values()))
+      setIsSaveCompleteOpen(true)
+    } catch (error) {
+      console.error(error)
+      setSaveErrorMessage('칵테일 기록을 저장하지 못했습니다.')
+    } finally {
+      setIsSaving(false)
+    }
+  }
+
   const handleCloseSaveComplete = () => {
     setIsSaveCompleteOpen(false)
-    onSave(mockCocktails.filter((cocktail) => selectedIds.has(cocktail.id)))
+    onClose()
   }
 
   return (
@@ -75,19 +116,29 @@ function CocktailSearchOverlay({
       />
 
       <div className="cocktail-search__list">
-        {filteredCocktails.map((cocktail) => (
+        {isLoading && <p className="cocktail-search__status">불러오는 중...</p>}
+        {!isLoading && errorMessage && (
+          <p className="cocktail-search__status cocktail-search__status--error">
+            {errorMessage}
+          </p>
+        )}
+        {!isLoading && !errorMessage && cocktails.length === 0 && (
+          <p className="cocktail-search__status">검색 결과가 없습니다.</p>
+        )}
+        {!isLoading && cocktails.map((cocktail) => (
           <button
-            key={cocktail.id}
+            key={cocktail.cocktailId}
             type="button"
-            className={`cocktail-search__item${selectedIds.has(cocktail.id) ? ' is-selected' : ''}`}
-            onClick={() => toggleCocktail(cocktail.id)}
+            className={`cocktail-search__item${selectedCocktails.has(cocktail.cocktailId) ? ' is-selected' : ''}${selectedCocktails.get(cocktail.cocktailId)?.recordId !== undefined ? ' is-saved' : ''}`}
+            onClick={() => toggleCocktail(cocktail)}
+            aria-disabled={selectedCocktails.get(cocktail.cocktailId)?.recordId !== undefined}
           >
-            <img src={cocktail.image} alt="" />
+            <img src={cocktail.imageUrl} alt="" />
             <span className="cocktail-search__copy">
-              <strong>{cocktail.name}</strong>
+              <strong>{cocktail.nameKo || cocktail.nameEn}</strong>
               <small>{cocktail.description}</small>
             </span>
-            <b>{cocktail.temperature}</b>
+            <b>{cocktail.alcoholDegree}°</b>
           </button>
         ))}
       </div>
@@ -95,10 +146,14 @@ function CocktailSearchOverlay({
       <div className="cocktail-search__fade" aria-hidden="true" />
       <HistoryPrimaryButton
         className="cocktail-search__save"
-        onClick={() => setIsSaveCompleteOpen(true)}
+        onClick={() => void handleSave()}
+        disabled={isSaving}
       >
-        저장하기
+        {isSaving ? '저장 중...' : '저장하기'}
       </HistoryPrimaryButton>
+      {saveErrorMessage && (
+        <p className="cocktail-search__save-error">{saveErrorMessage}</p>
+      )}
 
       {isSaveCompleteOpen && (
         <SaveCompleteModal title="저장 완료되었습니다" onClose={handleCloseSaveComplete} />

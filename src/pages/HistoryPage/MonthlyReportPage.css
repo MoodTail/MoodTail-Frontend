@@ -56,7 +56,8 @@
 }
 
 .monthly-report-page__box {
-  width: 345px;
+  width: 100%;
+  max-width: 345px;
   border: 1px solid #f0e6e1;
   border-radius: 24px;
   background: rgba(255, 255, 255, 0.92);
@@ -543,7 +544,8 @@
 }
 
 .monthly-report-page__share-button {
-  width: 353px;
+  width: calc(100% + 8px);
+  max-width: 353px;
   height: 61px;
   margin-top: 24px;
   margin-left: -4px;
@@ -719,6 +721,17 @@
   opacity: 0.65;
 }
 
+.monthly-report-share-modal__error {
+  position: absolute;
+  top: 680px;
+  right: 20px;
+  left: 20px;
+  margin: 0;
+  color: #e97857;
+  font-size: 11px;
+  text-align: center;
+}
+
 .monthly-report-page__save-toast .action-complete-toast {
   position: fixed;
   top: min(749px, calc(100dvh - 75px));
@@ -745,4 +758,46 @@
     padding-right: 20px;
     padding-left: 20px;
   }
+
+  .monthly-report-page__type-list { right: 20px; }
+  .monthly-report-page__type-card { width: calc((100% - 8px) / 2); }
+  .monthly-report-page__summary-character { left: clamp(4px, 3vw, 12px); width: min(42vw, 150px); }
+  .monthly-report-page__summary-copy { right: 12px; left: auto; width: 42%; }
+
+  .monthly-report-page__radar-chart { right: 20px; left: 20px; width: auto; max-width: 265px; margin: 0 auto; }
+  .monthly-report-page__taste-metrics { width: 100%; gap: 6px; }
+  .monthly-report-page__metric { min-width: 0; width: auto; flex: 1; }
+  .monthly-report-page__cocktail-list { right: 9px; }
+  .monthly-report-page__cocktail-card { width: 100%; }
+
+  .monthly-report-page__activity {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    align-items: center;
+    gap: 12px;
+    padding: 0 18px;
+  }
+  .monthly-report-page__activity > h2,
+  .monthly-report-page__activity-count { position: static; width: auto; }
+
+  .monthly-report-share-modal__overlay { padding: 16px; }
+  .monthly-report-share-modal { width: 100%; max-height: calc(100dvh - 32px); overflow-y: auto; }
+  .monthly-report-share-modal__preview { right: 16px; left: 16px; width: auto; }
+  .monthly-report-share-modal__preview .monthly-report-page__box { width: 100%; }
+  .monthly-report-share-modal__preview .monthly-report-page__cocktail-list { right: 9px; }
+  .monthly-report-share-modal__preview .monthly-report-page__cocktail-card { width: 100%; }
+  .monthly-report-share-modal__preview .monthly-report-page__summary-character { width: min(40vw, 134px); }
+  .monthly-report-share-modal__preview .monthly-report-page__summary-copy { right: 10px; left: auto; width: 45%; }
+  .monthly-report-share-modal__actions { right: 16px; left: 16px; gap: 10px; }
+  .monthly-report-share-modal__actions .monthly-report-share-modal__button { min-width: 0; width: auto; flex: 1; }
+}
+.monthly-report-page__status {
+  position: absolute;
+  top: 180px;
+  right: 24px;
+  left: 24px;
+  margin: 0;
+  color: #77716e;
+  font-size: 13px;
+  text-align: center;
 }
