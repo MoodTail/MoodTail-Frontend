@@ -43,7 +43,7 @@ export default function QuizQuestionPage({
               flex: 1,
               height: 6,
               borderRadius: 3,
-              background: COLORS.progressTrack,
+              background: '#F5F4F0',
               overflow: "hidden",
             }}
           >

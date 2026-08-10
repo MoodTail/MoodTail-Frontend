@@ -5,6 +5,7 @@ import drinkImages from "../../assets/drinks";
 import { COLORS } from "../../theme/colors";
 import { TYPES } from "../../data/types";
 import { DEX_DATA } from "../../data/dexData";
+import { getCharacterType } from "../../data/characterType";
 import Header from "../../components/Header";
 import PhoneFrame from "../../components/PhoneFrame";
 import DexBackground from "../../components/DexBackground";
@@ -13,19 +14,22 @@ import DexBox from "../../components/DexBox";
 
 export default function TypeDexPage({
   repTypeId,
+  dexStatus,
   onOpenTypeDetail,
   onShare,
-  onBack,
   onGoTest,
 }: {
   repTypeId: string;
+  dexStatus?: Record<string, { unlocked: boolean; collectionRate: number }>;
   onOpenType: (typeId: string) => void;
   onOpenTypeDetail: (typeId: string) => void;
   onShare: () => void;
-  onBack: () => void;
   onGoTest: () => void;
 }) {
   const repType = TYPES.find((t) => t.id === repTypeId)!;
+  const repCharacterType = getCharacterType(repTypeId);
+  const repDexEntry = DEX_DATA.find((d) => d.typeId === repTypeId);
+  const repImg = repDexEntry ? drinkImages[repDexEntry.id] : drink0;
   const [lockedName, setLockedName] = useState<string | null>(null);
 
   return (
@@ -33,15 +37,16 @@ export default function TypeDexPage({
       <div style={{ padding: "18px 20px 0", flex: 1 }}>
         <Header
           title="캐릭터 도감"
-          onBack={onBack}
+          titleSize={20}
           right={
             <button
               onClick={onShare}
               style={{
+                width: 80,
                 border: "none",
                 background: COLORS.orange,
                 color: "#fff",
-                fontSize: 11.5,
+                fontSize: 12,
                 fontWeight: 700,
                 padding: "7px 12px",
                 borderRadius: 20,
@@ -57,10 +62,11 @@ export default function TypeDexPage({
         <button
           onClick={() => onOpenTypeDetail(repType.id)}
           style={{
-            background: COLORS.card,
-            border: `1px solid ${COLORS.border}`,
+            background: '#FFFAF9',
+            border: "1px solid #fff",
             borderRadius: 20,
-            padding: 18,
+            boxShadow: "0 6px 20px rgba(255, 111, 79, 0.12), 0 2px 6px rgba(43, 35, 28, 0.06)",
+            padding: "20px 18px",
             display: "flex",
             alignItems: "center",
             gap: 14,
@@ -70,12 +76,12 @@ export default function TypeDexPage({
             textAlign: "left",
           }}
         >
-          <img src={drink0} alt="" style={{ width: 60, height: 60, objectFit: "contain" }} />
+          <img src={repImg} alt="" style={{ width: 84, height: 84, objectFit: "contain" }} />
           <div style={{ flex: 1 }}>
-            <div style={{ fontSize: 12, color: COLORS.inkSoft, fontWeight: 600, marginBottom: 4 }}>
+            <div style={{ fontSize: 14, color: COLORS.inkSoft, fontWeight: 600, marginBottom: 4 }}>
               대표 타입
             </div>
-            <div style={{ fontSize: 19, fontWeight: 800, color: COLORS.ink }}>{repType.name}</div>
+            <div style={{ fontSize: 24, fontWeight: 800, color: COLORS.ink }}>{repCharacterType.name}</div>
           </div>
         </button>
 
@@ -87,22 +93,25 @@ export default function TypeDexPage({
             paddingBottom: 20,
           }}
         >
-          {DEX_DATA.map((dex) => (
-            <DexBox
-              key={dex.id}
-              drinkImg={drinkImages[dex.id]}
-              name={dex.name}
-              unlocked={dex.unlocked}
-              collectionRate={dex.collectionRate}
-              onClick={
-                dex.typeId
-                  ? () => onOpenTypeDetail(dex.typeId!)
-                  : dex.unlocked
-                    ? undefined
-                    : () => setLockedName(dex.name)
-              }
-            />
-          ))}
+          {DEX_DATA.map((dex) => {
+            const status = dexStatus?.[dex.typeId];
+            const unlocked = status?.unlocked ?? dex.unlocked;
+            const collectionRate = status?.collectionRate ?? dex.collectionRate;
+            return (
+              <DexBox
+                key={dex.id}
+                drinkImg={drinkImages[dex.id]}
+                typeId={dex.typeId}
+                unlocked={unlocked}
+                collectionRate={collectionRate}
+                onClick={
+                  unlocked
+                    ? () => onOpenTypeDetail(dex.typeId)
+                    : () => setLockedName(getCharacterType(dex.typeId).name)
+                }
+              />
+            );
+          })}
         </div>
       </div>
 

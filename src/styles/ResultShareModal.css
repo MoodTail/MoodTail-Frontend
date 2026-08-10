@@ -11,23 +11,25 @@
 
 .result-share-modal {
   position: relative;
-  width: 359.37px;
+  box-sizing: border-box;
+  width: 359px;
+  height: 593px;
   max-width: 100%;
-  max-height: 85vh;
+  max-height: calc(100dvh - 32px);
   overflow-y: auto;
-  padding: 46px 40.46px 51.22px;
-  border-radius: 15.87px;
+  padding: 56px 20px 12px;
+  border-radius: 24px;
   background: #ffffff;
-  box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
+  box-shadow: none;
 }
 
 .result-share-modal__close {
   position: absolute;
-  top: 16px;
-  right: 15px;
+  top: 21px;
+  right: 20px;
   z-index: 2;
-  width: 16px;
-  height: 17px;
+  width: 17.5px;
+  height: 18.8px;
   padding: 0;
   border: 0;
   background: transparent;
@@ -35,24 +37,33 @@
 }
 
 .result-share-modal__close img {
+  display: none;
+}
+
+.result-share-modal__close::before {
+  content: '';
   display: block;
   width: 100%;
   height: 100%;
+  background: var(--share-card-accent, #ff613d);
+  mask: url("../assets/icons/close.svg") center / contain no-repeat;
+  -webkit-mask: url("../assets/icons/close.svg") center / contain no-repeat;
 }
 
 .result-share-modal__buttons {
   display: flex;
-  gap: 12.72px;
-  margin-top: 26.54px;
+  gap: 16px;
+  margin-top: 18px;
 }
 
 .result-share-modal__button {
   flex: 1;
-  height: 48.39px;
+  min-width: 0;
+  height: 55px;
   padding: 0;
-  border-radius: 24.2px;
+  border-radius: 27.5px;
   font-family: 'Pretendard', sans-serif;
-  font-size: 13px;
+  font-size: 16px;
   font-weight: 700;
   line-height: 1;
   letter-spacing: 0;
@@ -61,13 +72,33 @@
 
 .result-share-modal__button--primary {
   border: none;
-  background: linear-gradient(180deg, #ff6f4f 0%, #ff613d 100%);
+  background: var(--share-card-accent, #ff613d);
   color: #ffffff;
 }
 
 .result-share-modal__button--secondary {
-  border: 0.79px solid #ffffff;
-  background: rgba(255, 255, 255, 0.78);
+  border: 1px solid #ffe5dc;
+  background: #ffffff;
   color: #ff613d;
-  box-shadow: 1.59px 0.79px 3.17px rgba(255, 101, 66, 0.46);
+  box-shadow: 1px 1px 4.7px rgba(255, 101, 66, 0.25);
+}
+
+@media (max-width: 392px) {
+  .result-share-modal-overlay {
+    padding: 16px;
+  }
+
+  .result-share-modal {
+    width: min(359px, 100%);
+    padding-right: 16px;
+    padding-left: 16px;
+  }
+
+  .result-share-modal__buttons {
+    gap: 12px;
+  }
+
+  .result-share-modal__button {
+    font-size: 14px;
+  }
 }

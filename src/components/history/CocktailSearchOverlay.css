@@ -1,7 +1,10 @@
 .cocktail-search {
   position: absolute;
-  inset: 0;
+  top: 0;
+  right: 0;
+  left: 0;
   z-index: 30;
+  height: 824px;
   overflow: hidden;
   background: transparent;
 }
@@ -39,6 +42,17 @@
 
 .cocktail-search__list::-webkit-scrollbar { display: none; }
 
+.cocktail-search__status {
+  margin: 32px 0 0;
+  color: #77716e;
+  font-size: 13px;
+  text-align: center;
+}
+
+.cocktail-search__status--error {
+  color: #e97857;
+}
+
 .cocktail-search__item {
   position: relative;
   display: block;
@@ -58,6 +72,10 @@
 .cocktail-search__item.is-selected {
   border-color: #ff6f4f;
   background: #ffede961;
+}
+
+.cocktail-search__item.is-saved {
+  cursor: default;
 }
 
 .cocktail-search__item.is-selected > img {
@@ -116,6 +134,18 @@
   border-radius: 26px;
 }
 
+.cocktail-search__save-error {
+  position: absolute;
+  right: 24px;
+  bottom: 88px;
+  left: 24px;
+  z-index: 2;
+  margin: 0;
+  color: #e97857;
+  font-size: 12px;
+  text-align: center;
+}
+
 @keyframes cocktail-glass-settle {
   0% { transform: translateY(0) rotate(0); }
   26% { transform: translateY(-7px) rotate(0); }
@@ -128,4 +158,10 @@
 
 @media (prefers-reduced-motion: reduce) {
   .cocktail-search__item.is-selected > img { animation-duration: 1ms; }
+}
+
+@media (max-width: 392px) {
+  .cocktail-search__input { right: 20px; width: auto; }
+  .cocktail-search__item { width: 100%; }
+  .cocktail-search__save { top: auto; right: 24px; bottom: 32px; left: 24px; width: auto; }
 }

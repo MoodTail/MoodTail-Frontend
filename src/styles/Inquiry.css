@@ -132,3 +132,33 @@
   font-weight: 700;
   cursor: pointer;
 }
+
+.inquiry__submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+@media (max-width: 392px) {
+  .inquiry {
+    padding-right: 16px;
+    padding-left: 16px;
+  }
+}
+
+@media (max-width: 359px), (max-height: 700px) {
+  .inquiry {
+    padding-top: 16px;
+  }
+
+  .inquiry__header {
+    padding-bottom: 16px;
+  }
+
+  .inquiry__description {
+    margin-bottom: 12px;
+  }
+
+  .inquiry__textarea-wrap {
+    margin-bottom: 12px;
+  }
+}

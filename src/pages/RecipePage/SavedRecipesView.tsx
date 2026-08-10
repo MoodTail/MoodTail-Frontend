@@ -1,5 +1,6 @@
 import { useState } from "react";
 import type { Recipe } from "./recipeData";
+import RecipeCard from "./RecipeCard";
 import "../../styles/SavedRecipesView.css";
 
 type CardPhase = "visible" | "exiting" | "collapsing";
@@ -11,15 +12,19 @@ interface SavedItem {
 
 interface SavedRecipesViewProps {
   recipes: Recipe[];
+  selectingId: string | null;
   onBack: () => void;
+  onUnsave: (id: string) => void;
+  onSelectRecipe: (id: string) => void;
 }
 
-function SavedRecipesView({ recipes, onBack }: SavedRecipesViewProps) {
+function SavedRecipesView({ recipes, selectingId, onBack, onUnsave, onSelectRecipe }: SavedRecipesViewProps) {
   const [items, setItems] = useState<SavedItem[]>(
     recipes.map((recipe) => ({ recipe, phase: "visible" }))
   );
 
   function handleUnsave(id: string) {
+    onUnsave(id);
     setItems((prev) => prev.map((it) => (it.recipe.id === id ? { ...it, phase: "exiting" } : it)));
     setTimeout(() => {
       setItems((prev) => prev.map((it) => (it.recipe.id === id ? { ...it, phase: "collapsing" } : it)));
@@ -28,6 +33,8 @@ function SavedRecipesView({ recipes, onBack }: SavedRecipesViewProps) {
       setItems((prev) => prev.filter((it) => it.recipe.id !== id));
     }, 500);
   }
+
+  const isEmpty = recipes.length === 0;
 
   return (
     <div className="saved-recipes">
@@ -40,6 +47,12 @@ function SavedRecipesView({ recipes, onBack }: SavedRecipesViewProps) {
         <span>저장된 레시피</span>
       </div>
 
+      {isEmpty && (
+        <p style={{ color: "#9b9088", fontSize: 13, textAlign: "center", margin: "40px 0 0" }}>
+          아직 저장한 칵테일이 없어요
+        </p>
+      )}
+
       <div className="saved-recipes__list">
         {items.map(({ recipe, phase }) => (
           <div
@@ -48,31 +61,13 @@ function SavedRecipesView({ recipes, onBack }: SavedRecipesViewProps) {
               phase === "exiting" || phase === "collapsing" ? "saved-recipe-card--leaving" : ""
             }`}
           >
-            <div className="saved-recipe-card__inner">
-              <div className="saved-recipe-card__thumb">
-                <img src={recipe.glassImage} alt={recipe.name} />
-              </div>
-              <div className="saved-recipe-card__body">
-                <div className="saved-recipe-card__name">{recipe.name}</div>
-                <div className="saved-recipe-card__desc">{recipe.description}</div>
-              </div>
-              <button
-                type="button"
-                className="saved-recipe-card__unsave"
-                onClick={() => handleUnsave(recipe.id)}
-                aria-label="저장 해제"
-              >
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                  <path
-                    d="M6 3.5 h12 a1 1 0 0 1 1 1 V21 l-7 -4.5 L5 21 V4.5 a1 1 0 0 1 1 -1 z"
-                    fill="#ff6f4f"
-                    stroke="#ff6f4f"
-                    strokeWidth="2"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </button>
-            </div>
+            <RecipeCard
+              recipe={recipe}
+              selecting={selectingId === recipe.id}
+              saved
+              onSelect={() => onSelectRecipe(recipe.id)}
+              onToggleSave={() => handleUnsave(recipe.id)}
+            />
           </div>
         ))}
       </div>

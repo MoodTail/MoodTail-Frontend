@@ -14,11 +14,19 @@ interface RankEntry {
   color: string;
 }
 
+interface KakaoShareData {
+  title: string;
+  description: string;
+  imageUrl: string;
+  webUrl: string;
+  buttonTitle: string;
+}
+
 interface ShareResultModalProps {
   onClose: () => void;
-  onShareSns: () => void; // 카카오 공유 등 실제 공유 실행 콜백으로 사용
   onSaveImage: () => void;
-  shareUrl: string; // 추가: SNS 모달에서 복사/공유할 URL
+  shareUrl: string;
+  kakaoShare: KakaoShareData;
   topPick: {
     tagline: string;
     name: string;
@@ -35,9 +43,9 @@ interface ShareResultModalProps {
 
 const ShareResultModal: FC<ShareResultModalProps> = ({
   onClose,
-  onShareSns,
   onSaveImage,
   shareUrl,
+  kakaoShare,
   topPick,
   ranking,
   matchPercent,
@@ -80,20 +88,30 @@ const ShareResultModal: FC<ShareResultModalProps> = ({
         <p className="share-result-modal__brand">MoodTail</p>
 
         <div className="share-result-modal__top-card">
-          <img
-            src={topPick.imageUrl || cocktail}
-            alt={topPick.name}
-            className="share-result-modal__top-image"
-          />
-          <p className="share-result-modal__top-tagline">{topPick.tagline}</p>
-          <p className="share-result-modal__top-name">{topPick.name}</p>
-          <p className="share-result-modal__top-desc">{topPick.description}</p>
-          <span className="share-result-modal__top-badge share-result-modal__top-badge--mine">
-            나와의 일치율 {topPick.myMatchPercent}%
-          </span>
-          <span className="share-result-modal__top-badge share-result-modal__top-badge--friend">
-            친구와의 일치율 {topPick.partnerMatchPercent}%
-          </span>
+          <div className="share-result-modal__top-main">
+            <img
+              src={topPick.imageUrl || cocktail}
+              alt={topPick.name}
+              className="share-result-modal__top-image"
+            />
+            <div className="share-result-modal__top-text">
+              <p className="share-result-modal__top-tagline">
+                {topPick.tagline}
+              </p>
+              <p className="share-result-modal__top-name">{topPick.name}</p>
+              <p className="share-result-modal__top-desc">
+                {topPick.description}
+              </p>
+              <div className="share-result-modal__top-badges">
+                <span className="share-result-modal__top-badge share-result-modal__top-badge--mine">
+                  나와의 일치율 {topPick.myMatchPercent}%
+                </span>
+                <span className="share-result-modal__top-badge share-result-modal__top-badge--friend">
+                  친구와의 일치율 {topPick.partnerMatchPercent}%
+                </span>
+              </div>
+            </div>
+          </div>
         </div>
 
         <p className="share-result-modal__rank-title">추천 순위</p>
@@ -155,7 +173,7 @@ const ShareResultModal: FC<ShareResultModalProps> = ({
           isOpen={isSnsModalOpen}
           url={shareUrl}
           onClose={() => setIsSnsModalOpen(false)}
-          onKakaoShare={onShareSns}
+          kakaoShare={kakaoShare}
         />
       </div>
     </div>

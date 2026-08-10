@@ -6,10 +6,12 @@ export default function Modal({
   children,
   onClose,
   background,
+  maxWidth = 320,
 }: {
   children: ReactNode;
   onClose: () => void;
   background?: ReactNode;
+  maxWidth?: number;
 }) {
   return (
     <div
@@ -33,7 +35,7 @@ export default function Modal({
           overflow: "hidden",
           borderRadius: 22,
           width: "100%",
-          maxWidth: 320,
+          maxWidth,
           boxShadow: "0 20px 40px rgba(43,35,28,0.25)",
         }}
       >

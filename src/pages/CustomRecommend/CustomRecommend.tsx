@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import type { FC } from "react";
 import TasteSlider from "../../components/CustomRecommend/TasteSlider";
 import "../../styles/CustomRecommend.css";
+import { postCustomCocktail } from "../../api/cocktails/cocktails.api.ts";
+import type { CustomCocktailResult } from "../../api/cocktails/cocktails.types.ts";
 
 interface TasteValues {
   strength: number;
@@ -13,7 +15,7 @@ interface TasteValues {
 
 interface CustomRecommendProps {
   onBack?: () => void;
-  onViewResult?: (values: TasteValues) => void;
+  onViewResult?: (values: TasteValues, result: CustomCocktailResult) => void;
 }
 
 const CustomRecommend: FC<CustomRecommendProps> = ({
@@ -27,6 +29,7 @@ const CustomRecommend: FC<CustomRecommendProps> = ({
     bitterness: 26,
     refreshing: 80,
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     document.body.classList.add("hide-bottom-nav");
@@ -37,6 +40,25 @@ const CustomRecommend: FC<CustomRecommendProps> = ({
 
   const updateValue = (key: keyof TasteValues) => (value: number) => {
     setValues((prev) => ({ ...prev, [key]: value }));
+  };
+
+  const handleSubmit = async (): Promise<void> => {
+    setIsSubmitting(true);
+
+    try {
+      const result = await postCustomCocktail({
+        alcoholIntensity: values.strength,
+        sweetness: values.sweetness,
+        sourness: values.acidity,
+        refreshing: values.refreshing,
+        bitterness: values.bitterness,
+      });
+      onViewResult?.(values, result);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -101,9 +123,10 @@ const CustomRecommend: FC<CustomRecommendProps> = ({
       <button
         type="button"
         className="custom-recommend-page__cta"
-        onClick={() => onViewResult?.(values)}
+        onClick={() => void handleSubmit()}
+        disabled={isSubmitting}
       >
-        추천 결과 보기
+        {isSubmitting ? "추천 받는 중..." : "추천 결과 보기"}
       </button>
     </div>
   );

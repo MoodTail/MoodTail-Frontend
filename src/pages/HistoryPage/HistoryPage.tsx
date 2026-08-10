@@ -1,4 +1,12 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import {
+  getHistoryTestResult,
+  getMonthlyHistory,
+} from '../../api/histories/histories.api'
+import type {
+  HistoryCalendarDay,
+  MonthlyHistoryResult,
+} from '../../api/histories/histories.types'
 import HistoryCalendar from '../../components/history/HistoryCalendar'
 import MonthlyReportNoticeModal from '../../components/history/MonthlyReportNoticeModal'
 import MonthlyRecordCard, {
@@ -11,28 +19,7 @@ import HistoryBackground from '../../components/common/HistoryBackground'
 import '../../styles/HistoryPage.css'
 
 const INITIAL_CALENDAR_DATE = new Date()
-const initialYear = INITIAL_CALENDAR_DATE.getFullYear()
-const initialMonth = String(INITIAL_CALENDAR_DATE.getMonth() + 1).padStart(2, '0')
-
-// TODO: 전체 히스토리 API 응답으로 교체 (date는 YYYY-MM-DD 형식)
-const MOCK_HISTORY_RECORDS: MonthlyTestRecord[] = [
-  { date: `${initialYear}-${initialMonth}-23`, type: '소다', cocktail: '모히토' },
-  { date: `${initialYear}-${initialMonth}-02`, type: '몽상가', cocktail: '블루 라군' },
-  { date: `${initialYear}-${initialMonth}-16`, type: '낭만주의자', cocktail: '마티니' },
-  { date: `${initialYear}-${initialMonth}-04`, type: '피치', cocktail: 'Corpse Reviver #2' },
-  { date: `${initialYear}-${initialMonth}-18`, type: '현실주의자', cocktail: '진 피즈' },
-  { date: `${initialYear}-${initialMonth}-06`, type: '모험가', cocktail: '마이 타이' },
-  { date: `${initialYear}-${initialMonth}-14`, type: '이상주의자', cocktail: '김렛' },
-  { date: `${initialYear}-${initialMonth}-08`, type: '평화주의자', cocktail: '미모사' },
-  { date: `${initialYear}-${initialMonth}-12`, type: '클래식', cocktail: '다이키리' },
-  { date: `${initialYear}-${initialMonth}-10`, type: '분석가', cocktail: '네그로니' },
-]
-
-function toMonthKey(date: Date) {
-  const year = date.getFullYear()
-  const month = String(date.getMonth() + 1).padStart(2, '0')
-  return `${year}-${month}`
-}
+const MAX_HISTORY_DATE = new Date()
 
 function toDateKey(date: Date) {
   const year = date.getFullYear()
@@ -46,6 +33,7 @@ interface HistoryPageProps {
   onOpenCocktailRecord: (hasTestResult: boolean, date: Date) => void
   onOpenTestResult: (hasTestResult: boolean, date: Date) => void
   onOpenMonthlyReport: (month: Date) => void
+  onStartTest: () => void
 }
 
 function HistoryPage({
@@ -53,21 +41,98 @@ function HistoryPage({
   onOpenCocktailRecord,
   onOpenTestResult,
   onOpenMonthlyReport,
+  onStartTest,
 }: HistoryPageProps) {
   const [activeMonth, setActiveMonth] = useState(INITIAL_CALENDAR_DATE)
   const [selectedDate, setSelectedDate] = useState<Date>()
   const [isMonthlyReportModalOpen, setIsMonthlyReportModalOpen] = useState(true)
   const [isHistoryDetailOpen, setIsHistoryDetailOpen] = useState(false)
   const [isNoMonthlyReportModalOpen, setIsNoMonthlyReportModalOpen] = useState(false)
+  const [monthlyHistory, setMonthlyHistory] = useState<MonthlyHistoryResult>()
+  const [monthlyRecords, setMonthlyRecords] = useState<MonthlyTestRecord[]>([])
+  const [isLoading, setIsLoading] = useState(false)
+  const [errorMessage, setErrorMessage] = useState<string>()
 
-  const activeMonthKey = toMonthKey(activeMonth)
-  const monthlyRecords = MOCK_HISTORY_RECORDS.filter((record) =>
-    record.date.startsWith(activeMonthKey),
-  )
-  const markedDates = monthlyRecords.map((record) => new Date(`${record.date}T00:00:00`))
+  const historyDays = monthlyHistory?.days ?? []
+  const markedDates = historyDays
+    .filter((day) => day.hasTestResult || day.hasDrinkingRecord)
+    .map((day) => new Date(`${day.date}T00:00:00`))
+  const selectedDay: HistoryCalendarDay | undefined = selectedDate
+    ? historyDays.find((day) => day.date === toDateKey(selectedDate))
+    : undefined
   const selectedRecord = selectedDate
     ? monthlyRecords.find((record) => record.date === toDateKey(selectedDate))
     : undefined
+  const reportAvailable = monthlyHistory?.reportAvailable ?? false
+
+  useEffect(() => {
+    let ignore = false
+
+    const fetchMonthlyHistory = async () => {
+      try {
+        setIsLoading(true)
+        setErrorMessage(undefined)
+        setMonthlyRecords([])
+
+        const result = await getMonthlyHistory({
+          year: activeMonth.getFullYear(),
+          month: activeMonth.getMonth() + 1,
+        })
+
+        if (!ignore) {
+          setMonthlyHistory(result)
+        }
+
+        const detailResults = await Promise.allSettled(
+          result.testResults.map((testResult) =>
+            getHistoryTestResult(testResult.resultId),
+          ),
+        )
+
+        if (!ignore) {
+          const records = detailResults.flatMap((detailResult) => {
+            if (detailResult.status === 'rejected') {
+              console.error(detailResult.reason)
+              return []
+            }
+
+            const detail = detailResult.value
+            const topCocktail = [...detail.recommendedCocktails].sort(
+              (a, b) => a.ranking - b.ranking,
+            )[0]
+
+            return [
+              {
+                date: detail.resultDate,
+                type: detail.moodType.name,
+                cocktail: topCocktail?.cocktailName ?? '추천 칵테일 없음',
+              },
+            ]
+          })
+
+          setMonthlyRecords(records)
+        }
+      } catch (error) {
+        console.error(error)
+
+        if (!ignore) {
+          setMonthlyHistory(undefined)
+          setMonthlyRecords([])
+          setErrorMessage('히스토리를 불러오지 못했습니다.')
+        }
+      } finally {
+        if (!ignore) {
+          setIsLoading(false)
+        }
+      }
+    }
+
+    void fetchMonthlyHistory()
+
+    return () => {
+      ignore = true
+    }
+  }, [activeMonth])
 
   const handleDateClick = (date: Date) => {
     setSelectedDate(date)
@@ -86,7 +151,7 @@ function HistoryPage({
   }
 
   const handleViewMonthlyReport = () => {
-    if (monthlyRecords.length < 5) {
+    if (!reportAvailable) {
       setIsMonthlyReportModalOpen(false)
       setIsNoMonthlyReportModalOpen(true)
       return
@@ -98,10 +163,10 @@ function HistoryPage({
 
   const handleGoToTest = () => {
     setIsMonthlyReportModalOpen(false)
-    // TODO: 테스트 화면 구현 후 이동 연결
+    onStartTest()
   }
 
-  const monthlyReportNotice = monthlyRecords.length >= 5
+  const monthlyReportNotice = reportAvailable
     ? {
         title: '월간 리포트가 도착했어요',
         description: '이번 달 테스트 기록이 5회 이상 쌓였어요.\n이달의 타입과 칵테일 통계를 확인해보세요.',
@@ -122,11 +187,17 @@ function HistoryPage({
 
       <HistoryCalendar
         initialDate={INITIAL_CALENDAR_DATE}
+        maxDate={MAX_HISTORY_DATE}
         markedDates={markedDates}
         selectedDate={selectedDate}
         onDateClick={handleDateClick}
         onActiveMonthChange={handleActiveMonthChange}
       />
+
+      {isLoading && <p className="history-page__status">히스토리를 불러오는 중...</p>}
+      {errorMessage && (
+        <p className="history-page__status history-page__status--error">{errorMessage}</p>
+      )}
 
       <MonthlyRecordCard records={monthlyRecords} />
 
@@ -138,7 +209,7 @@ function HistoryPage({
         월간 리포트 보기
       </button>
 
-      {isMonthlyReportModalOpen && (
+      {monthlyHistory && isMonthlyReportModalOpen && (
         <MonthlyReportNoticeModal
           title={monthlyReportNotice.title}
           description={monthlyReportNotice.description}
@@ -148,25 +219,25 @@ function HistoryPage({
         />
       )}
 
-      {isHistoryDetailOpen && selectedDate && selectedRecord && (
+      {isHistoryDetailOpen && selectedDate && selectedDay && (
         <HistoryDetailBottomSheet
           year={selectedDate.getFullYear()}
           month={selectedDate.getMonth() + 1}
           date={selectedDate.getDate()}
-          type={selectedRecord.type}
+          type={selectedDay.moodType?.name ?? selectedRecord?.type ?? ''}
           message="재미있으면 그걸로 충분한 거 아닐까?"
           onRecordCocktail={() => {
-            onOpenCocktailRecord(true, selectedDate)
+            onOpenCocktailRecord(selectedDay.hasTestResult, selectedDate)
           }}
           onViewDetails={() => {
-            onOpenPhotoDetails(true, selectedDate)
+            onOpenPhotoDetails(selectedDay.hasTestResult, selectedDate)
           }}
-          onViewTestResult={() => onOpenTestResult(true, selectedDate)}
+          onViewTestResult={() => onOpenTestResult(selectedDay.hasTestResult, selectedDate)}
           onClose={handleCloseHistoryDetail}
         />
       )}
 
-      {isHistoryDetailOpen && selectedDate && !selectedRecord && (
+      {isHistoryDetailOpen && selectedDate && !selectedDay && (
         <EmptyHistoryDateBottomSheet
           year={selectedDate.getFullYear()}
           month={selectedDate.getMonth() + 1}

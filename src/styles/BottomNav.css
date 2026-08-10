@@ -14,7 +14,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 53px;
+  justify-content: space-around;
+  gap: 0;
+  padding: 0 16px;
 }
 
 .bottom-nav__item {

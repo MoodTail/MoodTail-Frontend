@@ -1,30 +1,41 @@
-import { COLORS } from "../theme/colors";
+import { getCharacterType } from "../data/characterType";
 
 export default function DexBox({
   drinkImg,
-  name,
+  typeId,
   collectionRate,
   unlocked,
   onClick,
+  border,
+  boxShadow,
+  nameFontSize,
 }: {
   drinkImg: string;
-  name: string;
+  typeId: string;
   collectionRate?: number;
   unlocked: boolean;
   onClick?: () => void;
+  border?: string;
+  boxShadow?: string;
+  nameFontSize?: number;
 }) {
   if (unlocked) {
+    // number가 아니라 typeId로 직접 찾습니다 — number는 characterType.ts에서 중복될 수 있어서
+    // (예: realist/straightforward가 둘 다 number 3) number 기준 조회는 틀린 항목을 찾을 수 있습니다.
+    const characterType = getCharacterType(typeId);
+
     return (
       <button
         type="button"
         onClick={onClick}
         disabled={!onClick}
         style={{
+          width: "100%",
           aspectRatio: "1 / 1",
           borderRadius: 18,
-          background: COLORS.card,
-          border: `1px solid ${COLORS.border}`,
-          boxShadow: "0 8px 18px rgba(43, 35, 28, 0.14)",
+          background: '#FFFAF9',
+          border: border ?? "none",
+          boxShadow: boxShadow ?? "0 6px 20px rgba(255, 111, 79, 0.12), 0 2px 6px rgba(43, 35, 28, 0.06)",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
@@ -34,8 +45,22 @@ export default function DexBox({
           cursor: onClick ? "pointer" : "default",
         }}
       >
-        <img src={drinkImg} alt="" style={{ width: "70%", height: "70%", objectFit: "contain" }} />
-        <span style={{ fontSize: 10.5, fontWeight: 700, color: COLORS.orange }}>{name}</span>
+        <img src={drinkImg} alt="" style={{ width: "90%", height: "70%", objectFit: "contain" }} />
+        <span
+          style={{
+            fontSize: nameFontSize ?? 11,
+            fontWeight: 700,
+            color: characterType?.color,
+            textAlign: "center",
+            lineHeight: 1.2,
+            display: "-webkit-box",
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: "vertical",
+            overflow: "hidden",
+          }}
+        >
+          {characterType?.name}
+        </span>
       </button>
     );
   }
@@ -46,11 +71,12 @@ export default function DexBox({
       onClick={onClick}
       disabled={!onClick}
       style={{
+        width: "100%",
         aspectRatio: "1 / 1",
         borderRadius: 18,
         background: "#CAB8B3",
-        border: "none",
-        boxShadow: "0 6px 14px rgba(43, 35, 28, 0.10)",
+        border: border ? "1px solid #CAB8B3" : "none",
+        boxShadow: boxShadow ?? "inset 0 1px 2px rgba(43, 35, 28, 0.06)",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
@@ -59,10 +85,8 @@ export default function DexBox({
         cursor: onClick ? "pointer" : "default",
       }}
     >
-      <div style={{ fontSize: 11.5, fontWeight: 700, color: "#323232" }}>타입명</div>
-      <div style={{ fontSize: 10, fontWeight: 600, color: "#827F7F" }}>
-        수집률 {collectionRate ?? 0}%
-      </div>
+      <div style={{ fontSize: 18, fontWeight: 700, color: "#323232" }}>타입명</div>
+      <div style={{ fontSize: 11, fontWeight: 600, color: "#8E8A88" }}>수집률 {collectionRate ?? 0}%</div>
     </button>
   );
 }

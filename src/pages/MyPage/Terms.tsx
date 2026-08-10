@@ -1,4 +1,9 @@
+import { useEffect, useState } from 'react'
+import ReactMarkdown from 'react-markdown'
+import { getTerms } from '../../api/terms/terms.api'
+import type { Term } from '../../api/terms/terms.types'
 import chevronLeftIcon from '../../assets/icons/chevron-left.svg'
+import { stripDuplicateMarkdownTitle } from '../../utils/termsMarkdown'
 import '../../styles/Terms.css'
 
 interface TermsProps {
@@ -7,6 +12,29 @@ interface TermsProps {
 }
 
 function Terms({ onBack }: TermsProps) {
+  const [terms, setTerms] = useState<Term[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [loadError, setLoadError] = useState('')
+
+  useEffect(() => {
+    let cancelled = false
+
+    getTerms()
+      .then((result) => {
+        if (!cancelled) setTerms(result)
+      })
+      .catch(() => {
+        if (!cancelled) setLoadError('이용약관을 불러오지 못했습니다')
+      })
+      .finally(() => {
+        if (!cancelled) setIsLoading(false)
+      })
+
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
   const handleBack = () => {
     if (onBack) {
       onBack()
@@ -25,7 +53,20 @@ function Terms({ onBack }: TermsProps) {
         <h1 className="terms__title">이용 약관</h1>
       </header>
 
-      <div className="terms__content">{/* TODO: 실제 이용약관 텍스트 반영 예정 */}</div>
+      <div className="terms__content">
+        {isLoading && '불러오는 중...'}
+        {!isLoading && loadError && loadError}
+        {!isLoading &&
+          !loadError &&
+          terms.map((term) => (
+            <section key={term.termId} className="terms__section">
+              <h2 className="terms__section-title">{term.title}</h2>
+              <div className="terms__section-body">
+                <ReactMarkdown>{stripDuplicateMarkdownTitle(term.content, term.title)}</ReactMarkdown>
+              </div>
+            </section>
+          ))}
+      </div>
     </div>
   )
 }

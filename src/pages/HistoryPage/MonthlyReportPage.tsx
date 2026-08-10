@@ -1,17 +1,23 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import { toBlob } from "html-to-image";
+import {
+  getSharedMonthlyReport,
+  getMonthlyReport,
+  uploadMonthlyReportShareImage,
+} from "../../api/reports/reports.api";
+import type {
+  MonthlyReportResult,
+  MonthlyReportTasteProfile,
+} from "../../api/reports/reports.types";
 import chevronLeftIcon from "../../assets/icons/chevron-left.svg";
 import monthlyReportCharacter from "../../assets/images/history/monthly_report_character.png";
 import Button from "../../components/Button/Button";
 import ActionCompleteToast from "../../components/Modal/ActionCompleteToast";
-import SnsShareOptionsModal from "../../components/SnsShareOptionsModal";
 import MonthlyReportBackground from "../../components/common/MonthlyReportBackground";
+import ResultSnsShareModal from "../../components/common/modal/ResultSnsShareModal";
+import { CHARACTER_IMAGES, type CharacterType } from "../../constants/characters";
 import "./MonthlyReportPage.css";
-
-const SECONDARY_TYPES = [
-  { rank: 2, name: '낭만주의자', count: 3 },
-  { rank: 3, name: '낭만주의자', count: 2 },
-];
 
 interface MonthlyReportPageProps {
   onBack: () => void;
@@ -30,11 +36,66 @@ function drawRoundedRect(
   context.roundRect(x, y, width, height, radius);
 }
 
-async function createMonthlyReportPng() {
+function fitCanvasText(
+  context: CanvasRenderingContext2D,
+  text: string,
+  maxWidth: number,
+  maxSize: number,
+  minSize: number,
+  weight = 800,
+) {
+  let size = maxSize;
+  while (size > minSize) {
+    context.font = `${weight} ${size}px Pretendard, sans-serif`;
+    if (context.measureText(text).width <= maxWidth) break;
+    size -= 1;
+  }
+  context.font = `${weight} ${size}px Pretendard, sans-serif`;
+}
+
+function wrapCanvasText(
+  context: CanvasRenderingContext2D,
+  text: string,
+  maxWidth: number,
+  maxLines: number,
+) {
+  const lines: string[] = [];
+  let line = '';
+
+  for (const character of text) {
+    const candidate = line + character;
+    if (line && context.measureText(candidate).width > maxWidth) {
+      lines.push(line.trimEnd());
+      line = character.trimStart();
+      if (lines.length === maxLines - 1) break;
+    } else {
+      line = candidate;
+    }
+  }
+
+  if (line && lines.length < maxLines) lines.push(line.trim());
+  return lines;
+}
+
+function getReportCharacterImage(report: MonthlyReportResult) {
+  const typeCode = report.monthlyMoodType.typeCode as CharacterType;
+  return CHARACTER_IMAGES[typeCode]
+    ?? report.monthlyMoodType.characterImageUrl
+    ?? monthlyReportCharacter;
+}
+
+async function createMonthlyReportPng(report: MonthlyReportResult) {
   await document.fonts.ready;
   const character = new Image();
-  character.src = monthlyReportCharacter;
-  await character.decode();
+  character.crossOrigin = 'anonymous';
+  character.src = getReportCharacterImage(report);
+  try {
+    await character.decode();
+  } catch {
+    character.removeAttribute('crossorigin');
+    character.src = monthlyReportCharacter;
+    await character.decode();
+  }
 
   const scale = 2;
   const canvas = document.createElement('canvas');
@@ -73,15 +134,29 @@ async function createMonthlyReportPng() {
   context.fill();
   context.fillStyle = '#ff6248';
   context.font = '700 12px Pretendard, sans-serif';
-  context.fillText('1위 · 7회', 209, 154);
+  const primaryType = report.topMoodTypes.find(
+    (type) => type.moodTypeId === report.monthlyMoodType.moodTypeId,
+  );
+  context.fillText(
+    `${primaryType?.ranking ?? 1}위 · ${primaryType?.count ?? 0}회`,
+    209,
+    154,
+  );
   context.textAlign = 'left';
   context.fillStyle = '#17172a';
-  context.font = '800 22px Pretendard, sans-serif';
-  context.fillText('현실주의자', 168, 195);
+  fitCanvasText(context, report.monthlyMoodType.name, 143, 22, 14);
+  context.fillText(report.monthlyMoodType.name, 168, 195);
   context.fillStyle = '#666666';
   context.font = '500 10px Pretendard, sans-serif';
-  context.fillText('“차분하지만 분명한 취향이', 168, 222);
-  context.fillText('이번 달을 채웠어요.”', 168, 242);
+  const descriptionLines = wrapCanvasText(
+    context,
+    report.monthlyMoodType.shortDescription,
+    143,
+    3,
+  );
+  descriptionLines.forEach((line, index) => {
+    context.fillText(line, 168, 222 + index * 20);
+  });
 
   drawCard(18, 302, 309, 291, 24);
   context.fillStyle = '#17172a';
@@ -91,11 +166,14 @@ async function createMonthlyReportPng() {
   context.font = '400 10px Pretendard, sans-serif';
   context.fillText('히스토리에 기록한 칵테일 기준이에요.', 36, 371);
 
-  const cocktails = [
-    { rank: 1, name: '피치 하이볼', count: 5, percent: 42, color: '#ff6248' },
-    { rank: 2, name: '모히토', count: 3, percent: 28, color: '#34dbce' },
-    { rank: 3, name: '선라이즈 소다', count: 2, percent: 18, color: '#ffc92c' },
-  ];
+  const rankColors = ['#ff6248', '#34dbce', '#ffc92c'];
+  const cocktails = report.frequentCocktails.map((cocktail, index) => ({
+    rank: cocktail.ranking,
+    name: cocktail.nameKo || cocktail.nameEn,
+    count: cocktail.count,
+    percent: cocktail.recordPercentage,
+    color: rankColors[index] ?? '#ff6248',
+  }));
   cocktails.forEach((cocktail, index) => {
     const y = 383 + index * 70;
     drawCard(27, y, 289, 64, 18);
@@ -127,9 +205,9 @@ async function createMonthlyReportPng() {
   context.fillText('활동 통계', 36, 651);
   context.fillStyle = '#ff6248';
   context.font = '700 15px Pretendard, sans-serif';
-  context.fillText('테스트 12회', 148, 651);
+  context.fillText(`테스트 ${report.activity.testCount}회`, 148, 651);
   context.fillStyle = '#2878ff';
-  context.fillText('기록 8회', 253, 651);
+  context.fillText(`기록 ${report.activity.drinkingRecordCount}회`, 253, 651);
 
   return await new Promise<Blob>((resolve, reject) => {
     canvas.toBlob((blob) => {
@@ -139,7 +217,37 @@ async function createMonthlyReportPng() {
   });
 }
 
-function SummaryCard() {
+const RADAR_CENTER = { x: 132.5, y: 112 };
+const RADAR_ENDPOINTS = [
+  { x: 132.5, y: 29 },
+  { x: 211.4, y: 86.4 },
+  { x: 181.3, y: 179.1 },
+  { x: 83.7, y: 179.1 },
+  { x: 53.6, y: 86.4 },
+];
+
+function toRadarPoints(scores: MonthlyReportTasteProfile) {
+  const values = [
+    scores.sweetness,
+    scores.sourness,
+    scores.bitterness,
+    scores.alcoholIntensity,
+    scores.refreshing,
+  ];
+
+  return RADAR_ENDPOINTS.map((endpoint, index) => {
+    const ratio = values[index] / 100;
+    const x = RADAR_CENTER.x + (endpoint.x - RADAR_CENTER.x) * ratio;
+    const y = RADAR_CENTER.y + (endpoint.y - RADAR_CENTER.y) * ratio;
+    return [Number(x.toFixed(1)), Number(y.toFixed(1))] as const;
+  });
+}
+
+function SummaryCard({ report }: { report: MonthlyReportResult }) {
+  const primaryType = report.topMoodTypes.find(
+    (type) => type.moodTypeId === report.monthlyMoodType.moodTypeId,
+  );
+
   return (
     <section
       className="monthly-report-page__box monthly-report-page__summary"
@@ -147,23 +255,28 @@ function SummaryCard() {
     >
       <img
         className="monthly-report-page__summary-character"
-        src={monthlyReportCharacter}
-        alt="현실주의자 캐릭터"
+        src={getReportCharacterImage(report)}
+        alt={`${report.monthlyMoodType.name} 캐릭터`}
       />
       <div className="monthly-report-page__summary-copy">
-        <span className="monthly-report-page__summary-rank">1위 · 7회</span>
-        <h2 className="monthly-report-page__summary-type">현실주의자</h2>
+        <span className="monthly-report-page__summary-rank">
+          {primaryType?.ranking ?? 1}위 · {primaryType?.count ?? 0}회
+        </span>
+        <h2
+          className="monthly-report-page__summary-type"
+          style={{ fontSize: report.monthlyMoodType.name.length > 8 ? '16px' : undefined }}
+        >
+          {report.monthlyMoodType.name}
+        </h2>
         <p className="monthly-report-page__summary-description">
-          "차분하지만 분명한 취향이
-          <br />
-          이번 달을 채웠어요."
+          {report.monthlyMoodType.shortDescription}
         </p>
       </div>
     </section>
   );
 }
 
-function CocktailsCard() {
+function CocktailsCard({ report }: { report: MonthlyReportResult }) {
   return (
     <section className="monthly-report-page__box monthly-report-page__cocktails">
       <h2>많이 마신 칵테일 TOP3</h2>
@@ -171,23 +284,22 @@ function CocktailsCard() {
         히스토리에 기록한 칵테일 기준이에요.
       </p>
       <div className="monthly-report-page__cocktail-list">
-        {[
-          { rank: 1, name: '피치 하이볼', count: 5, percent: 42 },
-          { rank: 2, name: '모히토', count: 3, percent: 28 },
-          { rank: 3, name: '선라이즈 소다', count: 2, percent: 18 },
-        ].map(({ rank, name, count, percent }) => (
-          <article className="monthly-report-page__cocktail-card" key={rank}>
+        {report.frequentCocktails.map((cocktail) => (
+          <article
+            className="monthly-report-page__cocktail-card"
+            key={cocktail.cocktailId}
+          >
             <span
-              className={`monthly-report-page__cocktail-rank monthly-report-page__cocktail-rank--${rank}`}
+              className={`monthly-report-page__cocktail-rank monthly-report-page__cocktail-rank--${cocktail.ranking}`}
             >
-              {rank}
+              {cocktail.ranking}
             </span>
             <div className="monthly-report-page__cocktail-copy">
-              <h3>{name}</h3>
-              <p>{count}회 기록</p>
+              <h3>{cocktail.nameKo || cocktail.nameEn}</h3>
+              <p>{cocktail.count}회 기록</p>
             </div>
             <strong className="monthly-report-page__cocktail-percent">
-              {percent}%
+              {cocktail.recordPercentage}%
             </strong>
           </article>
         ))}
@@ -196,55 +308,116 @@ function CocktailsCard() {
   );
 }
 
-function ActivityCard() {
+function ActivityCard({ report }: { report: MonthlyReportResult }) {
   return (
     <section className="monthly-report-page__box monthly-report-page__activity">
       <h2>활동 통계</h2>
       <strong className="monthly-report-page__activity-count monthly-report-page__activity-count--test">
-        테스트 12회
+        테스트 {report.activity.testCount}회
       </strong>
       <strong className="monthly-report-page__activity-count monthly-report-page__activity-count--record">
-        기록 8회
+        기록 {report.activity.drinkingRecordCount}회
       </strong>
     </section>
   );
 }
 
 function MonthlyReportPage({ onBack, reportMonth }: MonthlyReportPageProps) {
+  const reportYear = reportMonth.getFullYear();
+  const reportMonthNumber = reportMonth.getMonth() + 1;
+  const [report, setReport] = useState<MonthlyReportResult>();
+  const [isReportLoading, setIsReportLoading] = useState(true);
+  const [reportError, setReportError] = useState<string>();
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [isSnsShareModalOpen, setIsSnsShareModalOpen] = useState(false);
   const [isSaveCompleteToastOpen, setIsSaveCompleteToastOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const hasSecondaryTypeData = SECONDARY_TYPES.length > 0;
+  const [isShareImageUploading, setIsShareImageUploading] = useState(false);
+  const [monthlyReportShareImageUrl, setMonthlyReportShareImageUrl] = useState<string>();
+  const [shareImageError, setShareImageError] = useState<string>();
+  const sharePreviewRef = useRef<HTMLDivElement>(null);
   const mobileFrame = document.querySelector<HTMLElement>(".app");
+  const secondaryTypes =
+    report?.topMoodTypes.filter(
+      (type) => type.moodTypeId !== report.monthlyMoodType.moodTypeId,
+    ) ?? [];
+  const hasSecondaryTypeData = secondaryTypes.length > 0;
+  const currentRadarPoints = report
+    ? toRadarPoints(report.displayAverageTasteScores)
+    : [];
+  const previousRadarPoints = report?.previousMonthDisplayTasteScores
+    ? toRadarPoints(report.previousMonthDisplayTasteScores)
+    : [];
+
+  useEffect(() => {
+    const controller = new AbortController();
+    const timer = window.setTimeout(async () => {
+      try {
+        setIsReportLoading(true);
+        setReportError(undefined);
+        const result = await getMonthlyReport(
+          { year: reportYear, month: reportMonthNumber },
+          controller.signal,
+        );
+        setReport(result);
+      } catch (error) {
+        if (controller.signal.aborted) return;
+        console.error(error);
+        setReport(undefined);
+        setReportError("월간 리포트를 불러오지 못했습니다.");
+      } finally {
+        if (!controller.signal.aborted) setIsReportLoading(false);
+      }
+    }, 0);
+
+    return () => {
+      window.clearTimeout(timer);
+      controller.abort();
+    };
+  }, [reportMonthNumber, reportYear]);
+
+  const handleOpenShareModal = () => {
+    if (!report) return;
+    setShareImageError(undefined);
+    setIsShareModalOpen(true);
+  };
+
+  const handleCloseShareModal = () => {
+    setIsShareModalOpen(false);
+  };
+
+  const createVisibleShareCardPng = async () => {
+    if (!sharePreviewRef.current) {
+      if (!report) throw new Error('월간 리포트 데이터가 없습니다.');
+      return createMonthlyReportPng(report);
+    }
+    const blob = await toBlob(sharePreviewRef.current, {
+      pixelRatio: 2,
+      cacheBust: true,
+      backgroundColor: '#fffaf8',
+    });
+    if (!blob) throw new Error('공유 카드 이미지를 생성하지 못했습니다.');
+    return blob;
+  };
 
   const handleSaveImage = async () => {
-    if (isSaving) return;
+    if (isSaving || !report) return;
     setIsSaving(true);
 
     try {
-      const blob = await createMonthlyReportPng();
+      const blob = await createVisibleShareCardPng();
       const file = new File([blob], 'moodtail-monthly-report.png', {
         type: 'image/png',
       });
-      const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(
-        navigator.userAgent,
-      );
-      const canShareFile = Boolean(navigator.canShare?.({ files: [file] }));
-
-      if (isMobile && canShareFile) {
-        await navigator.share({ files: [file], title: 'MoodTail 월간 리포트' });
-      } else {
-        const downloadUrl = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = downloadUrl;
-        link.download = file.name;
-        link.style.display = 'none';
-        document.body.appendChild(link);
-        link.click();
-        link.remove();
-        window.setTimeout(() => URL.revokeObjectURL(downloadUrl), 1000);
-      }
+      const downloadUrl = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = downloadUrl;
+      link.download = file.name;
+      link.style.display = 'none';
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.setTimeout(() => URL.revokeObjectURL(downloadUrl), 1000);
 
       setIsSaveCompleteToastOpen(true);
     } catch (error) {
@@ -254,6 +427,71 @@ function MonthlyReportPage({ onBack, reportMonth }: MonthlyReportPageProps) {
       setIsSaving(false);
     }
   };
+
+  const handleOpenSnsShare = async () => {
+    if (isShareImageUploading || !report) return;
+
+    try {
+      setIsShareImageUploading(true);
+      setShareImageError(undefined);
+
+      const blob = await createVisibleShareCardPng();
+      if (blob.size > 5 * 1024 * 1024) {
+        throw new Error("월간 리포트 이미지가 5MB를 초과했습니다.");
+      }
+
+      const image = new File([blob], "moodtail-monthly-report.png", {
+        type: "image/png",
+      });
+      const result = await uploadMonthlyReportShareImage({
+        year: reportYear,
+        month: reportMonthNumber,
+        image,
+      });
+      await getSharedMonthlyReport(result.shareToken);
+      const shareImageUrl = new URL(
+        `/api/v1/reports/monthly/shares/${encodeURIComponent(result.shareToken)}/image`,
+        import.meta.env.VITE_API_BASE_URL,
+      ).href;
+
+      setMonthlyReportShareImageUrl(shareImageUrl);
+      setIsSnsShareModalOpen(true);
+    } catch (error) {
+      console.error("월간 리포트 공유 이미지 업로드 실패", error);
+      setShareImageError(
+        error instanceof Error
+          ? error.message
+          : "공유 이미지를 저장하지 못했습니다.",
+      );
+    } finally {
+      setIsShareImageUploading(false);
+    }
+  };
+
+  if (!report) {
+    return (
+      <div className="monthly-report-page">
+        <MonthlyReportBackground variant="short" />
+        <header className="monthly-report-page__header">
+          <button
+            type="button"
+            className="monthly-report-page__back-button"
+            onClick={onBack}
+            aria-label="히스토리로 돌아가기"
+          >
+            <img src={chevronLeftIcon} alt="" />
+          </button>
+          <div>
+            <h1>월간 리포트</h1>
+            <p>지난 달과 이번 달의 맛 변화를 비교해요</p>
+          </div>
+        </header>
+        <p className="monthly-report-page__status">
+          {isReportLoading ? "월간 리포트를 불러오는 중..." : reportError}
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div
@@ -279,25 +517,28 @@ function MonthlyReportPage({ onBack, reportMonth }: MonthlyReportPageProps) {
       </header>
 
       <main className="monthly-report-page__content">
-        <SummaryCard />
+        <SummaryCard report={report} />
 
         {hasSecondaryTypeData && (
           <section className="monthly-report-page__box monthly-report-page__types">
             <h2>다음으로 많이 나온 타입</h2>
             <div className="monthly-report-page__type-list">
-              {SECONDARY_TYPES.map(({ rank, name, count }) => (
-                <article className="monthly-report-page__type-card" key={rank}>
+              {secondaryTypes.map((type, index) => (
+                <article
+                  className="monthly-report-page__type-card"
+                  key={type.moodTypeId}
+                >
                   <span
-                    className={`monthly-report-page__type-rank monthly-report-page__type-rank--${rank === 2 ? 'second' : 'third'}`}
+                    className={`monthly-report-page__type-rank monthly-report-page__type-rank--${index === 0 ? 'second' : 'third'}`}
                   >
-                    {rank}
+                    {type.ranking}
                   </span>
                   <div className="monthly-report-page__type-copy">
-                    <h3>{name}</h3>
+                    <h3>{type.name}</h3>
                     <p
-                      className={`monthly-report-page__type-count monthly-report-page__type-count--${rank === 2 ? 'second' : 'third'}`}
+                      className={`monthly-report-page__type-count monthly-report-page__type-count--${index === 0 ? 'second' : 'third'}`}
                     >
-                      {count}회
+                      {type.count}회
                     </p>
                   </div>
                 </article>
@@ -343,30 +584,36 @@ function MonthlyReportPage({ onBack, reportMonth }: MonthlyReportPageProps) {
               <text x="28" y="88" textAnchor="middle">청량감</text>
             </g>
 
-            <polygon
-              className="monthly-report-page__radar-area monthly-report-page__radar-area--previous"
-              points="132.5,72 181.4,96.1 146.2,130.8 99.8,157 71,92"
-            />
-            <g className="monthly-report-page__radar-points monthly-report-page__radar-points--previous">
-              {[[132.5, 72], [181.4, 96.1], [146.2, 130.8], [99.8, 157], [71, 92]].map(([cx, cy]) => (
-                <circle key={`${cx}-${cy}`} cx={cx} cy={cy} r="5" />
-              ))}
-            </g>
+            {previousRadarPoints.length > 0 && (
+              <>
+                <polygon
+                  className="monthly-report-page__radar-area monthly-report-page__radar-area--previous"
+                  points={previousRadarPoints.map((point) => point.join(",")).join(" ")}
+                />
+                <g className="monthly-report-page__radar-points monthly-report-page__radar-points--previous">
+                  {previousRadarPoints.map(([cx, cy]) => (
+                    <circle key={`${cx}-${cy}`} cx={cx} cy={cy} r="5" />
+                  ))}
+                </g>
+              </>
+            )}
             <polygon
               className="monthly-report-page__radar-area monthly-report-page__radar-area--current"
-              points="132.5,52.2 174.3,98.4 155.9,144.2 90.5,169.7 88.3,97.6"
+              points={currentRadarPoints.map((point) => point.join(",")).join(" ")}
             />
             <g className="monthly-report-page__radar-points monthly-report-page__radar-points--current">
-              {[[132.5, 52.2], [174.3, 98.4], [155.9, 144.2], [90.5, 169.7], [88.3, 97.6]].map(([cx, cy]) => (
+              {currentRadarPoints.map(([cx, cy]) => (
                 <circle key={`${cx}-${cy}`} cx={cx} cy={cy} r="5" />
               ))}
             </g>
           </svg>
 
           <div className="monthly-report-page__chart-legend" aria-label="그래프 범례">
-            <span className="monthly-report-page__legend-item monthly-report-page__legend-item--previous">
-              지난달
-            </span>
+            {previousRadarPoints.length > 0 && (
+              <span className="monthly-report-page__legend-item monthly-report-page__legend-item--previous">
+                지난달
+              </span>
+            )}
             <span className="monthly-report-page__legend-item monthly-report-page__legend-item--current">
               이번달
             </span>
@@ -375,11 +622,11 @@ function MonthlyReportPage({ onBack, reportMonth }: MonthlyReportPageProps) {
 
         <section className="monthly-report-page__taste-metrics" aria-label="맛 지표">
           {[
-            { label: '도수', value: 45, highlighted: true },
-            { label: '당도', value: 30, highlighted: false },
-            { label: '산도', value: 70, highlighted: true },
-            { label: '쓴맛', value: 20, highlighted: false },
-            { label: '청량감', value: 90, highlighted: true },
+            { label: '도수', value: report.displayAverageTasteScores.alcoholIntensity, highlighted: true },
+            { label: '당도', value: report.displayAverageTasteScores.sweetness, highlighted: false },
+            { label: '산도', value: report.displayAverageTasteScores.sourness, highlighted: true },
+            { label: '쓴맛', value: report.displayAverageTasteScores.bitterness, highlighted: false },
+            { label: '청량감', value: report.displayAverageTasteScores.refreshing, highlighted: true },
           ].map(({ label, value, highlighted }) => (
             <div
               className={`monthly-report-page__metric${
@@ -393,14 +640,14 @@ function MonthlyReportPage({ onBack, reportMonth }: MonthlyReportPageProps) {
           ))}
         </section>
 
-        <CocktailsCard />
+        <CocktailsCard report={report} />
 
-        <ActivityCard />
+        <ActivityCard report={report} />
 
         <button
           type="button"
           className="monthly-report-page__share-button"
-          onClick={() => setIsShareModalOpen(true)}
+          onClick={handleOpenShareModal}
         >
           공유하기
         </button>
@@ -409,42 +656,37 @@ function MonthlyReportPage({ onBack, reportMonth }: MonthlyReportPageProps) {
       {isShareModalOpen && createPortal(
         <div
           className="monthly-report-share-modal__overlay"
-          onClick={() => setIsShareModalOpen(false)}
+          onClick={handleCloseShareModal}
         >
           <section
             className="monthly-report-share-modal"
             role="dialog"
             aria-modal="true"
-            aria-labelledby="share-modal-title"
+            aria-label="월간 리포트 공유 미리보기"
             onClick={(event) => event.stopPropagation()}
           >
             <button
               type="button"
               className="monthly-report-share-modal__close"
-              onClick={() => setIsShareModalOpen(false)}
+              onClick={handleCloseShareModal}
               aria-label="공유 미리보기 닫기"
             >
               ×
             </button>
-            <h2 id="share-modal-title" className="monthly-report-share-modal__title">
-              MoodTail
-            </h2>
-
-            <div className="monthly-report-share-modal__preview">
-              <SummaryCard />
-              <CocktailsCard />
-              <ActivityCard />
+            <div ref={sharePreviewRef} className="monthly-report-share-modal__preview">
+              <SummaryCard report={report} />
+              <CocktailsCard report={report} />
+              <ActivityCard report={report} />
             </div>
 
             <div className="monthly-report-share-modal__actions">
               <Button
                 variant="primary"
-                  className="monthly-report-share-modal__button"
-                  onClick={() => {
-                    setIsSnsShareModalOpen(true);
-                  }}
+                className="monthly-report-share-modal__button"
+                onClick={() => void handleOpenSnsShare()}
+                disabled={isShareImageUploading}
               >
-                SNS 공유하기
+                {isShareImageUploading ? "업로드 중..." : "SNS 공유하기"}
               </Button>
               <Button
                 variant="light"
@@ -455,32 +697,32 @@ function MonthlyReportPage({ onBack, reportMonth }: MonthlyReportPageProps) {
                 {isSaving ? '저장 중...' : '이미지 저장'}
               </Button>
             </div>
+            {shareImageError && (
+              <p className="monthly-report-share-modal__error">
+                {shareImageError}
+              </p>
+            )}
           </section>
         </div>,
         mobileFrame ?? document.body,
       )}
 
-      {isSnsShareModalOpen &&
-        (mobileFrame
-          ? createPortal(
-              <div
-                style={{
-                  position: "absolute",
-                  inset: 0,
-                  zIndex: 1001,
-                }}
-              >
-                <SnsShareOptionsModal
-                  onClose={() => setIsSnsShareModalOpen(false)}
-                />
-              </div>,
-              mobileFrame,
-            )
-          : (
-              <SnsShareOptionsModal
-                onClose={() => setIsSnsShareModalOpen(false)}
-              />
-            ))}
+      {isSnsShareModalOpen && monthlyReportShareImageUrl &&
+        createPortal(
+          <ResultSnsShareModal
+            isOpen
+            url={monthlyReportShareImageUrl}
+            onClose={() => setIsSnsShareModalOpen(false)}
+            kakaoShare={{
+              title: `MoodTail ${reportYear}년 ${reportMonthNumber}월 리포트`,
+              description: `${report.monthlyMoodType.name} 유형의 월간 취향 리포트예요.`,
+              imageUrl: monthlyReportShareImageUrl,
+              webUrl: monthlyReportShareImageUrl,
+              buttonTitle: '결과 이미지 보기',
+            }}
+          />,
+          mobileFrame ?? document.body,
+        )}
 
       {isSaveCompleteToastOpen &&
         createPortal(

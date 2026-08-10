@@ -69,14 +69,15 @@
   border-radius: 50%;
   background: radial-gradient(circle, #ffe9df 0%, #fff5ef 70%, transparent 100%);
   box-shadow: 0 12px 28px rgba(255, 111, 79, 0.45);
+  overflow: hidden;
   cursor: pointer;
 }
 
 .profile-edit__avatar-image {
   width: 100%;
   height: 100%;
-  border-radius: 50%;
-  object-fit: cover;
+  object-fit: contain;
+  transform-origin: center;
 }
 
 .profile-edit__avatar-hint {
@@ -135,6 +136,13 @@
   cursor: pointer;
 }
 
+.profile-edit__error {
+  margin: 0 0 8px;
+  font-size: 12px;
+  color: #ff4d4f;
+  text-align: center;
+}
+
 .profile-edit__save {
   margin-top: auto;
   width: 100%;
@@ -147,4 +155,46 @@
   font-size: 16px;
   font-weight: 700;
   cursor: pointer;
+}
+
+.profile-edit__save:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+@media (max-width: 392px) {
+  .profile-edit {
+    padding-right: 16px;
+    padding-left: 16px;
+  }
+
+  .profile-edit__card {
+    padding-right: 16px;
+    padding-left: 16px;
+  }
+
+  .profile-edit__avatar-hint {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 359px), (max-height: 700px) {
+  .profile-edit {
+    padding-top: 16px;
+  }
+
+  .profile-edit__header {
+    padding-bottom: 16px;
+  }
+
+  .profile-edit__card {
+    padding-top: 18px;
+    padding-bottom: 18px;
+    margin-bottom: 12px;
+  }
+
+  .profile-edit__avatar {
+    width: 96px;
+    height: 96px;
+  }
 }

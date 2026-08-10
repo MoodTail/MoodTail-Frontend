@@ -1,21 +1,31 @@
 import RankChangeItem from "./RankChangeItem";
 import "../../styles/RankChangeCard.css";
+import type { RankChangeCocktail } from "../../api/cocktails/cocktails.types";
 
-const RANK_CHANGES: { direction: "up" | "down"; name: string; diff: number }[] =
-  [
-    { direction: "up", name: "모히토", diff: 6 },
-    { direction: "down", name: "진 토닉", diff: 4 },
-  ];
+interface RankChangeCardProps {
+  items: RankChangeCocktail[];
+}
 
-function RankChangeCard() {
+function RankChangeCard({ items }: RankChangeCardProps) {
   return (
     <section className="rank-change-card">
       <h2 className="rank-change-card__title">지난주 대비 순위 변화</h2>
-      <div className="rank-change-card__list">
-        {RANK_CHANGES.map((item) => (
-          <RankChangeItem key={item.name} {...item} />
-        ))}
-      </div>
+      {items.length === 0 ? (
+        <p className="rank-change-card__empty">
+          아직 비교할 지난주 데이터가 없어요.
+        </p>
+      ) : (
+        <div className="rank-change-card__list">
+          {items.map((item) => (
+            <RankChangeItem
+              key={item.cocktailId}
+              direction={item.changeDirection === "UP" ? "up" : "down"}
+              name={item.nameKo}
+              diff={item.rankChange}
+            />
+          ))}
+        </div>
+      )}
     </section>
   );
 }

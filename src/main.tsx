@@ -2,9 +2,19 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
 import App from "./App.tsx";
+import SharedMonthlyReportPage from "./pages/HistoryPage/SharedMonthlyReportPage.tsx";
 
-createRoot(document.getElementById("root")!).render(
+const sharedMonthlyReportMatch = window.location.pathname.match(
+  /^\/reports\/monthly\/share\/([^/]+)\/?$/,
+);
+const root = createRoot(document.getElementById("root")!);
+
+root.render(
   <StrictMode>
-    <App />
+    {sharedMonthlyReportMatch ? (
+      <SharedMonthlyReportPage shareToken={decodeURIComponent(sharedMonthlyReportMatch[1])} />
+    ) : (
+      <App />
+    )}
   </StrictMode>,
 );

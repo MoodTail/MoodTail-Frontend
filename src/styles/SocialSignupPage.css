@@ -1,0 +1,215 @@
+.social-signup-page p,
+.social-signup-page button {
+  margin: 0;
+  padding: 0;
+}
+
+.social-signup-page {
+  position: fixed;
+  left: 50%;
+  top: 0;
+  transform: translateX(-50%);
+  width: 393px;
+  height: 824px;
+  overflow: hidden;
+  background: linear-gradient(
+    224.79deg,
+    #fee5e5 -16.15%,
+    #fff 17.41%,
+    #fff 81.62%,
+    #c2ede9 117.1%
+  );
+}
+
+.social-signup-page__bg-decoration {
+  display: block;
+  width: 670px;
+  height: 1024px;
+}
+
+.social-signup-page__title {
+  position: absolute;
+  left: 131px;
+  top: 88px;
+  font-size: 32px;
+  font-weight: 700;
+  text-align: center;
+  color: #ff6f4f;
+}
+
+.social-signup-page__subtitle {
+  position: absolute;
+  left: 103px;
+  top: 130px;
+  font-size: 16px;
+  font-weight: 700;
+  text-align: center;
+  color: #ff6f4f;
+}
+
+.social-signup-page__label {
+  position: absolute;
+  left: 48px;
+  top: 191px;
+  font-size: 12px;
+  color: #aaa;
+}
+
+.social-signup-page__nickname-input {
+  position: absolute;
+  left: 39px;
+  top: 208px;
+  width: 310px;
+  height: 48px;
+  padding: 0 20px;
+  box-sizing: border-box;
+  border: 1px solid #ff6f4f;
+  border-radius: 10px;
+  background: #fff;
+  font-size: 14px;
+  color: #1b1c30;
+}
+
+.social-signup-page__nickname-input::placeholder {
+  font-size: 12px;
+  color: #aaa;
+}
+
+.social-signup-page__terms-title {
+  position: absolute;
+  left: 49px;
+  top: 511px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #1b1c30;
+}
+
+.social-signup-page__terms-card {
+  position: absolute;
+  left: 39px;
+  top: 539px;
+  width: 310px;
+  height: 138px;
+  border-radius: 18px;
+  background: #fff;
+  border: 1px solid #e8dbd4;
+  box-shadow: 0px 8px 18px rgba(255, 111, 79, 0.08);
+}
+
+.social-signup-page__checkbox {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border-radius: 6px;
+  background: #fff;
+  border: 1.5px solid #e8dbd4;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  color: #ff6f4f;
+}
+
+.social-signup-page__checkbox--checked {
+  border-color: #ff6f4f;
+  background: #fff6f3;
+}
+
+.social-signup-page__checkbox--all {
+  left: 20px;
+  top: 13px;
+}
+
+.social-signup-page__terms-all-label {
+  position: absolute;
+  left: 51px;
+  top: 16px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #1b1c30;
+}
+
+.social-signup-page__terms-divider {
+  position: absolute;
+  left: 20px;
+  top: 42px;
+  width: 270px;
+  height: 1px;
+  background: #e8dbd4;
+}
+
+.social-signup-page__checkbox--terms1 {
+  left: 20px;
+  top: 52px;
+}
+
+.social-signup-page__checkbox--terms2 {
+  left: 20px;
+  top: 79px;
+}
+
+.social-signup-page__checkbox--privacy {
+  left: 20px;
+  top: 106px;
+}
+
+.social-signup-page__terms-label {
+  position: absolute;
+  left: 51px;
+  font-size: 12.5px;
+  color: #73737a;
+}
+
+.social-signup-page__terms-label--terms1 {
+  top: 56px;
+}
+
+.social-signup-page__terms-label--terms2 {
+  top: 83px;
+}
+
+.social-signup-page__terms-label--privacy {
+  top: 110px;
+}
+
+.social-signup-page__terms-view {
+  position: absolute;
+  left: 269px;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #ff6f4f;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+.social-signup-page__terms-view--terms2 {
+  top: 83px;
+}
+
+.social-signup-page__terms-view--privacy {
+  top: 110px;
+}
+
+.social-signup-page__submit {
+  position: absolute;
+  left: 40px;
+  top: 718px;
+  width: 310px;
+  height: 50px;
+  border: none;
+  border-radius: 100px;
+  background: #ff6f4f;
+  font-size: 20px;
+  font-weight: 700;
+  color: #fff;
+  cursor: pointer;
+}
+
+.social-signup-page__submit:disabled {
+  background: #b6b6b6;
+  cursor: not-allowed;
+}
