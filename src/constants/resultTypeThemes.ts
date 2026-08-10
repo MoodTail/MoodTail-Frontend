@@ -9,8 +9,10 @@ import star23Shape from "../assets/images/result-shapes/star-23.svg";
 import sensitivePerfectionistCharacter from "../assets/images/character/character-7.png";
 import shard9584Shape from "../assets/images/result-shapes/shard-9584.svg";
 import meticulousCriticCharacter from "../assets/images/character/character-5.png";
-import sparkles9585MainShape from "../assets/images/result-shapes/sparkles-9585-main.svg";
+import sparkles9585MainShape from "../assets/images/result-shapes/sparkles-9585-main-base.svg";
 import sparkles9585AccentShape from "../assets/images/result-shapes/sparkles-9585-accent.svg";
+import sparkles9585TopLeftShape from "../assets/images/result-shapes/sparkles-9585-top-left.svg";
+import sparkles9585RightShape from "../assets/images/result-shapes/sparkles-9585-right.svg";
 import emotionalThinkerCharacter from "../assets/images/character/character-10.png";
 import wave9586Shape from "../assets/images/result-shapes/wave-9586.svg";
 import steadfastPrinciplistCharacter from "../assets/images/character/character-3.png";
@@ -86,6 +88,13 @@ export interface ResultTypeTheme {
   accentShapeHeight?: number;
   accentShapeTop?: number;
   accentShapeLeft?: number;
+  extraShapes?: {
+    src: string;
+    width: number;
+    height: number;
+    top: number;
+    left: number;
+  }[];
   // 헤더 전체(캐릭터 영역보다 넓은 범위)에 흩어진 흰색 둥근 정사각형 장식들.
   // 각각 독립적으로 위치/크기/회전을 조정할 수 있음. header 기준 절대좌표(px)
   decorativeSquares?: {
@@ -218,6 +227,22 @@ export const RESULT_TYPE_THEMES: Record<string, ResultTypeTheme> = {
     accentShapeHeight: 113,
     accentShapeTop: 301,
     accentShapeLeft: 72,
+    extraShapes: [
+      {
+        src: sparkles9585TopLeftShape,
+        width: 171,
+        height: 191,
+        top: 35,
+        left: -8,
+      },
+      {
+        src: sparkles9585RightShape,
+        width: 240,
+        height: 177,
+        top: 168,
+        left: 200,
+      },
+    ],
   },
   "emotional-thinker": {
     name: "감성적인 사색가",

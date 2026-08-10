@@ -7,19 +7,58 @@ import type { MyPageResult } from "../../api/users/users.types";
 import {
   CHARACTER_GRADIENTS,
   CHARACTER_IMAGES,
+  CHARACTER_LABELS,
   type CharacterType,
 } from "../../constants/characters";
+import { RESULT_TYPE_THEMES } from "../../constants/resultTypeThemes";
+import { DEX_DATA } from "../../data/dexData";
+import { TYPECODE_TO_LOCAL_TYPE } from "../../data/typeCodeMapping";
 import chevronRightIcon from "../../assets/icons/chevron-right.svg";
 import "../../styles/MyPage.css";
 
 // typeCode(백엔드) -> CharacterType(프론트) 매핑. 서로 다른 표기일 수 있어 소문자로 비교
 function resolveCharacterType(typeCode?: string | null): CharacterType | null {
   if (!typeCode) return null
-  const normalized = typeCode.toLowerCase()
+  const normalized = typeCode.trim().toLowerCase().replace(/_/g, '-')
   return (normalized in CHARACTER_GRADIENTS
     ? (normalized as CharacterType)
     : null)
 }
+
+function getNonEmptyValue(value?: string | null): string | null {
+  const trimmed = value?.trim()
+  return trimmed ? value! : null
+}
+
+function getDexCharacterName(typeCode?: string | null): string | null {
+  const normalized = typeCode?.trim().toLowerCase().replace(/_/g, '-')
+  if (!normalized) return null
+  const localTypeId = TYPECODE_TO_LOCAL_TYPE[normalized]
+  if (!localTypeId) return null
+  return DEX_DATA.find((dex) => dex.typeId === localTypeId)?.name ?? null
+}
+
+export type ProfileAvatarStyle = { scale: number; x: number; y: number };
+
+export const PROFILE_AVATAR_STYLES: Record<CharacterType, ProfileAvatarStyle> = {
+  "easygoing-optimist": { scale: 1.3, x: -3, y: 20 },
+  "free-spirited-romantic": { scale: 1.9, x: 5, y: 25 },
+  "refreshing-explorer": { scale: 1.5, x: -6, y: 50 },
+  "passionate-challenger": { scale: 1.1, x: 6, y:30},
+  "grounded-realist": { scale: 0.98, x: 0, y: 35 },
+  "emotional-thinker": { scale: 1.05, x: 2, y: 33 },
+  "explosive-adventurer": { scale: 1.57, x: 0, y: 5 },
+  "meticulous-critic": { scale: 1.1, x: 5, y: 50 },
+  "sensitive-perfectionist": { scale: 1.25, x: 0, y: 26 },
+  "steadfast-principlist": { scale: 1.15, x: 0, y: 25 },
+  "quiet-supporter": { scale: 1.15, x: 0, y: 40 },
+  "balanced-mediator": { scale: 1.3, x: 0, y: 24 },
+};
+
+const PREVIEW_MY_PAGE_CHARACTER_TYPE: CharacterType | null = null;
+const PREVIEW_MY_PAGE_BACKEND_IMAGE_URL = PREVIEW_MY_PAGE_CHARACTER_TYPE
+  ? `https://moodtail-bucket.s3.ap-southeast-2.amazonaws.com/public/mood-types/${PREVIEW_MY_PAGE_CHARACTER_TYPE}.png`
+  : null;
 
 function MenuArrow() {
   return (
@@ -55,10 +94,18 @@ type ModalStep =
   | "withdraw-done"
   | "withdraw-error";
 
+export interface MyPageProfileSnapshot {
+  profile: MyPageResult | null;
+  nickname: string;
+  avatarImageSrc: string;
+  avatarStyle: ProfileAvatarStyle;
+  characterLabel: string;
+}
+
 interface MyPageProps {
   isLoggedIn?: boolean;
   // TODO: react-router-dom 도입되면 이 prop들 대신 라우팅으로 대체
-  onEditProfile?: () => void;
+  onEditProfile?: (snapshot: MyPageProfileSnapshot) => void;
   onInquiry?: () => void;
   onTerms?: () => void;
   onLoggedOut?: () => void;
@@ -96,23 +143,37 @@ function MyPage({
   }, [isLoggedIn]);
 
   const nickname = profile?.nickname ?? MOCK_USER.nickname;
+  const previewThemeTypeCode = PREVIEW_MY_PAGE_CHARACTER_TYPE;
+  const themeTypeCode =
+    previewThemeTypeCode ??
+    profile?.representativeMoodType?.typeCode?.trim().toLowerCase().replace(/_/g, '-');
+  const resultTheme = themeTypeCode ? RESULT_TYPE_THEMES[themeTypeCode] : undefined;
   const characterType =
+    PREVIEW_MY_PAGE_CHARACTER_TYPE ??
     resolveCharacterType(profile?.representativeMoodType?.typeCode) ??
     MOCK_USER.characterType;
   // API가 실제 캐릭터 이미지 URL을 내려주면 그걸 우선 사용, 없으면 로컬 mock 이미지로 폴백
   const avatarImageSrc =
-    profile?.representativeMoodType?.characterImageUrl ??
+    PREVIEW_MY_PAGE_BACKEND_IMAGE_URL ??
+    (previewThemeTypeCode ? resultTheme?.characterImage : getNonEmptyValue(profile?.representativeMoodType?.characterImageUrl)) ??
+    resultTheme?.characterImage ??
     CHARACTER_IMAGES[characterType];
+  const characterLabel =
+    (previewThemeTypeCode ? getDexCharacterName(previewThemeTypeCode) : getDexCharacterName(profile?.representativeMoodType?.typeCode)) ??
+    (previewThemeTypeCode ? resultTheme?.name : getNonEmptyValue(profile?.representativeMoodType?.name)) ??
+    resultTheme?.name ??
+    CHARACTER_LABELS[characterType];
   const testCount = profile?.totalTestCount ?? MOCK_USER.testCount;
   const monthlyCount = profile?.monthlyRecordCount ?? MOCK_USER.monthlyCount;
   const collectedCount =
     profile?.unlockedMoodTypeCount ?? MOCK_USER.collectedCount;
+  const avatarStyle = PROFILE_AVATAR_STYLES[characterType];
 
   const closeModal = () => setModalStep("none");
 
   const handleEditProfile = () => {
     if (onEditProfile) {
-      onEditProfile();
+      onEditProfile({ profile, nickname, avatarImageSrc, avatarStyle, characterLabel });
       return;
     }
     // TODO: react-router-dom 도입 후 프로필 수정 페이지로 라우팅 연결
@@ -177,7 +238,7 @@ function MyPage({
   return (
     <div className="mypage">
       <section
-        className="mypage__profile"
+        className={`mypage__profile${isLoggedIn ? "" : " mypage__profile--guest"}`}
         style={
           isLoggedIn
             ? { background: CHARACTER_GRADIENTS[characterType] }
@@ -192,6 +253,9 @@ function MyPage({
                   className="mypage__avatar-image"
                   src={avatarImageSrc}
                   alt=""
+                  style={{
+                    transform: `translate(${avatarStyle.x}px, ${avatarStyle.y}px) scale(${avatarStyle.scale})`,
+                  }}
                 />
               ) : (
                 "🍹"

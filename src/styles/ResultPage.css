@@ -118,6 +118,11 @@
   z-index: 0;
 }
 
+.result-page__extra-shape {
+  position: absolute;
+  z-index: 0;
+}
+
 .result-page__type-name {
   margin: 20px 0 0;
   font-size: 32px;
