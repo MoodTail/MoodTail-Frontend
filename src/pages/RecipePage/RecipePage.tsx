@@ -48,7 +48,9 @@ function RecipePage({ onNavVisibilityChange, isLoggedIn, onGoToLogin }: RecipePa
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [recipes, setRecipes] = useState<Recipe[]>(RECIPES);
   const [cocktailIdByRecipeId, setCocktailIdByRecipeId] = useState<Record<string, number>>({});
-  const [liveDetail, setLiveDetail] = useState<Record<string, { ingredients: string[]; steps: string[] }>>({});
+  const [liveDetail, setLiveDetail] = useState<
+    Record<string, { ingredients?: string[]; steps?: string[]; heroImage?: string }>
+  >({});
 
   useEffect(() => {
     onNavVisibilityChange?.(view.name === "list");
@@ -57,6 +59,7 @@ function RecipePage({ onNavVisibilityChange, isLoggedIn, onGoToLogin }: RecipePa
 
   // 목록 화면은 실제 API(/api/v1/cocktails)에서 이름/도수/설명을 받아오되,
   // 재료/조리법 등 백엔드에 아직 없는 필드는 이름이 일치하는 로컬 목데이터에서 그대로 가져옵니다.
+  // 잔 실루엣 이미지(glassImage)/상세 히어로 이미지(heroImage)도 서버 실제 칵테일 사진(imageUrl)으로 대체합니다.
   useEffect(() => {
     let cancelled = false;
     getCocktails()
@@ -72,6 +75,9 @@ function RecipePage({ onNavVisibilityChange, isLoggedIn, onGoToLogin }: RecipePa
             description: c.description,
             degree: `${Math.round(c.alcoholDegree)}°`,
             taste: { ...local.taste, 도수: Math.round(c.alcoholDegree) },
+            ...(c.imageUrl
+              ? { glassImage: c.imageUrl, heroImage: c.imageUrl, hasHeroPhoto: true }
+              : {}),
           });
           idMap[local.id] = c.cocktailId;
         });
@@ -120,16 +126,22 @@ function RecipePage({ onNavVisibilityChange, isLoggedIn, onGoToLogin }: RecipePa
     getCocktailDetail(cocktailId)
       .then((detail) => {
         if (cancelled) return;
-        if (detail.cocktailIngredients.length === 0 && detail.recipeSteps.length === 0) return;
+        const hasSteps = detail.cocktailIngredients.length > 0 || detail.recipeSteps.length > 0;
+        if (!hasSteps && !detail.imageUrl) return;
         setLiveDetail((prev) => ({
           ...prev,
           [detailId]: {
-            ingredients: [...detail.cocktailIngredients]
-              .sort((a, b) => a.sortOrder - b.sortOrder)
-              .map((i) => `${i.amountText} ${i.name}`),
-            steps: [...detail.recipeSteps]
-              .sort((a, b) => a.stepOrder - b.stepOrder)
-              .map((s) => s.description),
+            ...(hasSteps
+              ? {
+                  ingredients: [...detail.cocktailIngredients]
+                    .sort((a, b) => a.sortOrder - b.sortOrder)
+                    .map((i) => `${i.amountText} ${i.name}`),
+                  steps: [...detail.recipeSteps]
+                    .sort((a, b) => a.stepOrder - b.stepOrder)
+                    .map((s) => s.description),
+                }
+              : {}),
+            ...(detail.imageUrl ? { heroImage: detail.imageUrl } : {}),
           },
         }));
       })
@@ -205,7 +217,9 @@ function RecipePage({ onNavVisibilityChange, isLoggedIn, onGoToLogin }: RecipePa
     const recipe = recipes.find((r) => r.id === view.id);
     if (recipe) {
       const override = liveDetail[view.id];
-      const displayRecipe = override ? { ...recipe, ...override } : recipe;
+      const displayRecipe = override
+        ? { ...recipe, ...override, hasHeroPhoto: recipe.hasHeroPhoto || Boolean(override.heroImage) }
+        : recipe;
       return (
         <RecipeDetailView
           recipe={displayRecipe}
