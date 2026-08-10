@@ -40,6 +40,7 @@ export interface MoodTypeSummary {
   characterQuote: string;
   characterImageUrl: string;
   displayTasteScores: MoodTasteScores;
+  matchPercent?: number;
 }
 
 export interface MoodTestRecommendation {

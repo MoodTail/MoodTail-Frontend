@@ -9,7 +9,7 @@ import TestResultPage from "./pages/HistoryPage/TestResultPage";
 import CharacterPage from "./pages/CharacterPage/CharacterPage";
 import MainPage from "./pages/MainPage/MainPage";
 import RecipePage from "./pages/RecipePage/RecipePage";
-import MyPage from "./pages/MyPage/MyPage";
+import MyPage, { type MyPageProfileSnapshot } from "./pages/MyPage/MyPage";
 import ProfileEdit from "./pages/MyPage/ProfileEdit";
 import Inquiry from "./pages/MyPage/Inquiry";
 import Terms from "./pages/MyPage/Terms";
@@ -70,6 +70,7 @@ function App() {
   const [historyTestResult, setHistoryTestResult] =
     useState<HistoryTestResultDetail | null>(null);
   const [mypageView, setMypageView] = useState<MyPageView>("main");
+  const [mypageProfile, setMypageProfile] = useState<MyPageProfileSnapshot | null>(null);
   const [recipeNavVisible, setRecipeNavVisible] = useState(true);
   const [goToQuizOnHome, setGoToQuizOnHome] = useState(false);
   const [isTestResultOpen, setIsTestResultOpen] = useState(false);
@@ -209,7 +210,10 @@ function App() {
         return (
           <MyPage
             isLoggedIn={!isGuest}
-            onEditProfile={() => setMypageView("profile-edit")}
+            onEditProfile={(snapshot) => {
+              setMypageProfile(snapshot);
+              setMypageView("profile-edit");
+            }}
             onInquiry={() => setMypageView("inquiry")}
             onTerms={() => setMypageView("terms")}
             onLoggedOut={handleGoToLoginScreen}
@@ -395,7 +399,12 @@ function App() {
 
   if (mypageView !== "main") {
     const mypageDetailPage = {
-      "profile-edit": <ProfileEdit onBack={() => setMypageView("main")} />,
+      "profile-edit": (
+        <ProfileEdit
+          initialProfileSnapshot={mypageProfile}
+          onBack={() => setMypageView("main")}
+        />
+      ),
       inquiry: <Inquiry onBack={() => setMypageView("main")} />,
       terms: <Terms onBack={() => setMypageView("main")} />,
     }[mypageView];

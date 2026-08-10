@@ -90,6 +90,12 @@ function getContentBounds(theme?: ResultTypeTheme) {
     right = Math.max(right, accentLeft + (theme.accentShapeWidth ?? 0))
     bottom = Math.max(bottom, accentTop + (theme.accentShapeHeight ?? 0))
   }
+  theme.extraShapes?.forEach((shape) => {
+    left = Math.min(left, shape.left)
+    top = Math.min(top, shape.top)
+    right = Math.max(right, shape.left + shape.width)
+    bottom = Math.max(bottom, shape.top + shape.height)
+  })
   return { left, top, right, bottom }
 }
 
@@ -159,7 +165,7 @@ function ResultPage({
   // 단, FORCE_PREVIEW_TYPE으로 타입을 강제 지정했을 때는 실제 result의 typeCode가 다를 수 있어
   // 이미지-배경-카피가 서로 다른 타입으로 섞이지 않도록 로컬 테마 이미지를 그대로 씀
   // 이름/문구는 디자인팀에게 받은 로컬 테마(theme)가 있으면 그걸 최우선으로 씁니다.
-  // matchPercent(이 타입이 나온 사용자 비율)는 실제 API에 대응 필드가 없어 목데이터 값을 그대로 씁니다.
+  // matchPercent(이 타입이 나온 사용자 비율)는 API가 내려주면 그 값을 쓰고, 없으면 목데이터 값을 씁니다.
   const characterImage = FORCE_PREVIEW_TYPE
     ? (PREVIEW_USE_BACKEND_IMAGE ? PREVIEW_BACKEND_IMAGE_URL : theme?.characterImage ?? MOCK_RESULT.characterImage)
     : result?.moodType.characterImageUrl ?? theme?.characterImage ?? MOCK_RESULT.characterImage
@@ -168,7 +174,7 @@ function ResultPage({
   const quote = theme?.quote ?? result?.moodType.characterQuote ?? MOCK_RESULT.quote
   const detailDescription = theme?.detailDescription ?? result?.moodType.shortDescription ?? MOCK_RESULT.detailDescription
   const shareDescription = theme?.description ?? result?.moodType.shortDescription ?? MOCK_RESULT.shareDescription
-  const matchPercent = MOCK_RESULT.matchPercent
+  const matchPercent = FORCE_PREVIEW_TYPE ? MOCK_RESULT.matchPercent : (result?.moodType.matchPercent ?? MOCK_RESULT.matchPercent)
 
   const topCocktails: CocktailTopItem[] = result
     ? result.recommendations.map((r) => ({
@@ -387,6 +393,21 @@ function ResultPage({
                 aria-hidden="true"
               />
             )}
+            {theme?.extraShapes?.map((shape, index) => (
+              <img
+                key={`${shape.src}-${index}`}
+                className="result-page__extra-shape"
+                style={{
+                  top: `${shapeOffsetY + shape.top}px`,
+                  left: `${shapeOffsetX + shape.left}px`,
+                  width: `${shape.width}px`,
+                  height: `${shape.height}px`,
+                }}
+                src={shape.src}
+                alt=""
+                aria-hidden="true"
+              />
+            ))}
             <img
               className={`result-page__character${
                 theme?.characterLayout === 'positioned' ? ' result-page__character--positioned' : ''
