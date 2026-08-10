@@ -336,6 +336,17 @@ function ResultPage({
         isOpen={isSnsModalOpen}
         url={shareUrl ?? "https://moodtail.app/share/mock-id"}
         onClose={() => setIsSnsModalOpen(false)}
+        kakaoShare={
+          shareUrl
+            ? {
+                title: `MoodTail - ${typeName}`,
+                description: typeDescription,
+                imageUrl: characterImage,
+                webUrl: shareUrl,
+                buttonTitle: '결과 확인하기',
+              }
+            : undefined
+        }
         onKakaoShare={handleKakaoShare}
       />
 

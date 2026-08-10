@@ -107,20 +107,20 @@ export default function LoadingPage({ onComplete }: { onComplete: () => void }) 
 
           <style>{`
             @keyframes breathe-0 {
-              0%, 100% { transform: scale(0.97); opacity: 0.9; }
-              50% { transform: scale(1.05); opacity: 1; }
+              0%, 100% { transform: scale(0.88); opacity: 0.8; }
+              50% { transform: scale(1.16); opacity: 1; }
             }
             @keyframes breathe-1 {
-              0%, 100% { transform: scale(0.96); opacity: 0.9; }
-              50% { transform: scale(1.06); opacity: 1; }
+              0%, 100% { transform: scale(0.85); opacity: 0.8; }
+              50% { transform: scale(1.2); opacity: 1; }
             }
             @keyframes breathe-2 {
-              0%, 100% { transform: scale(0.95); opacity: 0.9; }
-              50% { transform: scale(1.08); opacity: 1; }
+              0%, 100% { transform: scale(0.82); opacity: 0.8; }
+              50% { transform: scale(1.26); opacity: 1; }
             }
             @keyframes breathe-3 {
-              0%, 100% { transform: scale(0.94); opacity: 0.9; }
-              50% { transform: scale(1.1); opacity: 1; }
+              0%, 100% { transform: scale(0.78); opacity: 0.8; }
+              50% { transform: scale(1.32); opacity: 1; }
             }
           `}</style>
         </div>
