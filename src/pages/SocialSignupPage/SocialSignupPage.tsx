@@ -51,9 +51,6 @@ const SocialSignupPage: FC<SocialSignupPageProps> = ({
   }, []);
 
   useEffect(() => {
-    // React StrictMode(개발 모드)에서 이 effect가 두 번 실행되는데,
-    // 구글/카카오 인가 코드는 1회용이라 두 번째 호출은 반드시 실패한다.
-    // ref 플래그로 실제 API 호출은 최초 1회만 나가도록 막는다.
     if (hasCheckedOauth.current) return;
     hasCheckedOauth.current = true;
 
@@ -86,7 +83,6 @@ const SocialSignupPage: FC<SocialSignupPageProps> = ({
     };
 
     void checkOauth();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const agreeAll = agreeTerms1 && agreeTerms2 && agreePrivacy;
@@ -125,11 +121,6 @@ const SocialSignupPage: FC<SocialSignupPageProps> = ({
         agreements,
       });
 
-      // accessToken이 없으면 로그인 상태로 넘어가면 안 된다.
-      // 여기서 그냥 onSignupComplete를 불러버리면 App.tsx가 토큰 유무와
-      // 상관없이 isLoggedIn(true)로 바꿔버려서, 화면은 로그인된 것처럼
-      // 홈으로 넘어가지만 실제로는 토큰이 없어 API 호출마다 401이 나는
-      // "로그인 풀린 상태"가 된다.
       if (!result.accessToken) {
         console.error("회원가입 응답에 accessToken이 없습니다.", result);
         setPhase("error");
