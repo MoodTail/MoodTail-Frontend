@@ -125,12 +125,22 @@ const SocialSignupPage: FC<SocialSignupPageProps> = ({
         agreements,
       });
 
-      if (result.accessToken) {
-        localStorage.setItem("accessToken", result.accessToken);
+      // accessToken이 없으면 로그인 상태로 넘어가면 안 된다.
+      // 여기서 그냥 onSignupComplete를 불러버리면 App.tsx가 토큰 유무와
+      // 상관없이 isLoggedIn(true)로 바꿔버려서, 화면은 로그인된 것처럼
+      // 홈으로 넘어가지만 실제로는 토큰이 없어 API 호출마다 401이 나는
+      // "로그인 풀린 상태"가 된다.
+      if (!result.accessToken) {
+        console.error("회원가입 응답에 accessToken이 없습니다.", result);
+        setPhase("error");
+        return;
       }
+
+      localStorage.setItem("accessToken", result.accessToken);
       onSignupComplete?.();
     } catch (error) {
       console.error(error);
+      setPhase("error");
     } finally {
       setIsSubmitting(false);
     }
@@ -243,6 +253,14 @@ const SocialSignupPage: FC<SocialSignupPageProps> = ({
           [필수] 만 14세 이상입니다
         </p>
 
+        <button
+          type="button"
+          className={`social-signup-page__checkbox social-signup-page__checkbox--terms2 ${agreeTerms2 ? "social-signup-page__checkbox--checked" : ""}`}
+          onClick={() => setAgreeTerms2((v) => !v)}
+          aria-label="서비스 이용약관 동의"
+        >
+          {agreeTerms2 && "✓"}
+        </button>
         <p className="social-signup-page__terms-label social-signup-page__terms-label--terms2">
           [필수] 서비스 이용약관 동의
         </p>
@@ -256,6 +274,14 @@ const SocialSignupPage: FC<SocialSignupPageProps> = ({
           보기
         </button>
 
+        <button
+          type="button"
+          className={`social-signup-page__checkbox social-signup-page__checkbox--privacy ${agreePrivacy ? "social-signup-page__checkbox--checked" : ""}`}
+          onClick={() => setAgreePrivacy((v) => !v)}
+          aria-label="개인정보 수집 및 이용 동의"
+        >
+          {agreePrivacy && "✓"}
+        </button>
         <p className="social-signup-page__terms-label social-signup-page__terms-label--privacy">
           [필수] 개인정보 수집 및 이용 동의
         </p>
