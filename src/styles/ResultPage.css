@@ -18,6 +18,9 @@
 }
 
 .result-page__header {
+  position: relative;
+  overflow: hidden;
+  flex-shrink: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -26,17 +29,34 @@
   text-align: center;
 }
 
+.result-page__decorative-square {
+  position: absolute;
+  background: #ffffff;
+  border-radius: 34px;
+  z-index: 0;
+}
+
 .result-page__back {
-  align-self: flex-start;
-  width: 27px;
+  position: absolute;
+  top: 40px;
+  left: 20px;
   height: 27px;
   padding: 0;
   border: 0;
   background: transparent;
   display: flex;
   align-items: center;
-  justify-content: center;
+  gap: 8px;
   cursor: pointer;
+}
+
+.result-page__back-label {
+  font-family: "Pretendard", sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: 0;
+  color: #ffffff;
 }
 
 .result-page__back-icon {
@@ -52,7 +72,10 @@
   justify-content: center;
   width: 355px;
   height: 355px;
-  margin: 12px auto 0;
+  /* 39px = 원래 흐름에서 뒤로가기 버튼(27px)+여백(12px)이었던 공간.
+     뒤로가기 버튼을 position:absolute로 흐름에서 뺀 대신, 이 여백을 그대로 옮겨서
+     캐릭터/무늬/장식사각형 위치가 기존 완성된 타입들과 그대로 유지되게 함 */
+  margin: 39px auto 0;
 }
 
 .result-page__background-shape {
@@ -114,6 +137,7 @@
 }
 
 .result-page__quote {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -189,6 +213,7 @@
   padding: 10px 20px 0;
   border-radius: 28px 28px 0 0;
   background: #ffffff;
+  box-shadow: 0 -5px 4px 1px rgba(255, 111, 79, 0.22);
 }
 
 .result-page__sheet-handle {
@@ -301,4 +326,97 @@
 .result-page__share-icon {
   width: 11px;
   height: 11px;
+}
+
+@media (max-width: 392px) {
+  .result-page__header {
+    padding-right: 16px;
+    padding-left: 16px;
+  }
+
+  .result-page__character-wrap {
+    transform: scale(0.96);
+    transform-origin: top center;
+    margin-bottom: -14px;
+  }
+
+  .result-page__type-name {
+    font-size: 30px;
+  }
+
+  .result-page__quote,
+  .result-page__detail-card {
+    width: 100%;
+  }
+
+  .result-page__quote {
+    padding-right: 18px;
+    padding-left: 18px;
+    font-size: 16px;
+  }
+
+  .result-page__sheet {
+    padding-right: 16px;
+    padding-left: 16px;
+  }
+
+  .result-page__match-section {
+    gap: 12px;
+  }
+
+  .result-page__actions {
+    margin-right: -16px;
+    margin-left: -16px;
+    padding-right: 16px;
+    padding-left: 16px;
+  }
+}
+
+@media (max-width: 359px) {
+  .result-page__header {
+    padding-right: 14px;
+    padding-left: 14px;
+  }
+
+  .result-page__back {
+    left: 16px;
+  }
+
+  .result-page__back-label {
+    font-size: 13px;
+  }
+
+  .result-page__character-wrap {
+    transform: scale(0.9);
+    margin-bottom: -32px;
+  }
+
+  .result-page__type-name {
+    font-size: 28px;
+  }
+
+  .result-page__detail-card {
+    padding-right: 18px;
+    padding-left: 18px;
+  }
+
+  .result-page__sheet {
+    padding-right: 14px;
+    padding-left: 14px;
+  }
+
+  .result-page__section-title {
+    font-size: 20px;
+  }
+
+  .result-page__match-section {
+    gap: 10px;
+  }
+
+  .result-page__actions {
+    margin-right: -14px;
+    margin-left: -14px;
+    padding-right: 14px;
+    padding-left: 14px;
+  }
 }

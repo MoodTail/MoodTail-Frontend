@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react'
+import ReactMarkdown from 'react-markdown'
 import { getTerms } from '../../api/terms/terms.api'
 import type { Term } from '../../api/terms/terms.types'
 import chevronLeftIcon from '../../assets/icons/chevron-left.svg'
+import { stripDuplicateMarkdownTitle } from '../../utils/termsMarkdown'
 import '../../styles/Terms.css'
 
 interface TermsProps {
@@ -59,7 +61,9 @@ function Terms({ onBack }: TermsProps) {
           terms.map((term) => (
             <section key={term.termId} className="terms__section">
               <h2 className="terms__section-title">{term.title}</h2>
-              <p className="terms__section-body">{term.content}</p>
+              <div className="terms__section-body">
+                <ReactMarkdown>{stripDuplicateMarkdownTitle(term.content, term.title)}</ReactMarkdown>
+              </div>
             </section>
           ))}
       </div>

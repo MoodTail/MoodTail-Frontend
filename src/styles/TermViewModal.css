@@ -49,5 +49,47 @@
   font-size: 13px;
   line-height: 1.6;
   color: #444;
-  white-space: pre-line;
+}
+
+.term-view-modal__content > * {
+  margin-top: 0;
+  margin-bottom: 10px;
+}
+
+.term-view-modal__content > *:last-child {
+  margin-bottom: 0;
+}
+
+.term-view-modal__content h1,
+.term-view-modal__content h2,
+.term-view-modal__content h3 {
+  font-size: 15px;
+  line-height: 1.45;
+  color: #17182f;
+}
+
+.term-view-modal__content p {
+  line-height: 1.6;
+}
+
+.term-view-modal__content ul,
+.term-view-modal__content ol {
+  padding-left: 18px;
+}
+
+.term-view-modal__content li + li {
+  margin-top: 4px;
+}
+
+.term-view-modal__content a {
+  color: var(--color-primary, #ff6f4f);
+  word-break: break-all;
+}
+
+.term-view-modal__content code {
+  padding: 1px 4px;
+  border-radius: 4px;
+  background: rgba(255, 111, 79, 0.08);
+  font-family: inherit;
+  font-size: 0.95em;
 }

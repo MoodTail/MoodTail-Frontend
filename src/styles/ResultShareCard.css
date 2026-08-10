@@ -7,6 +7,15 @@
   text-align: center;
 }
 
+.result-share-card--themed {
+  width: 318px;
+  height: 441px;
+  max-width: 100%;
+  border-radius: 10px;
+  box-shadow: none;
+  overflow: hidden;
+}
+
 .result-share-card__inner {
   position: absolute;
   inset: 0;
@@ -14,6 +23,413 @@
   border-radius: 25.39px;
   background: rgba(255, 255, 255, 0.75);
   overflow: hidden;
+}
+
+.result-share-card--themed .result-share-card__inner {
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+}
+
+.result-share-card__background {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 318px;
+  height: 441px;
+}
+
+.result-share-card--romantic .result-share-card__background {
+  border-radius: 10px;
+  object-fit: cover;
+}
+
+.result-share-card--refreshing .result-share-card__background {
+  border-radius: 10px;
+  object-fit: cover;
+}
+
+.result-share-card--explosive .result-share-card__background {
+  border-radius: 10px;
+  object-fit: cover;
+}
+
+.result-share-card--sensitive .result-share-card__background {
+  border-radius: 10px;
+  object-fit: cover;
+}
+
+.result-share-card--critic .result-share-card__background {
+  border-radius: 10px;
+  object-fit: cover;
+}
+
+.result-share-card--emotional .result-share-card__background {
+  border-radius: 10px;
+  object-fit: cover;
+}
+
+.result-share-card--principlist .result-share-card__background {
+  border-radius: 10px;
+  object-fit: cover;
+}
+
+.result-share-card--realist .result-share-card__background {
+  border-radius: 10px;
+  object-fit: cover;
+}
+
+.result-share-card--optimist .result-share-card__background {
+  border-radius: 10px;
+  object-fit: cover;
+}
+
+.result-share-card--supporter .result-share-card__background {
+  border-radius: 10px;
+  object-fit: cover;
+}
+
+.result-share-card--mediator .result-share-card__background {
+  border-radius: 10px;
+  object-fit: cover;
+}
+
+.result-share-card__star {
+  position: absolute;
+  top: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1;
+  width: 257px;
+  height: 270px;
+}
+
+.result-share-card--explosive .result-share-card__star {
+  top: 30px;
+  width: 285px;
+  height: 289px;
+}
+
+.result-share-card--critic .result-share-card__star {
+  top: 72px;
+  width: 237px;
+  height: 238px;
+}
+
+.result-share-card__citrus {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2;
+  width: 50px;
+  height: 49px;
+}
+
+.result-share-card--romantic .result-share-card__citrus {
+  top: 0;
+  left: 0;
+}
+
+.result-share-card--explosive .result-share-card__citrus {
+  top: 2px;
+  left: 7px;
+  width: 39px;
+  height: 44px;
+}
+
+.result-share-card--sensitive .result-share-card__citrus {
+  top: 2px;
+  left: 3px;
+  width: 46px;
+  height: 43px;
+}
+
+.result-share-card--critic .result-share-card__citrus {
+  top: 0;
+  left: 0;
+  width: 50px;
+  height: 53px;
+}
+
+.result-share-card--emotional .result-share-card__citrus {
+  top: -7px;
+  left: 7px;
+  width: 47px;
+  height: 58px;
+}
+
+.result-share-card--principlist .result-share-card__citrus {
+  top: 3px;
+  left: 5px;
+  width: 44px;
+  height: 44px;
+}
+
+.result-share-card--realist .result-share-card__citrus {
+  top: 0;
+  left: 0;
+  width: 46px;
+  height: 46px;
+}
+
+.result-share-card--optimist .result-share-card__citrus {
+  top: 0;
+  left: 0;
+  width: 46px;
+  height: 46px;
+}
+
+.result-share-card--supporter .result-share-card__citrus {
+  top: 0;
+  left: 0;
+  width: 45px;
+  height: 46px;
+}
+
+.result-share-card--mediator .result-share-card__citrus {
+  top: 0;
+  left: 0;
+  width: 43px;
+  height: 43px;
+}
+
+.result-share-card__realist-shape {
+  position: absolute;
+  z-index: 1;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+.result-share-card__realist-shape--back {
+  top: 113px;
+  left: 62px;
+  width: 195px;
+  height: 195px;
+}
+
+.result-share-card__realist-shape--main {
+  top: 55px;
+  left: 35px;
+  width: 168.29px;
+  height: 168.29px;
+}
+
+.result-share-card__realist-shape--small {
+  top: -25px;
+  right: 70px;
+  width: 70.08px;
+  height: 70.08px;
+}
+
+.result-share-card__critic-star {
+  position: absolute;
+  z-index: 2;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+.result-share-card__critic-star--top-large {
+  top: 55px;
+  left: 5px;
+  width: 125px;
+  height: 125px;
+}
+
+.result-share-card__critic-star--top-medium {
+  top: 15px;
+  left: 70px;
+  width: 61px;
+  height: 61px;
+}
+
+.result-share-card__critic-star--bottom-small {
+  top: 225px;
+  left: 48px;
+  width: 37px;
+  height: 37px;
+}
+
+.result-share-card__critic-star--bottom-medium {
+  top: 248px;
+  left: 63px;
+  width: 61px;
+  height: 61px;
+}
+
+.result-share-card__critic-star--right-large {
+  top: 220px;
+  right: -2px;
+  width: 125px;
+  height: 125px;
+}
+
+.result-share-card__shard {
+  position: absolute;
+  z-index: 1;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+.result-share-card__shard--sensitive-1 {
+  top: 90px;
+  left: 30px;
+  width: 239.94px;
+  height: 148.4px;
+}
+
+.result-share-card__shard--sensitive-2 {
+  top: 140px;
+  left: -40px;
+  width: 357.83px;
+  height: 221.91px;
+}
+
+.result-share-card__shard--sensitive-3 {
+  top: 90px;
+  left: 30px;
+  width: 183.77px;
+  height: 58.25px;
+}
+
+.result-share-card__circle {
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1;
+  width: 279px;
+  height: 279px;
+  border-radius: 50%;
+}
+
+.result-share-card__cloud {
+  position: absolute;
+  top: 30px;
+  left: 50%;
+  z-index: 1;
+  width: 339px;
+  height: 274px;
+  transform: translateX(-50%);
+}
+
+.result-share-card--emotional .result-share-card__cloud {
+  top: 80px;
+  width: 353px;
+  height: 220px;
+}
+
+.result-share-card--principlist .result-share-card__cloud {
+  top: 92px;
+  width: 319px;
+  height: 220px;
+}
+
+.result-share-card--optimist .result-share-card__cloud {
+  top: 80px;
+  width: 360px;
+  height: 227px;
+}
+
+.result-share-card--supporter .result-share-card__cloud {
+  top: 63px;
+  width: 360px;
+  height: 272px;
+}
+
+.result-share-card--mediator .result-share-card__cloud {
+  top: 119px;
+  width: 359px;
+  height: 166px;
+}
+
+.result-share-card__bubble {
+  position: absolute;
+  z-index: 2;
+  border-radius: 50%;
+  background: #ffffff;
+}
+
+.result-share-card__bubble--top-small {
+  top: 15px;
+  right: 19px;
+  width: 6px;
+  height: 6px;
+}
+
+.result-share-card__bubble--top-medium {
+  top: 24px;
+  right: 28px;
+  width: 15px;
+  height: 15px;
+}
+
+.result-share-card__bubble--top-large {
+  top: 45px;
+  right: 16px;
+  width: 25px;
+  height: 25px;
+}
+
+.result-share-card__bubble--bottom-small {
+  top: 255px;
+  left: 35px;
+  width: 12px;
+  height: 12px;
+}
+
+.result-share-card__bubble--bottom-medium {
+  top: 270px;
+  left: 15px;
+  width: 18px;
+  height: 18px;
+}
+
+.result-share-card__bubble--bottom-large {
+  top: 285px;
+  left: 35px;
+  width: 25px;
+  height: 25px;
+}
+
+.result-share-card__sparkle {
+  position: absolute;
+  z-index: 2;
+  object-fit: contain;
+}
+
+.result-share-card__sparkle--large {
+  top: 275px;
+  left: 7px;
+  width: 47px;
+  height: 47px;
+}
+
+.result-share-card__sparkle--medium {
+  top: 240px;
+  left: 25px;
+  width: 39px;
+  height: 39px;
+}
+
+.result-share-card__sparkle--small {
+  top: 267px;
+  left: 50px;
+  width: 26px;
+  height: 26px;
+}
+
+.result-share-card__sparkle--top-large {
+  top: 70px;
+  right: 30px;
+  width: 39px;
+  height: 39px;
+}
+
+.result-share-card__sparkle--top-small {
+  top: 35px;
+  right: 5px;
+  width: 47px;
+  height: 47px;
 }
 
 .result-share-card__hill {
@@ -37,6 +453,118 @@
   filter: drop-shadow(6.35px 3.17px 10.55px rgba(254, 164, 144, 0.25));
 }
 
+.result-share-card--themed .result-share-card__character {
+  top: 60px;
+  left: 50%;
+  width: 170px;
+  height: 205px;
+  object-fit: contain;
+  filter: none;
+  transform: translateX(-50%);
+}
+
+.result-share-card--romantic .result-share-card__character {
+  top: 51px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+  width: 147px;
+  height: 233px;
+}
+
+.result-share-card--refreshing .result-share-card__character {
+  top: 57px;
+  left: 50%;
+  z-index: 2;
+  width: 157.96px;
+  height: 223px;
+  transform: translateX(-50%);
+}
+
+.result-share-card--explosive .result-share-card__character {
+  top: 64px;
+  left: 50%;
+  z-index: 2;
+  width: 156.99px;
+  height: 202px;
+  filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.25));
+  transform: translateX(-50%);
+}
+
+.result-share-card--sensitive .result-share-card__character {
+  top: 65px;
+  left: 50%;
+  z-index: 2;
+  width: 166.97px;
+  height: 244px;
+  transform: translateX(-50%);
+}
+
+.result-share-card--critic .result-share-card__character {
+  top: 75px;
+  left: 50%;
+  z-index: 3;
+  width: 184px;
+  height: 217.01px;
+  filter: drop-shadow(8px 7px 4px rgba(0, 0, 0, 0.19));
+  transform: translateX(-50%);
+}
+
+.result-share-card--emotional .result-share-card__character {
+  top: 50px;
+  left: 50%;
+  z-index: 3;
+  width: 220px;
+  height: 250px;
+  transform: translateX(-50%);
+}
+
+.result-share-card--principlist .result-share-card__character {
+  top: 62px;
+  left: 50%;
+  z-index: 3;
+  width: 225px;
+  height: 250px;
+  transform: translateX(-50%);
+}
+
+.result-share-card--realist .result-share-card__character {
+  top: 77px;
+  left: 50%;
+  z-index: 3;
+  width: 150px;
+  height: 235px;
+  filter: drop-shadow(9px 1px 4px rgba(0, 0, 0, 0.25));
+  transform: translateX(-50%);
+}
+
+.result-share-card--optimist .result-share-card__character {
+  top: 50px;
+  left: 50%;
+  z-index: 3;
+  width: 225px;
+  height: 250px;
+  transform: translateX(-50%);
+}
+
+.result-share-card--supporter .result-share-card__character {
+  top: 56px;
+  left: 50%;
+  z-index: 3;
+  width: 195px;
+  height: 250px;
+  transform: translateX(-50%);
+}
+
+.result-share-card--mediator .result-share-card__character {
+  top: 55px;
+  left: 50%;
+  z-index: 3;
+  width: 215px;
+  height: 250px;
+  transform: translateX(-50%);
+}
+
 .result-share-card__type-name {
   position: absolute;
   top: 302.26px;
@@ -51,6 +579,17 @@
   letter-spacing: 0;
   color: #ffffff;
   text-align: center;
+}
+
+.result-share-card--themed .result-share-card__type-name {
+  top: 320px;
+  left: 50%;
+  width: 230px;
+  transform: translateX(-50%);
+  font-size: 25.39px;
+  line-height: 30.15px;
+  color: #ffffff;
+  white-space: nowrap;
 }
 
 .result-share-card__type-description {
@@ -69,6 +608,71 @@
   text-align: center;
 }
 
+.result-share-card--themed .result-share-card__type-description {
+  top: 355px;
+  left: 50%;
+  width: 250px;
+  transform: translateX(-50%);
+  font-size: 11.11px;
+  line-height: 13.49px;
+  color: #fdfdfd;
+}
+
+.result-share-card--romantic .result-share-card__type-description {
+  width: 300px;
+  white-space: nowrap;
+}
+
+.result-share-card--refreshing .result-share-card__type-description {
+  width: 300px;
+  white-space: nowrap;
+}
+
+.result-share-card--explosive .result-share-card__type-description {
+  width: 300px;
+  white-space: nowrap;
+}
+
+.result-share-card--sensitive .result-share-card__type-description {
+  width: 300px;
+  white-space: nowrap;
+}
+
+.result-share-card--critic .result-share-card__type-description {
+  width: 300px;
+  white-space: nowrap;
+}
+
+.result-share-card--emotional .result-share-card__type-description {
+  width: 300px;
+  white-space: nowrap;
+}
+
+.result-share-card--principlist .result-share-card__type-description {
+  width: 300px;
+  white-space: nowrap;
+}
+
+.result-share-card--realist .result-share-card__type-description {
+  width: 300px;
+  white-space: nowrap;
+}
+
+.result-share-card--optimist .result-share-card__type-description {
+  width: 300px;
+  white-space: nowrap;
+}
+
+.result-share-card--supporter .result-share-card__type-description {
+  width: 300px;
+  white-space: nowrap;
+}
+
+.result-share-card--mediator .result-share-card__type-description {
+  width: 300px;
+  white-space: nowrap;
+}
+
 .result-share-card__quote {
   position: absolute;
   top: 388.74px;
@@ -83,4 +687,14 @@
   letter-spacing: 0;
   color: #fdfdfd;
   text-align: center;
+}
+
+.result-share-card--themed .result-share-card__quote {
+  top: 394px;
+  left: 50%;
+  width: 232px;
+  transform: translateX(-50%);
+  font-size: 15.87px;
+  line-height: 19.04px;
+  color: #fdfdfd;
 }
