@@ -27,7 +27,11 @@ import type {
   TodayCocktailResult,
   CustomCocktailResult,
 } from "../../api/cocktails/cocktails.types";
-import { clearQuizProgress, loadQuizProgress, saveQuizProgress } from "../../utils/quizProgress";
+import {
+  clearQuizProgress,
+  loadQuizProgress,
+  saveQuizProgress,
+} from "../../utils/quizProgress";
 
 import cocktail from "../../assets/images/glass/glass-1.png";
 
@@ -60,6 +64,7 @@ interface MainPageProps {
   initialView?: "quiz";
   onInitialViewConsumed?: () => void;
   onNavVisibilityChange?: (visible: boolean) => void;
+  onGoToLogin?: () => void;
 }
 
 const MainPage: FC<MainPageProps> = ({
@@ -67,11 +72,14 @@ const MainPage: FC<MainPageProps> = ({
   initialView,
   onInitialViewConsumed,
   onNavVisibilityChange,
+  onGoToLogin,
 }) => {
   // 앱이 백그라운드로 갔다가 돌아오거나 새로고침돼도 진행 중이던 테스트를 이어할 수 있도록,
   // sessionStorage에 저장된 진행 상황이 있으면 그대로 복원합니다. 탭을 완전히 닫으면
   // sessionStorage가 비워지므로 그땐 자연스럽게 홈(시작) 화면이 보입니다.
-  const [initialQuizProgress] = useState(() => loadQuizProgress(MAIN_QUIZ_PROGRESS_KEY));
+  const [initialQuizProgress] = useState(() =>
+    loadQuizProgress(MAIN_QUIZ_PROGRESS_KEY),
+  );
   const [view, setView] = useState<ViewState>(
     initialView === "quiz" || initialQuizProgress ? "quiz" : "home",
   );
@@ -81,7 +89,9 @@ const MainPage: FC<MainPageProps> = ({
     null,
   );
 
-  const [quizStep, setQuizStep] = useState(() => initialQuizProgress?.step ?? 0);
+  const [quizStep, setQuizStep] = useState(
+    () => initialQuizProgress?.step ?? 0,
+  );
   const [quizAnswers, setQuizAnswers] = useState<Record<number, string>>(
     () => initialQuizProgress?.answers ?? {},
   );
@@ -229,7 +239,9 @@ const MainPage: FC<MainPageProps> = ({
   }
 
   if (view === "together") {
-    return <TogetherPickPage onBack={() => setView("home")} />;
+    return (
+      <TogetherPickPage onBack={() => setView("home")} onLogin={onGoToLogin} />
+    );
   }
 
   if (view === "custom") {
