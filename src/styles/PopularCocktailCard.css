@@ -89,5 +89,5 @@
 }
 
 .popular-cocktail-card__toggle--expanded svg {
-  transform: rotate(180deg);
+  transform: translateY(2px) rotate(180deg);
 }

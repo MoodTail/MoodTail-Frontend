@@ -67,7 +67,7 @@ const TasteComparePage: FC<TasteComparePageProps> = ({
             seriesB={{
               label: "친구",
               color: "#FF613D",
-              fillOpacity: 0.2,
+              fillOpacity: 0.35,
               values: partnerValues,
             }}
           />
@@ -85,7 +85,7 @@ const TasteComparePage: FC<TasteComparePageProps> = ({
               className="taste-compare-page__legend-dot"
               style={{ background: "#FF613D" }}
             />
-            친구
+            상대방
           </span>
         </div>
       </div>

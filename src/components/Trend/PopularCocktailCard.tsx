@@ -10,12 +10,35 @@ interface PopularCocktailCardProps {
   onToggle: () => void;
 }
 
+// API의 ranking은 동점이면 1,2,2,4,4처럼 다음 순위를 건너뛰는데(경쟁 순위 방식),
+// 화면에는 1,2,2,3,3처럼 동점 그룹끼리만 같은 숫자를 쓰고 건너뛰지 않아야 한다(밀집 순위 방식).
+// cocktails는 이미 API에서 순위대로 정렬되어 오므로, ranking 값이 바뀌는 지점마다
+// 화면용 순번을 하나씩만 증가시켜서 매핑을 만든다.
+function computeDenseRanks(
+  cocktails: PopularCocktailTrend[],
+): Map<number, number> {
+  const ranks = new Map<number, number>();
+  let denseRank = 0;
+  let lastApiRank: number | null = null;
+
+  cocktails.forEach((cocktail) => {
+    if (cocktail.ranking !== lastApiRank) {
+      denseRank += 1;
+      lastApiRank = cocktail.ranking;
+    }
+    ranks.set(cocktail.cocktailId, denseRank);
+  });
+
+  return ranks;
+}
+
 function PopularCocktailCard({
   cocktails,
   isExpanded,
   onToggle,
 }: PopularCocktailCardProps) {
   const visibleCocktails = isExpanded ? cocktails : cocktails.slice(0, 1);
+  const denseRanks = computeDenseRanks(cocktails);
 
   return (
     <section
@@ -26,16 +49,19 @@ function PopularCocktailCard({
         결과 1위로 추천된 칵테일 기준
       </p>
       <div className="popular-cocktail-card__list">
-        {visibleCocktails.map((cocktail) => (
-          <CocktailRankItem
-            key={cocktail.cocktailId}
-            rank={cocktail.ranking}
-            name={cocktail.nameKo}
-            description={cocktail.shortDescription}
-            percent={cocktail.ratio}
-            color={RANK_COLORS[(cocktail.ranking - 1) % RANK_COLORS.length]}
-          />
-        ))}
+        {visibleCocktails.map((cocktail) => {
+          const displayRank = denseRanks.get(cocktail.cocktailId) ?? 1;
+          return (
+            <CocktailRankItem
+              key={cocktail.cocktailId}
+              rank={displayRank}
+              name={cocktail.nameKo}
+              description={cocktail.shortDescription}
+              percent={cocktail.ratio}
+              color={RANK_COLORS[(displayRank - 1) % RANK_COLORS.length]}
+            />
+          );
+        })}
       </div>
       <button
         type="button"
