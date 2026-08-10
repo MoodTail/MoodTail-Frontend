@@ -12,6 +12,7 @@ import type { PairRecommendationResult } from "../../api/cocktails/cocktails.typ
 import { postInviteCode } from "../../api/users/users.api";
 import {
   getPairRecommendation,
+  getCocktailDetail,
   postPairShare,
   postPairShareImage,
 } from "../../api/cocktails/cocktails.api";
@@ -28,6 +29,8 @@ interface TogetherPickPageProps {
 
 const RANKING_COLORS = ["#FF613D", "#34DBCE", "#1564FE", "#FFC107"];
 
+const toPercent = (rawScore: number): number => (rawScore / 5) * 100;
+
 function TogetherPickPage({
   onBack,
   onLogin,
@@ -43,6 +46,7 @@ function TogetherPickPage({
   const [pairResult, setPairResult] = useState<PairRecommendationResult | null>(
     null,
   );
+  const [topPickDescription, setTopPickDescription] = useState("");
 
   const [showLoginModal, setShowLoginModal] = useState(
     () => !isLoggedIn || localStorage.getItem("isGuest") === "true",
@@ -55,6 +59,22 @@ function TogetherPickPage({
         // TODO: 초대 코드 조회 실패 시 에러 UI 필요하면 여기서 처리
       });
   }, []);
+
+  useEffect(() => {
+    if (step !== "result" || !pairResult) return;
+
+    const first =
+      pairResult.recommendations.find((item) => item.ranking === 1) ??
+      pairResult.recommendations[0];
+    if (!first) return;
+
+    getCocktailDetail(first.cocktailId)
+      .then((detail) => setTopPickDescription(detail.shortDescription))
+      .catch((error) => {
+        console.error(error);
+        setTopPickDescription("");
+      });
+  }, [step, pairResult]);
 
   const handleCopy = () => {
     navigator.clipboard.writeText(inviteCode);
@@ -130,18 +150,18 @@ function TogetherPickPage({
         onViewResult={() => setStep("result")}
         matchPercent={first?.matchScore ?? 0} // TODO: 전체 취향 일치율 필드가 따로 없어 1위 칵테일 매치율로 대체
         myValues={[
-          pairResult.myProfile.alcoholIntensity,
-          pairResult.myProfile.sweetness,
-          pairResult.myProfile.sourness,
-          pairResult.myProfile.bitterness,
-          pairResult.myProfile.refreshing,
+          toPercent(pairResult.myProfile.alcoholIntensity),
+          toPercent(pairResult.myProfile.refreshing),
+          toPercent(pairResult.myProfile.bitterness),
+          toPercent(pairResult.myProfile.sourness),
+          toPercent(pairResult.myProfile.sweetness),
         ]}
         partnerValues={[
-          pairResult.partnerProfile.alcoholIntensity,
-          pairResult.partnerProfile.sweetness,
-          pairResult.partnerProfile.sourness,
-          pairResult.partnerProfile.bitterness,
-          pairResult.partnerProfile.refreshing,
+          toPercent(pairResult.partnerProfile.alcoholIntensity),
+          toPercent(pairResult.partnerProfile.refreshing),
+          toPercent(pairResult.partnerProfile.bitterness),
+          toPercent(pairResult.partnerProfile.sourness),
+          toPercent(pairResult.partnerProfile.sweetness),
         ]}
       />
     );
@@ -162,7 +182,7 @@ function TogetherPickPage({
         topPick={{
           tagline: "둘의 최적 타협점",
           name: first?.nameKo ?? "",
-          description: "", // TODO: API에 설명 텍스트 없음
+          description: topPickDescription,
           myMatchPercent: first?.myMatchScore ?? 0,
           partnerMatchPercent: first?.partnerMatchScore ?? 0,
         }}

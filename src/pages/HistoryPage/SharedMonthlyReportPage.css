@@ -1,0 +1,32 @@
+.shared-monthly-report-page {
+  min-height: 100dvh;
+  padding: 28px 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  background: linear-gradient(180deg, #fff 0%, #fffaf8 58%, #f7fffc 100%);
+  color: #171717;
+}
+
+.shared-monthly-report-page h1 {
+  margin: 0;
+  font-size: 20px;
+  line-height: 1.4;
+  text-align: center;
+}
+
+.shared-monthly-report-page img {
+  display: block;
+  width: min(100%, 393px);
+  height: auto;
+  border-radius: 23px;
+  box-shadow: 0 14px 34px rgba(30, 24, 21, 0.14);
+}
+
+.shared-monthly-report-page p {
+  margin: auto 0;
+  color: #777;
+  font-size: 14px;
+  text-align: center;
+}

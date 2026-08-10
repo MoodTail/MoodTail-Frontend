@@ -1,6 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import { toBlob } from "html-to-image";
 import {
+  getSharedMonthlyReport,
   getMonthlyReport,
   uploadMonthlyReportShareImage,
 } from "../../api/reports/reports.api";
@@ -14,6 +16,7 @@ import Button from "../../components/Button/Button";
 import ActionCompleteToast from "../../components/Modal/ActionCompleteToast";
 import MonthlyReportBackground from "../../components/common/MonthlyReportBackground";
 import ResultSnsShareModal from "../../components/common/modal/ResultSnsShareModal";
+import { CHARACTER_IMAGES, type CharacterType } from "../../constants/characters";
 import "./MonthlyReportPage.css";
 
 interface MonthlyReportPageProps {
@@ -33,11 +36,59 @@ function drawRoundedRect(
   context.roundRect(x, y, width, height, radius);
 }
 
+function fitCanvasText(
+  context: CanvasRenderingContext2D,
+  text: string,
+  maxWidth: number,
+  maxSize: number,
+  minSize: number,
+  weight = 800,
+) {
+  let size = maxSize;
+  while (size > minSize) {
+    context.font = `${weight} ${size}px Pretendard, sans-serif`;
+    if (context.measureText(text).width <= maxWidth) break;
+    size -= 1;
+  }
+  context.font = `${weight} ${size}px Pretendard, sans-serif`;
+}
+
+function wrapCanvasText(
+  context: CanvasRenderingContext2D,
+  text: string,
+  maxWidth: number,
+  maxLines: number,
+) {
+  const lines: string[] = [];
+  let line = '';
+
+  for (const character of text) {
+    const candidate = line + character;
+    if (line && context.measureText(candidate).width > maxWidth) {
+      lines.push(line.trimEnd());
+      line = character.trimStart();
+      if (lines.length === maxLines - 1) break;
+    } else {
+      line = candidate;
+    }
+  }
+
+  if (line && lines.length < maxLines) lines.push(line.trim());
+  return lines;
+}
+
+function getReportCharacterImage(report: MonthlyReportResult) {
+  const typeCode = report.monthlyMoodType.typeCode as CharacterType;
+  return CHARACTER_IMAGES[typeCode]
+    ?? report.monthlyMoodType.characterImageUrl
+    ?? monthlyReportCharacter;
+}
+
 async function createMonthlyReportPng(report: MonthlyReportResult) {
   await document.fonts.ready;
   const character = new Image();
   character.crossOrigin = 'anonymous';
-  character.src = report.monthlyMoodType.characterImageUrl ?? monthlyReportCharacter;
+  character.src = getReportCharacterImage(report);
   try {
     await character.decode();
   } catch {
@@ -93,15 +144,17 @@ async function createMonthlyReportPng(report: MonthlyReportResult) {
   );
   context.textAlign = 'left';
   context.fillStyle = '#17172a';
-  context.font = '800 22px Pretendard, sans-serif';
+  fitCanvasText(context, report.monthlyMoodType.name, 143, 22, 14);
   context.fillText(report.monthlyMoodType.name, 168, 195);
   context.fillStyle = '#666666';
   context.font = '500 10px Pretendard, sans-serif';
-  const quote = `“${report.monthlyMoodType.characterQuote}”`;
-  const quoteLines = quote.length > 15
-    ? [quote.slice(0, 15), quote.slice(15)]
-    : [quote];
-  quoteLines.slice(0, 2).forEach((line, index) => {
+  const descriptionLines = wrapCanvasText(
+    context,
+    report.monthlyMoodType.shortDescription,
+    143,
+    3,
+  );
+  descriptionLines.forEach((line, index) => {
     context.fillText(line, 168, 222 + index * 20);
   });
 
@@ -202,14 +255,17 @@ function SummaryCard({ report }: { report: MonthlyReportResult }) {
     >
       <img
         className="monthly-report-page__summary-character"
-        src={report.monthlyMoodType.characterImageUrl ?? monthlyReportCharacter}
+        src={getReportCharacterImage(report)}
         alt={`${report.monthlyMoodType.name} 캐릭터`}
       />
       <div className="monthly-report-page__summary-copy">
         <span className="monthly-report-page__summary-rank">
           {primaryType?.ranking ?? 1}위 · {primaryType?.count ?? 0}회
         </span>
-        <h2 className="monthly-report-page__summary-type">
+        <h2
+          className="monthly-report-page__summary-type"
+          style={{ fontSize: report.monthlyMoodType.name.length > 8 ? '16px' : undefined }}
+        >
           {report.monthlyMoodType.name}
         </h2>
         <p className="monthly-report-page__summary-description">
@@ -277,8 +333,9 @@ function MonthlyReportPage({ onBack, reportMonth }: MonthlyReportPageProps) {
   const [isSaveCompleteToastOpen, setIsSaveCompleteToastOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isShareImageUploading, setIsShareImageUploading] = useState(false);
-  const [shareImageUrl, setShareImageUrl] = useState<string>();
+  const [monthlyReportShareImageUrl, setMonthlyReportShareImageUrl] = useState<string>();
   const [shareImageError, setShareImageError] = useState<string>();
+  const sharePreviewRef = useRef<HTMLDivElement>(null);
   const mobileFrame = document.querySelector<HTMLElement>(".app");
   const secondaryTypes =
     report?.topMoodTypes.filter(
@@ -319,33 +376,48 @@ function MonthlyReportPage({ onBack, reportMonth }: MonthlyReportPageProps) {
     };
   }, [reportMonthNumber, reportYear]);
 
+  const handleOpenShareModal = () => {
+    if (!report) return;
+    setShareImageError(undefined);
+    setIsShareModalOpen(true);
+  };
+
+  const handleCloseShareModal = () => {
+    setIsShareModalOpen(false);
+  };
+
+  const createVisibleShareCardPng = async () => {
+    if (!sharePreviewRef.current) {
+      if (!report) throw new Error('월간 리포트 데이터가 없습니다.');
+      return createMonthlyReportPng(report);
+    }
+    const blob = await toBlob(sharePreviewRef.current, {
+      pixelRatio: 2,
+      cacheBust: true,
+      backgroundColor: '#fffaf8',
+    });
+    if (!blob) throw new Error('공유 카드 이미지를 생성하지 못했습니다.');
+    return blob;
+  };
+
   const handleSaveImage = async () => {
     if (isSaving || !report) return;
     setIsSaving(true);
 
     try {
-      const blob = await createMonthlyReportPng(report);
+      const blob = await createVisibleShareCardPng();
       const file = new File([blob], 'moodtail-monthly-report.png', {
         type: 'image/png',
       });
-      const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(
-        navigator.userAgent,
-      );
-      const canShareFile = Boolean(navigator.canShare?.({ files: [file] }));
-
-      if (isMobile && canShareFile) {
-        await navigator.share({ files: [file], title: 'MoodTail 월간 리포트' });
-      } else {
-        const downloadUrl = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = downloadUrl;
-        link.download = file.name;
-        link.style.display = 'none';
-        document.body.appendChild(link);
-        link.click();
-        link.remove();
-        window.setTimeout(() => URL.revokeObjectURL(downloadUrl), 1000);
-      }
+      const downloadUrl = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = downloadUrl;
+      link.download = file.name;
+      link.style.display = 'none';
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.setTimeout(() => URL.revokeObjectURL(downloadUrl), 1000);
 
       setIsSaveCompleteToastOpen(true);
     } catch (error) {
@@ -363,7 +435,7 @@ function MonthlyReportPage({ onBack, reportMonth }: MonthlyReportPageProps) {
       setIsShareImageUploading(true);
       setShareImageError(undefined);
 
-      const blob = await createMonthlyReportPng(report);
+      const blob = await createVisibleShareCardPng();
       if (blob.size > 5 * 1024 * 1024) {
         throw new Error("월간 리포트 이미지가 5MB를 초과했습니다.");
       }
@@ -376,8 +448,13 @@ function MonthlyReportPage({ onBack, reportMonth }: MonthlyReportPageProps) {
         month: reportMonthNumber,
         image,
       });
+      await getSharedMonthlyReport(result.shareToken);
+      const shareImageUrl = new URL(
+        `/api/v1/reports/monthly/shares/${encodeURIComponent(result.shareToken)}/image`,
+        import.meta.env.VITE_API_BASE_URL,
+      ).href;
 
-      setShareImageUrl(result.shareImageUrl);
+      setMonthlyReportShareImageUrl(shareImageUrl);
       setIsSnsShareModalOpen(true);
     } catch (error) {
       console.error("월간 리포트 공유 이미지 업로드 실패", error);
@@ -570,7 +647,7 @@ function MonthlyReportPage({ onBack, reportMonth }: MonthlyReportPageProps) {
         <button
           type="button"
           className="monthly-report-page__share-button"
-          onClick={() => setIsShareModalOpen(true)}
+          onClick={handleOpenShareModal}
         >
           공유하기
         </button>
@@ -579,28 +656,24 @@ function MonthlyReportPage({ onBack, reportMonth }: MonthlyReportPageProps) {
       {isShareModalOpen && createPortal(
         <div
           className="monthly-report-share-modal__overlay"
-          onClick={() => setIsShareModalOpen(false)}
+          onClick={handleCloseShareModal}
         >
           <section
             className="monthly-report-share-modal"
             role="dialog"
             aria-modal="true"
-            aria-labelledby="share-modal-title"
+            aria-label="월간 리포트 공유 미리보기"
             onClick={(event) => event.stopPropagation()}
           >
             <button
               type="button"
               className="monthly-report-share-modal__close"
-              onClick={() => setIsShareModalOpen(false)}
+              onClick={handleCloseShareModal}
               aria-label="공유 미리보기 닫기"
             >
               ×
             </button>
-            <h2 id="share-modal-title" className="monthly-report-share-modal__title">
-              MoodTail
-            </h2>
-
-            <div className="monthly-report-share-modal__preview">
+            <div ref={sharePreviewRef} className="monthly-report-share-modal__preview">
               <SummaryCard report={report} />
               <CocktailsCard report={report} />
               <ActivityCard report={report} />
@@ -634,18 +707,18 @@ function MonthlyReportPage({ onBack, reportMonth }: MonthlyReportPageProps) {
         mobileFrame ?? document.body,
       )}
 
-      {isSnsShareModalOpen && shareImageUrl &&
+      {isSnsShareModalOpen && monthlyReportShareImageUrl &&
         createPortal(
           <ResultSnsShareModal
             isOpen
-            url={shareImageUrl}
+            url={monthlyReportShareImageUrl}
             onClose={() => setIsSnsShareModalOpen(false)}
             kakaoShare={{
               title: `MoodTail ${reportYear}년 ${reportMonthNumber}월 리포트`,
               description: `${report.monthlyMoodType.name} 유형의 월간 취향 리포트예요.`,
-              imageUrl: shareImageUrl,
-              webUrl: window.location.origin,
-              buttonTitle: 'MoodTail 보기',
+              imageUrl: monthlyReportShareImageUrl,
+              webUrl: monthlyReportShareImageUrl,
+              buttonTitle: '결과 이미지 보기',
             }}
           />,
           mobileFrame ?? document.body,

@@ -88,20 +88,30 @@ const ShareResultModal: FC<ShareResultModalProps> = ({
         <p className="share-result-modal__brand">MoodTail</p>
 
         <div className="share-result-modal__top-card">
-          <img
-            src={topPick.imageUrl || cocktail}
-            alt={topPick.name}
-            className="share-result-modal__top-image"
-          />
-          <p className="share-result-modal__top-tagline">{topPick.tagline}</p>
-          <p className="share-result-modal__top-name">{topPick.name}</p>
-          <p className="share-result-modal__top-desc">{topPick.description}</p>
-          <span className="share-result-modal__top-badge share-result-modal__top-badge--mine">
-            나와의 일치율 {topPick.myMatchPercent}%
-          </span>
-          <span className="share-result-modal__top-badge share-result-modal__top-badge--friend">
-            친구와의 일치율 {topPick.partnerMatchPercent}%
-          </span>
+          <div className="share-result-modal__top-main">
+            <img
+              src={topPick.imageUrl || cocktail}
+              alt={topPick.name}
+              className="share-result-modal__top-image"
+            />
+            <div className="share-result-modal__top-text">
+              <p className="share-result-modal__top-tagline">
+                {topPick.tagline}
+              </p>
+              <p className="share-result-modal__top-name">{topPick.name}</p>
+              <p className="share-result-modal__top-desc">
+                {topPick.description}
+              </p>
+              <div className="share-result-modal__top-badges">
+                <span className="share-result-modal__top-badge share-result-modal__top-badge--mine">
+                  나와의 일치율 {topPick.myMatchPercent}%
+                </span>
+                <span className="share-result-modal__top-badge share-result-modal__top-badge--friend">
+                  친구와의 일치율 {topPick.partnerMatchPercent}%
+                </span>
+              </div>
+            </div>
+          </div>
         </div>
 
         <p className="share-result-modal__rank-title">추천 순위</p>

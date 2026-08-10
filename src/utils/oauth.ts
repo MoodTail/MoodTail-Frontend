@@ -12,10 +12,10 @@ export const parseOauthCallback = (): OauthCallbackParams | null => {
 
   if (!code || !state) return null;
 
-  if (pathname === "/oauth/kakao/callback") {
+  if (pathname === "/auth/kakao/callback") {
     return { provider: "kakao", code, state };
   }
-  if (pathname === "/oauth/google/callback") {
+  if (pathname === "/auth/google/callback") {
     return { provider: "google", code, state };
   }
   return null;

@@ -56,19 +56,34 @@ const resolveQueue = (token: string | null): void => {
 
 const REISSUE_URL = "/api/v1/auth/reissue";
 
+const PUBLIC_AUTH_URLS = [
+  "/api/v1/auth/reissue",
+  "/api/v1/auth/kakao",
+  "/api/v1/auth/google",
+  "/api/v1/auth/guest",
+  "/api/v1/auth/login/local",
+  "/api/v1/auth/signup/local",
+  "/api/v1/auth/signup/social",
+  "/api/v1/auth/oauth-states",
+  "/api/v1/auth/password-reset",
+  "/api/v1/auth/password",
+];
+
 apiClient.interceptors.response.use(
   (response) => response,
   async (error: AxiosError) => {
     const originalRequest = error.config as RetriableRequestConfig | undefined;
 
     const isUnauthorized = error.response?.status === 401;
-    const isReissueRequest = originalRequest?.url?.includes(REISSUE_URL);
+    const isPublicAuthRequest = PUBLIC_AUTH_URLS.some((url) =>
+      originalRequest?.url?.includes(url),
+    );
 
     if (
       !isUnauthorized ||
       !originalRequest ||
       originalRequest._retry ||
-      isReissueRequest
+      isPublicAuthRequest
     ) {
       return Promise.reject(error);
     }
