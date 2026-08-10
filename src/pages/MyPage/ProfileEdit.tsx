@@ -3,11 +3,9 @@ import CompleteModal from '../../components/MyPage/CompleteModal'
 import NicknameEditOverlay from './NicknameEditOverlay'
 import { getMyPage, updateProfile } from '../../api/users/users.api'
 import type { RepresentativeMoodType } from '../../api/users/users.types'
-import {
-  PROFILE_AVATAR_STYLES,
-  type MyPageProfileSnapshot,
-} from './MyPage'
+import type { MyPageProfileSnapshot } from './MyPage'
 import { CHARACTER_IMAGES, CHARACTER_LABELS, type CharacterType } from '../../constants/characters'
+import { PROFILE_AVATAR_STYLES } from '../../constants/profileAvatarStyles'
 import { RESULT_TYPE_THEMES } from '../../constants/resultTypeThemes'
 import { DEX_DATA } from '../../data/dexData'
 import { TYPECODE_TO_LOCAL_TYPE } from '../../data/typeCodeMapping'
@@ -77,12 +75,6 @@ function ProfileEdit({ initialProfileSnapshot, onBack }: ProfileEditProps) {
     CHARACTER_LABELS[characterType]
   const avatarStyle =
     initialProfileSnapshot?.avatarStyle ?? PROFILE_AVATAR_STYLES[characterType]
-
-  useEffect(() => {
-    if (!initialProfileSnapshot) return
-    setNickname(initialProfileSnapshot.nickname)
-    setRepresentativeMoodType(initialProfileSnapshot.profile?.representativeMoodType ?? null)
-  }, [initialProfileSnapshot])
 
   useEffect(() => {
     if (initialProfileSnapshot) return
