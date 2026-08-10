@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, type CSSProperties } from 'react'
 import chevronLeftIcon from '../../assets/icons/chevron-left-white.svg'
 import shareIcon from '../../assets/icons/share.svg'
 import RadarChart, { type RadarChartData } from '../../components/ResultPage/RadarChart'
@@ -8,9 +8,10 @@ import TwoButtonModal from '../../components/common/modal/TwoButtonModal'
 import ResultShareModal from '../../components/common/modal/ResultShareModal'
 import ResultSnsShareModal from '../../components/common/modal/ResultSnsShareModal'
 import SaveCompleteToast from '../../components/common/SaveCompleteToast'
+import { RESULT_TYPE_THEMES, type ResultTypeTheme } from '../../constants/resultTypeThemes'
+import { CHARACTER_TYPES, type CharacterType } from '../../data/characterType'
+import { TYPECODE_TO_LOCAL_TYPE } from '../../data/typeCodeMapping'
 import romanticCharacterImg from '../../assets/images/character/character-12.png'
-import visionaryCharacterImg from '../../assets/images/character-crop/character-crop-11.svg'
-import disciplinarianCharacterImg from '../../assets/images/character-crop/character-crop-2.png'
 import glass1 from '../../assets/images/glass/glass-1.png'
 import glass2 from '../../assets/images/glass/glass-2.png'
 import glass3 from '../../assets/images/glass/glass-3.png'
@@ -30,6 +31,66 @@ const MOCK_RESULT = {
   detailDescription:
     '자유로운 탐험가 오늘은 상그리아, 내일은 모스코 뮬. 탄산처럼 톡 튀는 취향이라 메뉴판을 다 읽어봐야 직성이 풀려요. 우산 꽂힌 트로피컬 잔처럼 어디서든 분위기를 만들어내고, 정해진 루트 없이 흘러가는 게 오히려 제일 자연스러운 타입이에요. 예측이 안 되는 게 매력이라는 걸 본인도 알고 있어요.',
   matchPercent: 68,
+}
+
+// PREVIEW_TYPE_CODE: 실제 테스트 결과(result prop)가 없을 때(로컬에서 화면 미리보기/작업할 때)만 쓰는 폴백.
+// 실제 결과가 있으면 그 typeCode로 RESULT_TYPE_THEMES를 찾아 씀
+const PREVIEW_TYPE_CODE = 'balanced-mediator'
+// FORCE_PREVIEW_TYPE: true면 실제 퀴즈 결과와 상관없이 항상 PREVIEW_TYPE_CODE 테마로 보여줌
+// (타입별 화면 작업/확인용). 작업 다 끝나면 false로 바꿔서 실제 결과 typeCode를 쓰게 해야 함
+const FORCE_PREVIEW_TYPE = false
+// PREVIEW_USE_BACKEND_IMAGE: true면 미리보기 중에도 캐릭터만 로컬 대신 실제 백엔드 이미지로 봄.
+// 퀴즈를 안 풀어도 "배경(로컬 테마) + 실제 백엔드 캐릭터 이미지" 조합이 맞는지 바로 확인할 때 씀.
+// 주의: S3 파일명이 typeCode와 같다는 규칙(https://.../mood-types/{typeCode}.png)은 실제로 떠보고
+// 확인한 것일 뿐 백엔드에서 공식 문서화된 건 아니라서, 미리보기 확인용으로만 쓰고 다른 곳엔 쓰지 말 것
+const PREVIEW_USE_BACKEND_IMAGE = false
+const PREVIEW_BACKEND_IMAGE_URL = `https://moodtail-bucket.s3.ap-southeast-2.amazonaws.com/public/mood-types/${PREVIEW_TYPE_CODE}.png`
+
+// FORCE_PREVIEW_MATCH: true면 "잘 맞는/안 맞는 타입" 카드도 실제 결과와 상관없이 아래 두 typeCode로
+// 강제로 보여줌 (카드 크롭/레이아웃 확인용). 실제 API 데이터(취향분석 등)는 그대로 진짜 결과를 씀.
+// 확인 다 끝나면 false로 꼭 되돌려야 함
+const FORCE_PREVIEW_MATCH = false
+const PREVIEW_GOOD_MATCH_TYPE_CODE = 'refreshing-explorer'
+const PREVIEW_BAD_MATCH_TYPE_CODE = 'free-spirited-romantic'
+
+// 백엔드 typeCode(예: 'easygoing-optimist') -> 로컬 캐릭터 id -> CharacterType(이름/네임태그 색) 순으로 찾음.
+// 매핑에 없는 typeCode면 undefined (FitUnfitCard/NameTag는 undefined를 안전하게 처리함)
+function resolveCharacterType(typeCode?: string): CharacterType | undefined {
+  if (!typeCode) return undefined
+  const localId = TYPECODE_TO_LOCAL_TYPE[typeCode]
+  if (!localId) return undefined
+  return CHARACTER_TYPES.find((t) => t.id === localId)
+}
+
+// wrap 안에서는 무늬(backgroundShape) 하나만 가운데 정렬하는 게 아니라, 캐릭터/보조무늬까지
+// 합친 전체 구성(bounding box)이 가운데 오도록 계산함 (캐릭터/보조무늬가 무늬 밖으로
+// 삐져나가는 만큼 무게중심이 한쪽으로 쏠리기 때문)
+function getContentBounds(theme?: ResultTypeTheme) {
+  if (!theme?.backgroundShapeWidth || !theme?.backgroundShapeHeight) {
+    return { left: 0, top: 0, right: 0, bottom: 0 }
+  }
+  let left = 0
+  let top = 0
+  let right = theme.backgroundShapeWidth
+  let bottom = theme.backgroundShapeHeight
+
+  if (theme.characterLayout === 'positioned') {
+    const charLeft = theme.characterPositionLeft ?? 0
+    const charTop = theme.characterPositionTop ?? 0
+    left = Math.min(left, charLeft)
+    top = Math.min(top, charTop)
+    right = Math.max(right, charLeft + (theme.characterPositionWidth ?? 0))
+    bottom = Math.max(bottom, charTop + (theme.characterPositionHeight ?? 0))
+  }
+  if (theme.accentShape) {
+    const accentLeft = theme.accentShapeLeft ?? 0
+    const accentTop = theme.accentShapeTop ?? 0
+    left = Math.min(left, accentLeft)
+    top = Math.min(top, accentTop)
+    right = Math.max(right, accentLeft + (theme.accentShapeWidth ?? 0))
+    bottom = Math.max(bottom, accentTop + (theme.accentShapeHeight ?? 0))
+  }
+  return { left, top, right, bottom }
 }
 
 // TODO: glass-*.png 파일명이 번호로만 되어 있어 모양으로 임의 매핑함. 실제 칵테일-잔 매핑 확정되면 교체
@@ -74,13 +135,39 @@ function ResultPage({
   // TODO: 실제 저장 상태 API 연동 후 아래 mock state를 실제 값으로 교체
   const [isResultSaved, setIsResultSaved] = useState(false) // 지금 보고 있는 결과를 저장했는지
 
+  // typeCode로 로컬 테마(캐릭터/배경무늬/카피)를 찾음. 실제 결과가 있으면 그 typeCode를,
+  // 없으면(로컬 미리보기) PREVIEW_TYPE_CODE를 씀. 아직 테마가 없는 타입(easygoing-optimist 등)은
+  // theme이 undefined가 되고, 이때는 API 응답값 -> 목데이터 순으로 폴백.
+  // FORCE_PREVIEW_TYPE이 true면 실제 결과가 있어도 무시하고 항상 PREVIEW_TYPE_CODE로 봄
+  const typeCode = FORCE_PREVIEW_TYPE ? PREVIEW_TYPE_CODE : (result?.moodType.typeCode ?? PREVIEW_TYPE_CODE)
+  const theme = RESULT_TYPE_THEMES[typeCode]
+
+  const wrapWidth = theme?.wrapWidth ?? 355
+  const wrapHeight = theme?.wrapHeight ?? 355
+  const contentBounds = getContentBounds(theme)
+  const shapeOffsetX =
+    (wrapWidth - (contentBounds.right - contentBounds.left)) / 2 -
+    contentBounds.left +
+    (theme?.contentOffsetX ?? 0)
+  const shapeOffsetY =
+    (wrapHeight - (contentBounds.bottom - contentBounds.top)) / 2 -
+    contentBounds.top +
+    (theme?.contentOffsetY ?? 0)
+
   // result가 있으면(실제 테스트를 막 완료한 경우) 그 값을, 없으면 목데이터를 사용합니다.
+  // 캐릭터 이미지는 백엔드 characterImageUrl을 최우선으로 씀 (로컬 PNG랑 픽셀 단위로 동일함을 확인함).
+  // 단, FORCE_PREVIEW_TYPE으로 타입을 강제 지정했을 때는 실제 result의 typeCode가 다를 수 있어
+  // 이미지-배경-카피가 서로 다른 타입으로 섞이지 않도록 로컬 테마 이미지를 그대로 씀
+  // 이름/문구는 디자인팀에게 받은 로컬 테마(theme)가 있으면 그걸 최우선으로 씁니다.
   // matchPercent(이 타입이 나온 사용자 비율)는 실제 API에 대응 필드가 없어 목데이터 값을 그대로 씁니다.
-  const characterImage = result?.moodType.characterImageUrl ?? MOCK_RESULT.characterImage
-  const typeName = result?.moodType.name ?? MOCK_RESULT.typeName
-  const typeDescription = result?.moodType.shortDescription ?? MOCK_RESULT.typeDescription
-  const quote = result?.moodType.characterQuote ?? MOCK_RESULT.quote
-  const detailDescription = result?.moodType.shortDescription ?? MOCK_RESULT.detailDescription
+  const characterImage = FORCE_PREVIEW_TYPE
+    ? (PREVIEW_USE_BACKEND_IMAGE ? PREVIEW_BACKEND_IMAGE_URL : theme?.characterImage ?? MOCK_RESULT.characterImage)
+    : result?.moodType.characterImageUrl ?? theme?.characterImage ?? MOCK_RESULT.characterImage
+  const typeName = theme?.name ?? result?.moodType.name ?? MOCK_RESULT.typeName
+  const typeDescription = theme?.description ?? result?.moodType.shortDescription ?? MOCK_RESULT.typeDescription
+  const quote = theme?.quote ?? result?.moodType.characterQuote ?? MOCK_RESULT.quote
+  const detailDescription = theme?.detailDescription ?? result?.moodType.shortDescription ?? MOCK_RESULT.detailDescription
+  const shareDescription = theme?.description ?? result?.moodType.shortDescription ?? MOCK_RESULT.shareDescription
   const matchPercent = MOCK_RESULT.matchPercent
 
   const topCocktails: CocktailTopItem[] = result
@@ -104,6 +191,21 @@ function ResultPage({
 
   const goodMatch = result?.compatibilities.best
   const badMatch = result?.compatibilities.worst
+  const goodMatchTypeCode = FORCE_PREVIEW_MATCH ? PREVIEW_GOOD_MATCH_TYPE_CODE : goodMatch?.typeCode
+  const badMatchTypeCode = FORCE_PREVIEW_MATCH ? PREVIEW_BAD_MATCH_TYPE_CODE : badMatch?.typeCode
+  const goodMatchType = resolveCharacterType(goodMatchTypeCode)
+  const badMatchType = resolveCharacterType(badMatchTypeCode)
+  // 미리보기 강제 지정 중이면 실제 API 이미지 대신 로컬 테마 캐릭터 이미지를 씀
+  const goodMatchImage = FORCE_PREVIEW_MATCH
+    ? RESULT_TYPE_THEMES[PREVIEW_GOOD_MATCH_TYPE_CODE]?.characterImage
+    : goodMatch?.characterImageUrl
+  const badMatchImage = FORCE_PREVIEW_MATCH
+    ? RESULT_TYPE_THEMES[PREVIEW_BAD_MATCH_TYPE_CODE]?.characterImage
+    : badMatch?.characterImageUrl
+  const goodMatchImageScale = goodMatchTypeCode ? RESULT_TYPE_THEMES[goodMatchTypeCode]?.matchCardImageScale : undefined
+  const badMatchImageScale = badMatchTypeCode ? RESULT_TYPE_THEMES[badMatchTypeCode]?.matchCardImageScale : undefined
+  const goodMatchImageOffsetY = goodMatchTypeCode ? RESULT_TYPE_THEMES[goodMatchTypeCode]?.matchCardImageOffsetY : undefined
+  const badMatchImageOffsetY = badMatchTypeCode ? RESULT_TYPE_THEMES[badMatchTypeCode]?.matchCardImageOffsetY : undefined
 
   const [modalStep, setModalStep] = useState<ModalStep>('none')
   const closeModal = () => setModalStep('none')
@@ -112,6 +214,7 @@ function ResultPage({
   const [isSnsModalOpen, setIsSnsModalOpen] = useState(false)
   const [isSaveToastVisible, setIsSaveToastVisible] = useState(false)
   const [isSaveResultToastVisible, setIsSaveResultToastVisible] = useState(false)
+  const [saveResultToastMessage, setSaveResultToastMessage] = useState('저장 완료되었습니다')
   const [shareUrl, setShareUrl] = useState<string | null>(null)
 
   useEffect(() => {
@@ -146,23 +249,33 @@ function ResultPage({
     console.log('TODO: 테스트 다시 시작')
   }
 
-  const performSave = () => {
-    setIsResultSaved(true)
+  const performSave = async () => {
     setModalStep('none')
-    setIsSaveResultToastVisible(true)
 
-    // 실제 테스트 결과가 있을 때만(직접 완료한 테스트) 저장 API를 호출합니다.
-    // 게스트 등 비로그인 상태거나 실패해도 위 토스트/로컬 상태는 이미 반영되어 있습니다.
-    if (result && result.recommendations.length === 4) {
-      saveMoodTestResult({
+    if (!result || result.recommendations.length !== 4) {
+      setIsResultSaved(false)
+      setSaveResultToastMessage('저장할 테스트 결과가 없습니다')
+      setIsSaveResultToastVisible(true)
+      return
+    }
+
+    try {
+      await saveMoodTestResult({
         moodType: { moodTypeId: result.moodType.moodTypeId, typeCode: result.moodType.typeCode },
         tasteProfile: result.tasteProfile,
         recommendedCocktails: result.recommendations.map((r) => ({
           cocktailId: r.cocktailId,
           matchScore: r.matchScore,
         })),
-      }).catch((err) => console.error('테스트 결과 저장에 실패했습니다', err))
+      })
+      setIsResultSaved(true)
+      setSaveResultToastMessage('저장 완료되었습니다')
+    } catch (err) {
+      console.error('테스트 결과 저장에 실패했습니다', err)
+      setIsResultSaved(false)
+      setSaveResultToastMessage('저장에 실패했습니다')
     }
+    setIsSaveResultToastVisible(true)
   }
 
   const handleSaveResult = () => {
@@ -193,8 +306,7 @@ function ResultPage({
   }
 
   const handleKakaoShare = () => {
-    // TODO: 카카오 SDK 연동
-    console.log('TODO: 카카오톡 공유 SDK 연동')
+    console.log('카카오톡 공유 데이터가 아직 준비되지 않았습니다.')
   }
 
   const handleImageSaved = () => {
@@ -204,21 +316,125 @@ function ResultPage({
   return (
     <>
       <div className="result-page">
-        <header className="result-page__header">
+        <header
+          className="result-page__header"
+          style={
+            theme
+              ? ({
+                  background: theme.backgroundColor,
+                  '--color-primary': theme.accentColor,
+                } as CSSProperties)
+              : undefined
+          }
+        >
+          {theme?.decorativeSquares?.map((square, index) => (
+            <div
+              key={index}
+              className="result-page__decorative-square"
+              aria-hidden="true"
+              style={{
+                top: `${square.top}px`,
+                left: `${square.left}px`,
+                width: `${square.size}px`,
+                height: `${square.size}px`,
+                borderRadius: square.radius !== undefined ? `${square.radius}px` : undefined,
+                transform: `rotate(${square.rotation}deg)`,
+              }}
+            />
+          ))}
           <button
             type="button"
             className="result-page__back"
             onClick={handleBack}
-            aria-label="뒤로가기"
           >
             <img className="result-page__back-icon" src={chevronLeftIcon} alt="" aria-hidden="true" />
+            <span className="result-page__back-label">홈으로 돌아가기</span>
           </button>
 
-          <div className="result-page__character-circle">
-            <img className="result-page__character" src={characterImage} alt="" />
+          <div
+            className="result-page__character-wrap"
+            style={{ width: `${wrapWidth}px`, height: `${wrapHeight}px` }}
+          >
+            {theme?.backgroundShape ? (
+              <img
+                className="result-page__background-shape"
+                style={{
+                  top: `${shapeOffsetY + (theme.backgroundShapeOffsetY ?? 0)}px`,
+                  left: `${shapeOffsetX + (theme.backgroundShapeOffsetX ?? 0)}px`,
+                  width: theme.backgroundShapeWidth ? `${theme.backgroundShapeWidth}px` : undefined,
+                  height: theme.backgroundShapeHeight ? `${theme.backgroundShapeHeight}px` : undefined,
+                }}
+                src={theme.backgroundShape}
+                alt=""
+                aria-hidden="true"
+              />
+            ) : (
+              !theme?.hideBackgroundCircle && (
+                <div className="result-page__background-circle" aria-hidden="true" />
+              )
+            )}
+            {theme?.accentShape && (
+              <img
+                className="result-page__accent-shape"
+                style={{
+                  top: `${shapeOffsetY + (theme.accentShapeTop ?? 0)}px`,
+                  left: `${shapeOffsetX + (theme.accentShapeLeft ?? 0)}px`,
+                  width: theme.accentShapeWidth ? `${theme.accentShapeWidth}px` : undefined,
+                  height: theme.accentShapeHeight ? `${theme.accentShapeHeight}px` : undefined,
+                }}
+                src={theme.accentShape}
+                alt=""
+                aria-hidden="true"
+              />
+            )}
+            <img
+              className={`result-page__character${
+                theme?.characterLayout === 'positioned' ? ' result-page__character--positioned' : ''
+              }`}
+              style={
+                theme?.characterLayout === 'positioned'
+                  ? {
+                      top: `${shapeOffsetY + (theme.characterPositionTop ?? 0)}px`,
+                      left: `${shapeOffsetX + (theme.characterPositionLeft ?? 0)}px`,
+                      width: theme.characterPositionWidth ? `${theme.characterPositionWidth}px` : undefined,
+                      height: theme.characterPositionHeight ? `${theme.characterPositionHeight}px` : undefined,
+                      filter: theme.characterShadowNone ? 'none' : theme.characterShadow,
+                    }
+                  : {
+                      ...(theme?.characterWidth ? { width: `${theme.characterWidth}px` } : {}),
+                      ...(theme?.characterShadowNone
+                        ? { filter: 'none' }
+                        : theme?.characterShadow
+                          ? { filter: theme.characterShadow }
+                          : {}),
+                      ...(theme?.characterOffsetX || theme?.characterOffsetY
+                        ? {
+                            transform: `translate(${theme?.characterOffsetX ?? 0}px, ${
+                              theme?.characterOffsetY ?? 0
+                            }px)`,
+                          }
+                        : {}),
+                    }
+              }
+              src={characterImage}
+              alt=""
+            />
           </div>
-          <p className="result-page__type-name">{typeName}</p>
-          <p className="result-page__type-description">{typeDescription}</p>
+          <p
+            className="result-page__type-name"
+            style={theme?.typeNameFontSize ? { fontSize: `${theme.typeNameFontSize}px` } : undefined}
+          >
+            {typeName}
+          </p>
+          <p
+            className="result-page__type-description"
+            style={{
+              ...(theme?.typeDescriptionFontSize ? { fontSize: `${theme.typeDescriptionFontSize}px` } : {}),
+              ...(theme?.typeDescriptionColor ? { color: theme.typeDescriptionColor } : {}),
+            }}
+          >
+            {typeDescription}
+          </p>
           <p className="result-page__quote">&ldquo;{quote}&rdquo;</p>
 
           <div className="result-page__detail-card">
@@ -257,22 +473,26 @@ function ResultPage({
           <section className="result-page__match-section">
             <TypeMatchCard
               label="잘 맞는 타입"
-              typeName={goodMatch?.name ?? "환상주의자"}
-              typeNameColor="#fda8a8"
-              image={goodMatch?.characterImageUrl ?? visionaryCharacterImg}
+              typeName={goodMatchType?.name ?? goodMatch?.name ?? ''}
+              typeNameColor={goodMatchType?.color ?? '#fda8a8'}
+              image={goodMatchImage}
+              imageScale={goodMatchImageScale}
+              imageOffsetY={goodMatchImageOffsetY}
             />
             <TypeMatchCard
               label="안 맞는 타입"
-              typeName={badMatch?.name ?? "규칙주의자"}
-              typeNameColor="#6fa8dc"
-              image={badMatch?.characterImageUrl ?? disciplinarianCharacterImg}
+              typeName={badMatchType?.name ?? badMatch?.name ?? ''}
+              typeNameColor={badMatchType?.color ?? '#6fa8dc'}
+              image={badMatchImage}
+              imageScale={badMatchImageScale}
+              imageOffsetY={badMatchImageOffsetY}
             />
           </section>
 
           <div className="result-page__actions">
             {isSaveResultToastVisible ? (
               <div className="result-page__save-toast" role="status" aria-live="polite">
-                저장 완료되었습니다
+                {saveResultToastMessage}
               </div>
             ) : (
               <button type="button" className="result-page__retest" onClick={handleRetest}>
@@ -321,9 +541,10 @@ function ResultPage({
       <ResultShareModal
         isOpen={isShareModalOpen}
         shareCard={{
+          typeCode,
           characterImage,
           typeName,
-          typeDescription: result?.moodType.shortDescription ?? MOCK_RESULT.shareDescription,
+          typeDescription: shareDescription,
           quote,
         }}
         tasteProfile={result?.tasteProfile}
@@ -348,6 +569,13 @@ function ResultPage({
             : undefined
         }
         onKakaoShare={handleKakaoShare}
+        kakaoShare={{
+          title: `MoodTail - ${typeName}`,
+          description: shareDescription,
+          imageUrl: characterImage,
+          webUrl: shareUrl ?? window.location.href,
+          buttonTitle: '결과 확인하기',
+        }}
       />
 
       <SaveCompleteToast

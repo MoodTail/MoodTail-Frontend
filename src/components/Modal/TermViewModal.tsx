@@ -1,4 +1,6 @@
 import type { FC } from "react";
+import ReactMarkdown from "react-markdown";
+import { stripDuplicateMarkdownTitle } from "../../utils/termsMarkdown";
 import "../../styles/TermViewModal.css";
 
 interface TermViewModalProps {
@@ -22,7 +24,9 @@ const TermViewModal: FC<TermViewModalProps> = ({ title, content, onClose }) => {
             ✕
           </button>
         </div>
-        <div className="term-view-modal__content">{content}</div>
+        <div className="term-view-modal__content">
+          <ReactMarkdown>{stripDuplicateMarkdownTitle(content, title)}</ReactMarkdown>
+        </div>
       </div>
     </div>
   );

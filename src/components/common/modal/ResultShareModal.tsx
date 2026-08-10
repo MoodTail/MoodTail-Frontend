@@ -1,4 +1,4 @@
-import { useRef } from 'react'
+import { useRef, type CSSProperties } from 'react'
 import { toBlob, toPng } from 'html-to-image'
 import ResultShareCard, { type ResultShareCardProps } from '../ResultShareCard'
 import closeIcon from '../../../assets/icons/close.svg'
@@ -25,6 +25,21 @@ function ResultShareModal({
   onImageSaved,
 }: ResultShareModalProps) {
   const cardRef = useRef<HTMLDivElement>(null)
+  const accentColorByType: Record<string, string> = {
+    'passionate-challenger': '#FECE3F',
+    'free-spirited-romantic': '#FDAF7A',
+    'refreshing-explorer': '#FDABAA',
+    'explosive-adventurer': '#F8490C',
+    'sensitive-perfectionist': '#FB8558',
+    'meticulous-critic': '#AC3E10',
+    'emotional-thinker': '#346A99',
+    'steadfast-principlist': '#124480',
+    'grounded-realist': '#1564FE',
+    'easygoing-optimist': '#3CD4C1',
+    'quiet-supporter': '#21A26A',
+    'balanced-mediator': '#6DCC9F',
+  }
+  const accentColor = shareCard.typeCode ? accentColorByType[shareCard.typeCode] ?? '#ff613d' : '#ff613d'
 
   if (!isOpen) return null
 
@@ -61,6 +76,7 @@ function ResultShareModal({
         className="result-share-modal"
         role="dialog"
         aria-modal="true"
+        style={{ '--share-card-accent': accentColor } as CSSProperties}
         aria-label="결과 공유"
         onClick={(event) => event.stopPropagation()}
       >

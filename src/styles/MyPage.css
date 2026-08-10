@@ -166,3 +166,55 @@
   height: 10.5px;
   flex: 0 0 6px;
 }
+
+@media (max-width: 392px) {
+  .mypage__profile {
+    padding-right: 16px;
+    padding-left: 16px;
+  }
+
+  .mypage__stats,
+  .mypage__menu {
+    padding-right: 16px;
+    padding-left: 16px;
+  }
+
+  .mypage__stat-card {
+    min-width: 0;
+  }
+
+  .mypage__stat-label {
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 359px), (max-height: 700px) {
+  .mypage__profile {
+    gap: 12px;
+    padding-top: 64px;
+    padding-bottom: 58px;
+  }
+
+  .mypage__avatar {
+    width: 128px;
+    height: 128px;
+    font-size: 54px;
+  }
+
+  .mypage__panel {
+    padding-top: 20px;
+  }
+
+  .mypage__stats {
+    gap: 8px;
+    padding-bottom: 16px;
+  }
+
+  .mypage__stat-card {
+    padding: 12px 6px;
+  }
+
+  .mypage__menu-item {
+    padding: 13px 14px;
+  }
+}

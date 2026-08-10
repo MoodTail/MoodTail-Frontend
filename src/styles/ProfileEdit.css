@@ -160,3 +160,40 @@
   opacity: 0.6;
   cursor: not-allowed;
 }
+
+@media (max-width: 392px) {
+  .profile-edit {
+    padding-right: 16px;
+    padding-left: 16px;
+  }
+
+  .profile-edit__card {
+    padding-right: 16px;
+    padding-left: 16px;
+  }
+
+  .profile-edit__avatar-hint {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 359px), (max-height: 700px) {
+  .profile-edit {
+    padding-top: 16px;
+  }
+
+  .profile-edit__header {
+    padding-bottom: 16px;
+  }
+
+  .profile-edit__card {
+    padding-top: 18px;
+    padding-bottom: 18px;
+    margin-bottom: 12px;
+  }
+
+  .profile-edit__avatar {
+    width: 96px;
+    height: 96px;
+  }
+}

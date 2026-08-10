@@ -1,10 +1,13 @@
 .type-match-card {
   position: relative;
   flex: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   width: 168px;
   height: 104px;
   overflow: hidden;
-  padding: 4px 12px 0;
+  padding: 10px 12px 0;
   border: 1px solid #ffffff;
   border-radius: 24px;
   background: #ffffff;
@@ -29,10 +32,40 @@
   letter-spacing: 0;
 }
 
+/* Figma 실측값(Group 205) 기준 top42.75, 너비는 이 값에서 조정 중.
+   높이는 원본 비율 그대로 둬서(height:auto) 좌우가 잘리는 일이 없게 함. 세로로
+   넘치는 부분은 카드(.type-match-card)의 overflow:hidden이 알아서 하단만 잘라줌
+   — 캐릭터 원본 비율에 따라 하단 여백이 남을 수도 있음.
+   left:50%+translateX(-50%)로 너비를 얼마로 바꾸든 항상 가운데 오게 함
+   (JS의 imageScale/imageOffsetY도 이 translateX(-50%) 뒤에 이어붙여서 적용됨) */
 .type-match-card__image {
   position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
+  top: 42.75px;
+  left: 50%;
+  width: 75px;
+  height: auto;
+  transform: translateX(-50%);
+  /* 확대(matchCardImageScale) 적용 시 위쪽 기준으로 커지도록 (텍스트 쪽으로 안 침범하게) */
+  transform-origin: top center;
+}
+@media (max-width: 392px) {
+  .type-match-card {
+    width: calc((100% - 12px) / 2);
+    padding-right: 8px;
+    padding-left: 8px;
+  }
+}
+
+@media (max-width: 359px) {
+  .type-match-card {
+    border-radius: 20px;
+  }
+
+  .type-match-card__label {
+    font-size: 14px;
+  }
+
+  .type-match-card__name {
+    font-size: 9px;
+  }
 }
