@@ -12,6 +12,7 @@ import SignupPage from "../SignupPage/SignupPage";
 import PostLoginScreen from "../PostLoginScreen/PostLoginScreen";
 import { postGuestLogin } from "../../api/auth/auth.api.ts";
 import { postLoginLocal } from "../../api/auth/auth.api.ts";
+import { COLORS } from "../../theme/colors";
 
 interface LoginPageProps {
   onLogin: () => void;
@@ -28,6 +29,10 @@ const LoginPage: FC<LoginPageProps> = ({ onLogin }) => {
   const [step, setStep] = useState<LoginStep>("onboarding");
   const [userId, setUserId] = useState("");
   const [password, setPassword] = useState("");
+  // 로그인/게스트 로그인 요청이 오래 걸리거나 실패해도 화면에 아무 표시가 없으면
+  // 버튼이 안 눌리는 것처럼 보입니다. 어느 버튼이 요청 중인지, 실패하면 왜 실패했는지 보여줍니다.
+  const [pendingAction, setPendingAction] = useState<"login" | "skip" | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const handleOnboardingFinish = (): void => setStep("login");
 
@@ -48,6 +53,9 @@ const LoginPage: FC<LoginPageProps> = ({ onLogin }) => {
   }
 
   const handleLoginClick = async (): Promise<void> => {
+    if (pendingAction) return;
+    setErrorMessage(null);
+    setPendingAction("login");
     try {
       const result = await postLoginLocal({ email: userId, password });
 
@@ -56,10 +64,16 @@ const LoginPage: FC<LoginPageProps> = ({ onLogin }) => {
       setStep("postLogin");
     } catch (error) {
       console.error(error);
+      setErrorMessage("로그인에 실패했어요. 아이디/비밀번호를 확인하거나 잠시 후 다시 시도해 주세요.");
+    } finally {
+      setPendingAction(null);
     }
   };
 
   const handleSkipLogin = async (): Promise<void> => {
+    if (pendingAction) return;
+    setErrorMessage(null);
+    setPendingAction("skip");
     try {
       let guestUuid = localStorage.getItem("guestUuid");
       if (!guestUuid) {
@@ -74,6 +88,9 @@ const LoginPage: FC<LoginPageProps> = ({ onLogin }) => {
       setStep("postLogin");
     } catch (error) {
       console.error(error);
+      setErrorMessage("접속에 실패했어요. 네트워크 상태를 확인하고 다시 시도해 주세요.");
+    } finally {
+      setPendingAction(null);
     }
   };
 
@@ -113,9 +130,16 @@ const LoginPage: FC<LoginPageProps> = ({ onLogin }) => {
         type="button"
         className="login-page__login-button"
         onClick={() => void handleLoginClick()}
+        disabled={pendingAction !== null}
       >
         로그인
       </button>
+
+      {errorMessage && (
+        <p style={{ color: COLORS.bad, fontSize: 12, textAlign: "center", margin: "8px 0 0" }}>
+          {errorMessage}
+        </p>
+      )}
 
       <div className="login-page__links">
         <button
@@ -139,6 +163,7 @@ const LoginPage: FC<LoginPageProps> = ({ onLogin }) => {
         type="button"
         className="login-page__skip-link"
         onClick={() => void handleSkipLogin()}
+        disabled={pendingAction !== null}
       >
         로그인 없이 이용하기
       </button>

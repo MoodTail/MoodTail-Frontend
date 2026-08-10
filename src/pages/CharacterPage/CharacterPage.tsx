@@ -1,5 +1,8 @@
 import { useEffect, useState } from "react";
 import { getType } from "../../data/types";
+import { getCharacterType } from "../../data/characterType";
+import { DEX_DATA } from "../../data/dexData";
+import drinkImages from "../../assets/drinks";
 import CharacterDexPage from "../CharacterDexPage/CharacterDexPage";
 import RepresentativeTypeSettingPage from "../RepresentativeTypeSettingPage/RepresentativeTypeSettingPage";
 import TypeDetailPage from "../TypeDetailPage/TypeDetailPage";
@@ -83,6 +86,9 @@ function CharacterPage({ onGoTest }: CharacterPageProps) {
     console.log("TODO: 카카오톡 공유 SDK 연동");
   };
 
+  const repDexEntry = DEX_DATA.find((d) => d.typeId === repTypeId);
+  const repShareImg = repDexEntry ? drinkImages[repDexEntry.id] : undefined;
+
   const dismissSavedToast = () => {
     setShowSavedToast(false);
     if (screen.name === "repSetting") goTypeDex();
@@ -120,7 +126,6 @@ function CharacterPage({ onGoTest }: CharacterPageProps) {
             screen.from === "typeDex" ? goTypeDex() : openCharacterDex(screen.typeId)
           }
           onSetRepresentative={() => openRepSetting(screen.typeId, screen.from)}
-          onGoTest={onGoTest}
         />
       )}
 
@@ -160,6 +165,17 @@ function CharacterPage({ onGoTest }: CharacterPageProps) {
         isOpen={snsModalOpen}
         url={snsShareUrl ?? "https://moodtail.app/share/mock-id"}
         onClose={() => setSnsModalOpen(false)}
+        kakaoShare={
+          snsShareUrl
+            ? {
+                title: "MoodTail 캐릭터 도감",
+                description: `대표 타입 "${getCharacterType(repTypeId).name}"의 캐릭터 도감을 확인해보세요!`,
+                imageUrl: repShareImg,
+                webUrl: snsShareUrl,
+                buttonTitle: "도감 보기",
+              }
+            : undefined
+        }
         onKakaoShare={handleKakaoShare}
       />
 

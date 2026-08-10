@@ -224,8 +224,10 @@ function RecipePage({ onNavVisibilityChange, isLoggedIn, onGoToLogin }: RecipePa
       <>
         <SavedRecipesView
           recipes={savedRecipes}
+          selectingId={selectingId}
           onBack={() => setView({ name: "list" })}
           onUnsave={toggleSaved}
+          onSelectRecipe={handleSelectRecipe}
         />
         {loginModal}
       </>

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import drinkImages from "../../assets/drinks";
 import { COLORS } from "../../theme/colors";
-import type { Cocktail, PersonalityType } from "../../data/types";
+import type { PersonalityType } from "../../data/types";
 import { getCharacterMatch, getCharacterType } from "../../data/characterType";
 import { DEX_DATA } from "../../data/dexData";
 import { getCocktailsByType, getGlassImage } from "../../data/cocktailGlasses";
@@ -10,9 +10,15 @@ import type { MoodTypeDetailResult } from "../../api/mood-types/moodTypes.types"
 import Header from "../../components/Header";
 import PhoneFrame from "../../components/PhoneFrame";
 import TypeDetailBackground from "../../components/TypeDetailBackground";
-import { LockIcon, Mascot } from "../../components/icons";
-import LockedCocktailModal from "../../components/LockedCocktailModal";
+import { Mascot } from "../../components/icons";
 import { FitUnfitMatch } from "../../components/fit_unfit";
+
+interface DisplayCocktail {
+  id: string;
+  name: string;
+  imageUrl?: string;
+  glassNumber?: number;
+}
 
 const TASTE_LABELS: { key: keyof PersonalityType["taste"]; label: string }[] = [
   { key: "alcohol", label: "도수" },
@@ -27,15 +33,12 @@ export default function TypeDetailPage({
   moodTypeId,
   onBack,
   onSetRepresentative,
-  onGoTest,
 }: {
   type: PersonalityType;
   moodTypeId?: number;
   onBack: () => void;
   onSetRepresentative: () => void;
-  onGoTest: () => void;
 }) {
-  const [lockedCocktail, setLockedCocktail] = useState<Cocktail | null>(null);
   const [detail, setDetail] = useState<MoodTypeDetailResult | null>(null);
   const localMatch = getCharacterMatch(type.id);
   const dexEntry = DEX_DATA.find((d) => d.typeId === type.id);
@@ -84,6 +87,22 @@ export default function TypeDetailPage({
         refreshing: detail.typeFigures.refreshing,
       }
     : type.taste;
+  // 해당 타입에 배정된 칵테일 8종은 잠금/해금 대상이 아니라 항상 공개되는
+  // 기준 정보이므로, 서버 unlocked 값과 무관하게 이름/이미지를 그대로 보여줍니다.
+  const displayCocktails: DisplayCocktail[] = detail
+    ? detail.cocktails.map((c) => ({
+        id: String(c.cocktailId),
+        name: c.nameKo,
+        imageUrl: c.imageUrl,
+      }))
+    : type.cocktails.map((cocktail, index) => {
+        const realCocktail = realCocktails[index];
+        return {
+          id: cocktail.id,
+          name: realCocktail?.nameKo ?? cocktail.name,
+          glassNumber: realCocktail?.glassNumber,
+        };
+      });
 
   return (
     <PhoneFrame background={<TypeDetailBackground />}>
@@ -125,7 +144,7 @@ export default function TypeDetailPage({
   <div style={{ fontSize: 27, fontWeight: 700, color: characterType.color, marginTop: 18 }}>{displayName}</div>
   <p
     style={{
-      fontSize: 14,
+      fontSize: 12,
       color: characterType.color,
       textAlign: "center",
       lineHeight: 1.6,
@@ -149,7 +168,7 @@ export default function TypeDetailPage({
             justifyContent: "center",
           }}
         >
-          <span style={{ fontSize: 15, fontWeight: 400 }}>"{displayCatchphrase}"</span>
+          <span style={{ fontSize: 15, fontWeight: 600 }}>"{displayCatchphrase}"</span>
         </div>
 
         <div
@@ -225,7 +244,7 @@ export default function TypeDetailPage({
         />
 
         <div style={{ fontSize: 18, fontWeight: 700, color: '#10161F', marginBottom: 10 }}>
-          해당 타입 칵테일 {type.cocktails.length}종
+          해당 타입 칵테일 {displayCocktails.length}종
         </div>
         <div
           style={{
@@ -235,72 +254,34 @@ export default function TypeDetailPage({
             paddingBottom: 20,
           }}
         >
-          {type.cocktails.map((cocktail, index) => {
-            const realCocktail = realCocktails[index];
-            return cocktail.unlocked ? (
-              <div
-                key={cocktail.id}
-                style={{
-                  aspectRatio: "1 / 1",
-                  borderRadius: 20,
-                  background: "#FFFFFF",
-                  border: "1.5px solid #F6C9C2",
-                  boxShadow: "3px 4px 4px 0px rgba(255, 111, 79, 0.16), 0px 0px 1.9px 0px rgba(255, 111, 79, 1) inset",
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  gap: 6,
-                }}
-              >
-                <img
-                  src={getGlassImage(realCocktail?.glassNumber)}
-                  alt=""
-                  style={{ width: 90, height: 90, objectFit: "contain" }}
-                />
-                <span style={{ fontSize: 12, fontWeight: 700, color: COLORS.ink }}>
-                  {realCocktail?.nameKo ?? cocktail.name}
-                </span>
-              </div>
-            ) : (
-              <button
-                key={cocktail.id}
-                type="button"
-                onClick={() => setLockedCocktail(cocktail)}
-                style={{
-                  aspectRatio: "1 / 1",
-                  borderRadius: 20,
-                  background: COLORS.lockedBg,
-                  border: "none",
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  gap: 6,
-                  cursor: "pointer",
-                }}
-              >
-                <LockIcon />
-                <span style={{ fontSize: 12, fontWeight: 700, color: COLORS.lockedIcon }}>
-                  ???
-                </span>
-              </button>
-            );
-          })}
+          {displayCocktails.map((cocktail) => (
+            <div
+              key={cocktail.id}
+              style={{
+                aspectRatio: "1 / 1",
+                borderRadius: 20,
+                background: "#FFFFFF",
+                border: "1px solid #fff",
+                boxShadow: `0 4px 10px ${COLORS.orangeSoft}`,
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 6,
+              }}
+            >
+              <img
+                src={cocktail.imageUrl ?? getGlassImage(cocktail.glassNumber)}
+                alt=""
+                style={{ width: 90, height: 90, objectFit: "contain" }}
+              />
+              <span style={{ fontSize: 14, fontWeight: 700, color: COLORS.ink }}>
+                {cocktail.name}
+              </span>
+            </div>
+          ))}
         </div>
       </div>
-
-      {lockedCocktail && (
-        <LockedCocktailModal
-          name={lockedCocktail.name}
-          hint={lockedCocktail.hint}
-          onClose={() => setLockedCocktail(null)}
-          onGoTest={() => {
-            setLockedCocktail(null);
-            onGoTest();
-          }}
-        />
-      )}
     </PhoneFrame>
   );
 }

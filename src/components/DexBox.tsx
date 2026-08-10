@@ -6,12 +6,18 @@ export default function DexBox({
   collectionRate,
   unlocked,
   onClick,
+  border,
+  boxShadow,
+  nameFontSize,
 }: {
   drinkImg: string;
   typeId: string;
   collectionRate?: number;
   unlocked: boolean;
   onClick?: () => void;
+  border?: string;
+  boxShadow?: string;
+  nameFontSize?: number;
 }) {
   if (unlocked) {
     // number가 아니라 typeId로 직접 찾습니다 — number는 characterType.ts에서 중복될 수 있어서
@@ -24,11 +30,12 @@ export default function DexBox({
         onClick={onClick}
         disabled={!onClick}
         style={{
+          width: "100%",
           aspectRatio: "1 / 1",
           borderRadius: 18,
           background: '#FFFAF9',
-          border: "none",
-          boxShadow: "0 6px 20px rgba(255, 111, 79, 0.12), 0 2px 6px rgba(43, 35, 28, 0.06)",
+          border: border ?? "none",
+          boxShadow: boxShadow ?? "0 6px 20px rgba(255, 111, 79, 0.12), 0 2px 6px rgba(43, 35, 28, 0.06)",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
@@ -41,7 +48,7 @@ export default function DexBox({
         <img src={drinkImg} alt="" style={{ width: "90%", height: "70%", objectFit: "contain" }} />
         <span
           style={{
-            fontSize: 11,
+            fontSize: nameFontSize ?? 11,
             fontWeight: 700,
             color: characterType?.color,
             textAlign: "center",
@@ -64,11 +71,12 @@ export default function DexBox({
       onClick={onClick}
       disabled={!onClick}
       style={{
+        width: "100%",
         aspectRatio: "1 / 1",
         borderRadius: 18,
         background: "#CAB8B3",
-        border: "none",
-        boxShadow: "inset 0 1px 2px rgba(43, 35, 28, 0.06)",
+        border: border ? "1px solid #CAB8B3" : "none",
+        boxShadow: boxShadow ?? "inset 0 1px 2px rgba(43, 35, 28, 0.06)",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
