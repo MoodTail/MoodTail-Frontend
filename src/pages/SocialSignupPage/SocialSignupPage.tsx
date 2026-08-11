@@ -51,9 +51,6 @@ const SocialSignupPage: FC<SocialSignupPageProps> = ({
   }, []);
 
   useEffect(() => {
-    // React StrictMode(개발 모드)에서 이 effect가 두 번 실행되는데,
-    // 구글/카카오 인가 코드는 1회용이라 두 번째 호출은 반드시 실패한다.
-    // ref 플래그로 실제 API 호출은 최초 1회만 나가도록 막는다.
     if (hasCheckedOauth.current) return;
     hasCheckedOauth.current = true;
 
@@ -86,7 +83,6 @@ const SocialSignupPage: FC<SocialSignupPageProps> = ({
     };
 
     void checkOauth();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const agreeAll = agreeTerms1 && agreeTerms2 && agreePrivacy;
@@ -125,12 +121,17 @@ const SocialSignupPage: FC<SocialSignupPageProps> = ({
         agreements,
       });
 
-      if (result.accessToken) {
-        localStorage.setItem("accessToken", result.accessToken);
+      if (!result.accessToken) {
+        console.error("회원가입 응답에 accessToken이 없습니다.", result);
+        setPhase("error");
+        return;
       }
+
+      localStorage.setItem("accessToken", result.accessToken);
       onSignupComplete?.();
     } catch (error) {
       console.error(error);
+      setPhase("error");
     } finally {
       setIsSubmitting(false);
     }
@@ -243,6 +244,14 @@ const SocialSignupPage: FC<SocialSignupPageProps> = ({
           [필수] 만 14세 이상입니다
         </p>
 
+        <button
+          type="button"
+          className={`social-signup-page__checkbox social-signup-page__checkbox--terms2 ${agreeTerms2 ? "social-signup-page__checkbox--checked" : ""}`}
+          onClick={() => setAgreeTerms2((v) => !v)}
+          aria-label="서비스 이용약관 동의"
+        >
+          {agreeTerms2 && "✓"}
+        </button>
         <p className="social-signup-page__terms-label social-signup-page__terms-label--terms2">
           [필수] 서비스 이용약관 동의
         </p>
@@ -256,6 +265,14 @@ const SocialSignupPage: FC<SocialSignupPageProps> = ({
           보기
         </button>
 
+        <button
+          type="button"
+          className={`social-signup-page__checkbox social-signup-page__checkbox--privacy ${agreePrivacy ? "social-signup-page__checkbox--checked" : ""}`}
+          onClick={() => setAgreePrivacy((v) => !v)}
+          aria-label="개인정보 수집 및 이용 동의"
+        >
+          {agreePrivacy && "✓"}
+        </button>
         <p className="social-signup-page__terms-label social-signup-page__terms-label--privacy">
           [필수] 개인정보 수집 및 이용 동의
         </p>
