@@ -1,3 +1,4 @@
+import axios from "axios";
 import { apiClient } from "../client";
 import type {
   CreateMoodTestResultShareRequest,
@@ -61,6 +62,8 @@ export const createMoodTestResultShare = async (
   tasteProfile: MoodTasteScores,
   thumbnail: Blob,
 ): Promise<CreateMoodTestResultShareResult> => {
+  const baseURL = import.meta.env.VITE_API_BASE_URL;
+  const accessToken = localStorage.getItem("accessToken");
   const request: CreateMoodTestResultShareRequest = { tasteProfile };
   const formData = new FormData();
   formData.append(
@@ -70,9 +73,13 @@ export const createMoodTestResultShare = async (
   formData.append("thumbnail", thumbnail, "mood-test-result-share.png");
   // Content-Type은 지정하지 않습니다 — axios가 FormData를 보고 boundary가 포함된
   // multipart/form-data 헤더를 자동으로 설정합니다.
-  const response = await apiClient.post<CreateMoodTestResultShareResponse>(
-    "/api/v1/tests/results/share",
+  const response = await axios.post<CreateMoodTestResultShareResponse>(
+    new URL("/api/v1/tests/results/share", baseURL).href,
     formData,
+    {
+      withCredentials: true,
+      headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : undefined,
+    },
   );
   return response.data.result;
 };

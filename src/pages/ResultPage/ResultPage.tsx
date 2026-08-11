@@ -9,8 +9,8 @@ import ResultShareModal from '../../components/common/modal/ResultShareModal'
 import ResultSnsShareModal from '../../components/common/modal/ResultSnsShareModal'
 import SaveCompleteToast from '../../components/common/SaveCompleteToast'
 import { RESULT_TYPE_THEMES, type ResultTypeTheme } from '../../constants/resultTypeThemes'
-import { CHARACTER_TYPES, type CharacterType } from '../../data/characterType'
-import { TYPECODE_TO_LOCAL_TYPE } from '../../data/typeCodeMapping'
+import { CHARACTER_TYPES, getCharacterMatch, type CharacterType } from '../../data/characterType'
+import { LOCAL_TYPE_TO_TYPECODE, TYPECODE_TO_LOCAL_TYPE } from '../../data/typeCodeMapping'
 import romanticCharacterImg from '../../assets/images/character/character-12.png'
 import glass1 from '../../assets/images/glass/glass-1.png'
 import glass2 from '../../assets/images/glass/glass-2.png'
@@ -108,7 +108,6 @@ const MOCK_TOP_COCKTAILS: CocktailTopItem[] = [
 ]
 
 const MOCK_MY_TASTE: RadarChartData = { 당도: 30, 산도: 70, 쓴맛: 20, 청량감: 90, 도수: 45 }
-const MOCK_COMPARE_TASTE: RadarChartData = { 당도: 55, 산도: 45, 쓴맛: 60, 청량감: 40, 도수: 65 }
 
 // TODO: 활성(active) 여부는 아직 데이터 기반 규칙이 없어 목데이터 기준으로 고정함. 실제 기준 정해지면 교체
 const TASTE_CHIP_ORDER: { key: keyof RadarChartData; label: string; active: boolean }[] = [
@@ -139,7 +138,8 @@ function ResultPage({
   onGoToLogin,
 }: ResultPageProps) {
   // TODO: 실제 저장 상태 API 연동 후 아래 mock state를 실제 값으로 교체
-  const [isResultSaved, setIsResultSaved] = useState(false) // 지금 보고 있는 결과를 저장했는지
+  const [saveStatusOverride, setSaveStatusOverride] = useState<boolean | null>(null)
+  const isResultSaved = saveStatusOverride ?? Boolean(result?.saved || result?.resultId) // 지금 보고 있는 결과를 저장했는지
 
   // typeCode로 로컬 테마(캐릭터/배경무늬/카피)를 찾음. 실제 결과가 있으면 그 typeCode를,
   // 없으면(로컬 미리보기) PREVIEW_TYPE_CODE를 씀. 아직 테마가 없는 타입(easygoing-optimist 등)은
@@ -169,6 +169,7 @@ function ResultPage({
   const characterImage = FORCE_PREVIEW_TYPE
     ? (PREVIEW_USE_BACKEND_IMAGE ? PREVIEW_BACKEND_IMAGE_URL : theme?.characterImage ?? MOCK_RESULT.characterImage)
     : result?.moodType.characterImageUrl ?? theme?.characterImage ?? MOCK_RESULT.characterImage
+  const shareCardCharacterImage = theme?.characterImage ?? characterImage
   const typeName = theme?.name ?? result?.moodType.name ?? MOCK_RESULT.typeName
   const typeDescription = theme?.description ?? result?.moodType.shortDescription ?? MOCK_RESULT.typeDescription
   const quote = theme?.quote ?? result?.moodType.characterQuote ?? MOCK_RESULT.quote
@@ -194,20 +195,35 @@ function ResultPage({
         도수: result.displayTasteScores.alcoholIntensity,
       }
     : MOCK_MY_TASTE
+  const shareTasteProfile = result?.tasteProfile ?? {
+    alcoholIntensity: MOCK_MY_TASTE.도수,
+    sweetness: MOCK_MY_TASTE.당도,
+    sourness: MOCK_MY_TASTE.산도,
+    refreshing: MOCK_MY_TASTE.청량감,
+    bitterness: MOCK_MY_TASTE.쓴맛,
+  }
 
+  const currentCharacterType = resolveCharacterType(typeCode)
+  const fallbackMatch = currentCharacterType ? getCharacterMatch(currentCharacterType.id) : {}
+  const fallbackGoodMatchTypeCode = fallbackMatch.good ? LOCAL_TYPE_TO_TYPECODE[fallbackMatch.good.id] : undefined
+  const fallbackBadMatchTypeCode = fallbackMatch.bad ? LOCAL_TYPE_TO_TYPECODE[fallbackMatch.bad.id] : undefined
   const goodMatch = result?.compatibilities.best
   const badMatch = result?.compatibilities.worst
-  const goodMatchTypeCode = FORCE_PREVIEW_MATCH ? PREVIEW_GOOD_MATCH_TYPE_CODE : goodMatch?.typeCode
-  const badMatchTypeCode = FORCE_PREVIEW_MATCH ? PREVIEW_BAD_MATCH_TYPE_CODE : badMatch?.typeCode
+  const goodMatchTypeCode = FORCE_PREVIEW_MATCH
+    ? PREVIEW_GOOD_MATCH_TYPE_CODE
+    : goodMatch?.typeCode ?? fallbackGoodMatchTypeCode
+  const badMatchTypeCode = FORCE_PREVIEW_MATCH
+    ? PREVIEW_BAD_MATCH_TYPE_CODE
+    : badMatch?.typeCode ?? fallbackBadMatchTypeCode
   const goodMatchType = resolveCharacterType(goodMatchTypeCode)
   const badMatchType = resolveCharacterType(badMatchTypeCode)
   // 미리보기 강제 지정 중이면 실제 API 이미지 대신 로컬 테마 캐릭터 이미지를 씀
   const goodMatchImage = FORCE_PREVIEW_MATCH
     ? RESULT_TYPE_THEMES[PREVIEW_GOOD_MATCH_TYPE_CODE]?.characterImage
-    : goodMatch?.characterImageUrl
+    : goodMatch?.characterImageUrl ?? (goodMatchTypeCode ? RESULT_TYPE_THEMES[goodMatchTypeCode]?.characterImage : undefined)
   const badMatchImage = FORCE_PREVIEW_MATCH
     ? RESULT_TYPE_THEMES[PREVIEW_BAD_MATCH_TYPE_CODE]?.characterImage
-    : badMatch?.characterImageUrl
+    : badMatch?.characterImageUrl ?? (badMatchTypeCode ? RESULT_TYPE_THEMES[badMatchTypeCode]?.characterImage : undefined)
   const goodMatchImageScale = goodMatchTypeCode ? RESULT_TYPE_THEMES[goodMatchTypeCode]?.matchCardImageScale : undefined
   const badMatchImageScale = badMatchTypeCode ? RESULT_TYPE_THEMES[badMatchTypeCode]?.matchCardImageScale : undefined
   const goodMatchImageOffsetY = goodMatchTypeCode ? RESULT_TYPE_THEMES[goodMatchTypeCode]?.matchCardImageOffsetY : undefined
@@ -259,7 +275,7 @@ function ResultPage({
     setModalStep('none')
 
     if (!result || result.recommendations.length !== 4) {
-      setIsResultSaved(false)
+      setSaveStatusOverride(false)
       setSaveResultToastMessage('저장할 테스트 결과가 없습니다')
       setIsSaveResultToastVisible(true)
       return
@@ -274,11 +290,11 @@ function ResultPage({
           matchScore: r.matchScore,
         })),
       })
-      setIsResultSaved(true)
+      setSaveStatusOverride(true)
       setSaveResultToastMessage('저장 완료되었습니다')
     } catch (err) {
       console.error('테스트 결과 저장에 실패했습니다', err)
-      setIsResultSaved(false)
+      setSaveStatusOverride(false)
       setSaveResultToastMessage('저장에 실패했습니다')
     }
     setIsSaveResultToastVisible(true)
@@ -289,7 +305,11 @@ function ResultPage({
       setModalStep('login-required')
       return
     }
-    setModalStep('save-overwrite-warning')
+    if (isResultSaved || result?.saved || result?.resultId) {
+      setModalStep('save-overwrite-warning')
+      return
+    }
+    performSave()
   }
 
   const handleGoToLogin = () => {
@@ -443,7 +463,10 @@ function ResultPage({
           </div>
           <p
             className="result-page__type-name"
-            style={theme?.typeNameFontSize ? { fontSize: `${theme.typeNameFontSize}px` } : undefined}
+            style={{
+              ...(theme?.typeNameFontSize ? { fontSize: `${theme.typeNameFontSize}px` } : {}),
+              ...(theme?.typeNameMarginTop ? { marginTop: `${theme.typeNameMarginTop}px` } : {}),
+            }}
           >
             {typeName}
           </p>
@@ -451,12 +474,18 @@ function ResultPage({
             className="result-page__type-description"
             style={{
               ...(theme?.typeDescriptionFontSize ? { fontSize: `${theme.typeDescriptionFontSize}px` } : {}),
+              ...(theme?.typeDescriptionMarginTop ? { marginTop: `${theme.typeDescriptionMarginTop}px` } : {}),
               ...(theme?.typeDescriptionColor ? { color: theme.typeDescriptionColor } : {}),
             }}
           >
             {typeDescription}
           </p>
-          <p className="result-page__quote">&ldquo;{quote}&rdquo;</p>
+          <p
+            className="result-page__quote"
+            style={theme?.quoteMarginTop ? { marginTop: `${theme.quoteMarginTop}px` } : undefined}
+          >
+            &ldquo;{quote}&rdquo;
+          </p>
 
           <div className="result-page__detail-card">
             <p className="result-page__detail-title">{typeName}</p>
@@ -477,7 +506,7 @@ function ResultPage({
 
           <section className="result-page__section">
             <h2 className="result-page__section-title">나의 취향 분석</h2>
-            <RadarChart myData={myTaste} compareData={MOCK_COMPARE_TASTE} />
+            <RadarChart myData={myTaste} />
             <div className="taste-chips">
               {TASTE_CHIP_ORDER.map(({ key, label, active }) => (
                 <div
@@ -563,12 +592,12 @@ function ResultPage({
         isOpen={isShareModalOpen}
         shareCard={{
           typeCode,
-          characterImage,
+          characterImage: shareCardCharacterImage,
           typeName,
           typeDescription: shareDescription,
           quote,
         }}
-        tasteProfile={result?.tasteProfile}
+        tasteProfile={shareTasteProfile}
         onClose={() => setIsShareModalOpen(false)}
         onSnsShare={handleSnsShare}
         onImageSaved={handleImageSaved}
@@ -576,7 +605,7 @@ function ResultPage({
 
       <ResultSnsShareModal
         isOpen={isSnsModalOpen}
-        url={shareUrl ?? "https://moodtail.app/share/mock-id"}
+        url={shareUrl ?? window.location.href}
         onClose={() => setIsSnsModalOpen(false)}
         onKakaoShare={handleKakaoShare}
         kakaoShare={{

@@ -43,21 +43,25 @@ import SharedResultPage from "./pages/SharedResultPage/SharedResultPage";
 import SharedCollectionPage from "./pages/SharedCollectionPage/SharedCollectionPage";
 
 const RETEST_PROGRESS_KEY = "moodtail-retest-progress";
+const LOCAL_AUTH_PREVIEW_KEY = "moodtail-local-auth-preview";
 
 export type NavKey = "history" | "dictionary" | "home" | "recipe" | "mypage";
 type HistoryView = "calendar" | "photo" | "test-result" | "monthly-report";
 type MyPageView = "main" | "profile-edit" | "inquiry" | "terms";
 
 function App() {
+  const isLocalAuthPreview =
+    import.meta.env.DEV &&
+    localStorage.getItem(LOCAL_AUTH_PREVIEW_KEY) === "true";
   const [mainNavVisible, setMainNavVisible] = useState(true);
   // 새로고침/백그라운드 복귀 시에도 재로그인 없이 이어서 쓸 수 있도록, 이미 저장된
   // accessToken이 있으면 로그인 상태를 그대로 복원합니다. 이게 없으면 토큰이 남아있어도
   // 매번 온보딩/로그인 화면부터 다시 봐야 해서, 테스트 진행 상황 복원도 체감이 안 됩니다.
   const [isLoggedIn, setIsLoggedIn] = useState(
-    () => !!localStorage.getItem("accessToken"),
+    () => isLocalAuthPreview || !!localStorage.getItem("accessToken"),
   );
   const [isGuest, setIsGuest] = useState(
-    () => localStorage.getItem("isGuest") === "true",
+    () => !isLocalAuthPreview && localStorage.getItem("isGuest") === "true",
   );
   const [activeMenu, setActiveMenu] = useState<NavKey>("home");
   const [historyView, setHistoryView] = useState<HistoryView>("calendar");
@@ -144,6 +148,7 @@ function App() {
   };
 
   const handleGoToLoginScreen = () => {
+    localStorage.removeItem(LOCAL_AUTH_PREVIEW_KEY);
     setIsLoggedIn(false);
     setIsGuest(false);
     setMypageView("main");

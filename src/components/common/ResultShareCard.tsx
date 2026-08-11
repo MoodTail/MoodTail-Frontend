@@ -249,7 +249,7 @@ function ResultShareCard({ typeCode, characterImage, typeName, typeDescription, 
         ) : (
           <div className="result-share-card__hill" aria-hidden="true" />
         )}
-        <img className="result-share-card__character" src={characterImage} alt="" />
+        <img className="result-share-card__character" src={characterImage} alt="" crossOrigin="anonymous" />
         <p className="result-share-card__type-name">{typeName}</p>
         <p className="result-share-card__type-description">{shareDescription}</p>
         <p className="result-share-card__quote">&ldquo;{shareQuote}&rdquo;</p>
