@@ -66,3 +66,7 @@
   padding-bottom: 0;
   overflow: hidden;
 }
+
+.app-content--no-nav {
+  padding-bottom: 0;
+}

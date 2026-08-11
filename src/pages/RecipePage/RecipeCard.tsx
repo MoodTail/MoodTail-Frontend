@@ -48,7 +48,7 @@ function RecipeCard({ recipe, selecting, saved, onSelect, onToggleSave }: Recipe
               onToggleSave();
             }}
           >
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none">
               <path
                 d="M6 3.5 h12 a1 1 0 0 1 1 1 V21 l-7 -4.5 L5 21 V4.5 a1 1 0 0 1 1 -1 z"
                 fill={saved ? "currentColor" : "none"}

@@ -145,7 +145,7 @@ const MainPage: FC<MainPageProps> = ({
   }, []);
 
   useEffect(() => {
-    onNavVisibilityChange?.(view !== "together");
+    onNavVisibilityChange?.(view !== "together" && view !== "quiz" && view !== "quizLoading");
   }, [view, onNavVisibilityChange]);
 
   const exitQuiz = () => {

@@ -104,7 +104,8 @@ export default function CharacterDexPage({
           style={{
             display: "grid",
             gridTemplateColumns: "repeat(3, 1fr)",
-            gap: 12,
+            rowGap: 22,
+            columnGap: 12,
             paddingBottom: 20,
           }}
         >

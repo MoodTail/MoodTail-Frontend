@@ -31,7 +31,7 @@ export default function FitUnfitCard({
       {img && (
         <div
           style={{
-            width: 80,
+            width: 68,
             height: 80,
             flexShrink: 0,
             display: "flex",
@@ -42,7 +42,7 @@ export default function FitUnfitCard({
           <img
             src={img}
             alt={name}
-            style={{ width: "80%", height: "100%", objectFit: "cover", objectPosition: "center top" }}
+            style={{ width: "100%", height: "100%", objectFit: "contain" }}
           />
         </div>
       )}

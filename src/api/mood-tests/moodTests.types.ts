@@ -7,7 +7,8 @@ export interface MoodTestQuestionOption {
 export interface MoodTestQuestion {
   questionId: number;
   questionType: "FIXED" | "RANDOM";
-  content: string;
+  title: string;
+  subtitle: string;
   sortOrder: number;
   options: MoodTestQuestionOption[];
 }
