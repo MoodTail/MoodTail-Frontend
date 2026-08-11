@@ -16,9 +16,10 @@ interface SocialSignupPageProps {
   stateValue: string;
   redirectUri: string;
   onSignupComplete?: () => void;
+  onLoginFailed?: () => void;
 }
 
-type Phase = "checking" | "signup-required" | "error";
+type Phase = "checking" | "signup-required";
 
 const SocialSignupPage: FC<SocialSignupPageProps> = ({
   provider,
@@ -26,6 +27,7 @@ const SocialSignupPage: FC<SocialSignupPageProps> = ({
   stateValue,
   redirectUri,
   onSignupComplete,
+  onLoginFailed,
 }) => {
   const [phase, setPhase] = useState<Phase>("checking");
   const [signupToken, setSignupToken] = useState<string | null>(null);
@@ -75,14 +77,15 @@ const SocialSignupPage: FC<SocialSignupPageProps> = ({
           return;
         }
 
-        setPhase("error");
+        onLoginFailed?.();
       } catch (error) {
         console.error(error);
-        setPhase("error");
+        onLoginFailed?.();
       }
     };
 
     void checkOauth();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const agreeAll = agreeTerms1 && agreeTerms2 && agreePrivacy;
@@ -123,7 +126,7 @@ const SocialSignupPage: FC<SocialSignupPageProps> = ({
 
       if (!result.accessToken) {
         console.error("회원가입 응답에 accessToken이 없습니다.", result);
-        setPhase("error");
+        onLoginFailed?.();
         return;
       }
 
@@ -131,7 +134,7 @@ const SocialSignupPage: FC<SocialSignupPageProps> = ({
       onSignupComplete?.();
     } catch (error) {
       console.error(error);
-      setPhase("error");
+      onLoginFailed?.();
     } finally {
       setIsSubmitting(false);
     }
@@ -142,17 +145,6 @@ const SocialSignupPage: FC<SocialSignupPageProps> = ({
       <div className="social-signup-page">
         <p className="social-signup-page__title">MoodTail</p>
         <p className="social-signup-page__subtitle">로그인 확인 중...</p>
-      </div>
-    );
-  }
-
-  if (phase === "error") {
-    return (
-      <div className="social-signup-page">
-        <p className="social-signup-page__title">MoodTail</p>
-        <p className="social-signup-page__subtitle">
-          로그인에 실패했어요. 다시 시도해주세요.
-        </p>
       </div>
     );
   }

@@ -6,11 +6,11 @@
   transform-origin: bottom center;
   will-change: transform, opacity, left, bottom;
   transition:
-    left 800ms ease-out,
-    transform 800ms ease-out,
-    opacity 800ms ease-out,
-    bottom 800ms ease-out,
-    z-index 0s 700ms;
+    left 2800ms ease-out,
+    transform 2800ms ease-out,
+    opacity 2800ms ease-out,
+    bottom 2800ms ease-out,
+    z-index 0s 2700ms;
 }
 
 .character-carousel__item--center {

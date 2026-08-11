@@ -18,6 +18,7 @@ interface TasteRadarChartProps {
 
 const GRID_RINGS = [0.25, 0.5, 0.75, 1];
 const DEFAULT_LABEL_OFFSETS = [21, 27, 25, 25, 27]; // 도수,청량,쓴맛,산도,당도
+const POINT_RADIUS = 4;
 
 function polarPoint(cx: number, cy: number, radius: number, angleDeg: number) {
   const angleRad = ((angleDeg - 90) * Math.PI) / 180;
@@ -27,7 +28,7 @@ function polarPoint(cx: number, cy: number, radius: number, angleDeg: number) {
   };
 }
 
-function buildPoints(
+function buildPointList(
   cx: number,
   cy: number,
   maxRadius: number,
@@ -35,13 +36,14 @@ function buildPoints(
   values?: number[],
 ) {
   const step = 360 / axisCount;
-  return Array.from({ length: axisCount })
-    .map((_, i) => {
-      const ratio = values ? values[i] / 100 : 1;
-      const p = polarPoint(cx, cy, maxRadius * ratio, i * step);
-      return `${p.x},${p.y}`;
-    })
-    .join(" ");
+  return Array.from({ length: axisCount }).map((_, i) => {
+    const ratio = values ? values[i] / 100 : 1;
+    return polarPoint(cx, cy, maxRadius * ratio, i * step);
+  });
+}
+
+function pointsToString(points: { x: number; y: number }[]) {
+  return points.map((p) => `${p.x},${p.y}`).join(" ");
 }
 
 const TasteRadarChart: FC<TasteRadarChartProps> = ({
@@ -55,6 +57,21 @@ const TasteRadarChart: FC<TasteRadarChartProps> = ({
   const cy = size / 2;
   const maxRadius = size / 2 - 4;
 
+  const pointsA = buildPointList(
+    cx,
+    cy,
+    maxRadius,
+    axes.length,
+    seriesA.values,
+  );
+  const pointsB = buildPointList(
+    cx,
+    cy,
+    maxRadius,
+    axes.length,
+    seriesB.values,
+  );
+
   return (
     <div className="taste-radar-chart" style={{ width: size, height: size }}>
       <svg
@@ -67,42 +84,74 @@ const TasteRadarChart: FC<TasteRadarChartProps> = ({
           {GRID_RINGS.map((ratio) => (
             <polygon
               key={ratio}
-              points={buildPoints(cx, cy, maxRadius * ratio, axes.length)}
+              points={pointsToString(
+                buildPointList(cx, cy, maxRadius * ratio, axes.length),
+              )}
               fill="none"
               stroke="#EADFD3"
             />
           ))}
         </g>
 
-        <polygon
-          className="taste-radar-chart__line taste-radar-chart__line--friend"
-          points={buildPoints(cx, cy, maxRadius, axes.length, seriesB.values)}
-          fill="none"
-          stroke={seriesB.color}
-          strokeWidth={2}
-        />
-        <polygon
-          className="taste-radar-chart__fill taste-radar-chart__fill--friend"
-          points={buildPoints(cx, cy, maxRadius, axes.length, seriesB.values)}
-          fill={seriesB.color}
-          fillOpacity={seriesB.fillOpacity}
-          stroke="none"
-        />
-
+        {/* 나(seriesA)를 선+채우기+원까지 통째로 먼저 그리고,
+            상대방(seriesB)을 선+채우기+원까지 통째로 나중에 그린다.
+            이렇게 하면 상대방 영역(채우기)이 내 원 위를 지나가면서
+            겹치는 부분의 내 원이 상대방 색으로 덮여 보이게 된다. */}
         <polygon
           className="taste-radar-chart__line taste-radar-chart__line--mine"
-          points={buildPoints(cx, cy, maxRadius, axes.length, seriesA.values)}
+          points={pointsToString(pointsA)}
           fill="none"
           stroke={seriesA.color}
           strokeWidth={2}
         />
         <polygon
           className="taste-radar-chart__fill taste-radar-chart__fill--mine"
-          points={buildPoints(cx, cy, maxRadius, axes.length, seriesA.values)}
+          points={pointsToString(pointsA)}
           fill={seriesA.color}
           fillOpacity={seriesA.fillOpacity}
           stroke="none"
         />
+        <g className="taste-radar-chart__points taste-radar-chart__points--mine">
+          {pointsA.map((p, i) => (
+            <circle
+              key={`mine-${i}`}
+              cx={p.x}
+              cy={p.y}
+              r={POINT_RADIUS}
+              fill="#fff"
+              stroke={seriesA.color}
+              strokeWidth={2}
+            />
+          ))}
+        </g>
+
+        <polygon
+          className="taste-radar-chart__line taste-radar-chart__line--friend"
+          points={pointsToString(pointsB)}
+          fill="none"
+          stroke={seriesB.color}
+          strokeWidth={2}
+        />
+        <polygon
+          className="taste-radar-chart__fill taste-radar-chart__fill--friend"
+          points={pointsToString(pointsB)}
+          fill={seriesB.color}
+          fillOpacity={seriesB.fillOpacity}
+          stroke="none"
+        />
+        <g className="taste-radar-chart__points taste-radar-chart__points--friend">
+          {pointsB.map((p, i) => (
+            <circle
+              key={`friend-${i}`}
+              cx={p.x}
+              cy={p.y}
+              r={POINT_RADIUS}
+              fill="#fff"
+              stroke={seriesB.color}
+              strokeWidth={2}
+            />
+          ))}
+        </g>
       </svg>
 
       {axes.map((label, i) => {

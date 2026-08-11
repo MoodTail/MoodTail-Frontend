@@ -23,11 +23,11 @@ const CustomRecommend: FC<CustomRecommendProps> = ({
   onViewResult,
 }) => {
   const [values, setValues] = useState<TasteValues>({
-    strength: 34,
-    sweetness: 72,
-    acidity: 48,
-    bitterness: 26,
-    refreshing: 80,
+    strength: 50,
+    sweetness: 50,
+    acidity: 50,
+    bitterness: 50,
+    refreshing: 50,
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
