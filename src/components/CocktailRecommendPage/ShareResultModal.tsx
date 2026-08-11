@@ -107,7 +107,7 @@ const ShareResultModal: FC<ShareResultModalProps> = ({
                   나와의 일치율 {topPick.myMatchPercent}%
                 </span>
                 <span className="share-result-modal__top-badge share-result-modal__top-badge--friend">
-                  친구와의 일치율 {topPick.partnerMatchPercent}%
+                  상대방과의 일치율 {topPick.partnerMatchPercent}%
                 </span>
               </div>
             </div>

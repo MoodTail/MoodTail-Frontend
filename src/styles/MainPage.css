@@ -101,6 +101,14 @@
   display: flex;
   overflow: hidden;
   box-sizing: border-box;
+  border: none;
+  outline: none;
+  padding: 0;
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
 }
 
 .main-page__cocktail-thumb {
@@ -184,6 +192,11 @@
   font-size: 20px;
   font-weight: 700;
   color: #ff6f4f;
+}
+
+.main-page__menu-item-arrow-icon {
+  position: relative;
+  top: 2px;
 }
 
 .app-content:has(> .main-page) {

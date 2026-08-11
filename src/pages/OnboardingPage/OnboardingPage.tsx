@@ -15,7 +15,7 @@ import image10 from "../../assets/images/cocktails/image 10.png";
 import image6 from "../../assets/images/cocktails/image 6.png";
 import image3 from "../../assets/images/cocktails/image 3.png";
 
-// 온보딩 9 컵 이미지 20개
+// 온보딩 9 컵 이미지 16개
 import glass1 from "../../assets/images/glass/glass-1.png";
 import glass2 from "../../assets/images/glass/glass-2.png";
 import glass3 from "../../assets/images/glass/glass-3.png";
@@ -32,10 +32,6 @@ import glass13 from "../../assets/images/glass/glass-13.png";
 import glass14 from "../../assets/images/glass/glass-14.png";
 import glass15 from "../../assets/images/glass/glass-15.png";
 import glass16 from "../../assets/images/glass/glass-16.png";
-import glass17 from "../../assets/images/glass/glass-17.png";
-import glass18 from "../../assets/images/glass/glass-18.png";
-import glass19 from "../../assets/images/glass/glass-19.png";
-import glass20 from "../../assets/images/glass/glass-20.png";
 
 // 온보딩 8 캐릭터 12개
 import ch1 from "../../assets/images/character/character-1.png";
@@ -138,10 +134,6 @@ const SLIDE_2_MARQUEE_IMAGES: string[] = [
   glass14,
   glass15,
   glass16,
-  glass17,
-  glass18,
-  glass19,
-  glass20,
 ];
 
 const CHARACTER_LIST: string[] = [
@@ -160,7 +152,14 @@ const CHARACTER_LIST: string[] = [
 ];
 
 const TOTAL_SLIDES = 3;
-const AUTO_SLIDE_INTERVAL_MS = 3000;
+const BASE_AUTO_SLIDE_INTERVAL_MS = 3000;
+const LAST_SLIDE_EXTRA_DELAY_MS = 3000;
+
+const SLIDE_DURATIONS_MS = [
+  BASE_AUTO_SLIDE_INTERVAL_MS,
+  BASE_AUTO_SLIDE_INTERVAL_MS,
+  BASE_AUTO_SLIDE_INTERVAL_MS + LAST_SLIDE_EXTRA_DELAY_MS,
+];
 const SWIPE_THRESHOLD_PX = 50;
 
 interface OnboardingPageProps {
@@ -172,11 +171,14 @@ const OnboardingPage: FC<OnboardingPageProps> = ({ onFinish }) => {
   const touchStartXRef = useRef<number | null>(null);
 
   useEffect(() => {
-    const timerId = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % TOTAL_SLIDES);
-    }, AUTO_SLIDE_INTERVAL_MS);
+    const duration =
+      SLIDE_DURATIONS_MS[currentIndex] ?? BASE_AUTO_SLIDE_INTERVAL_MS;
 
-    return () => clearInterval(timerId);
+    const timerId = setTimeout(() => {
+      setCurrentIndex((prev) => (prev + 1) % TOTAL_SLIDES);
+    }, duration);
+
+    return () => clearTimeout(timerId);
   }, [currentIndex]);
 
   const handleTouchStart = (event: TouchEvent<HTMLDivElement>): void => {
@@ -254,7 +256,7 @@ const OnboardingPage: FC<OnboardingPageProps> = ({ onFinish }) => {
             >
               <OnboardingCharacterCarousel
                 characters={CHARACTER_LIST}
-                intervalMs={1300}
+                intervalMs={3000}
               />
             </OnboardingSlide>
           </div>

@@ -225,15 +225,15 @@
 }
 .signup-page__checkbox--terms1 {
   left: 19.75px;
-  top: 56.75px;
+  top: 59.75px;
 }
 .signup-page__checkbox--terms2 {
   left: 19.75px;
-  top: 82.75px;
+  top: 84.75px;
 }
 .signup-page__checkbox--privacy {
   left: 19.75px;
-  top: 108.75px;
+  top: 110.75px;
 }
 
 .signup-page__terms-all-label {
@@ -284,10 +284,10 @@
   cursor: pointer;
 }
 .signup-page__terms-view--terms2 {
-  top: 86px;
+  top: 83px;
 }
 .signup-page__terms-view--privacy {
-  top: 112px;
+  top: 111px;
 }
 
 .signup-page__submit {
