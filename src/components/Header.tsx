@@ -7,11 +7,15 @@ export default function Header({
   onBack,
   right,
   titleSize = 17,
+  titleGap = 8,
+  leftOffset = 0,
 }: {
   title: string;
   onBack?: () => void;
   right?: ReactNode;
   titleSize?: number;
+  titleGap?: number;
+  leftOffset?: number;
 }) {
   return (
     <div
@@ -22,7 +26,7 @@ export default function Header({
         marginBottom: 18,
       }}
     >
-      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+      <div style={{ display: "flex", alignItems: "center", gap: titleGap, marginLeft: leftOffset }}>
         {onBack && (
           <button
             onClick={onBack}

@@ -76,6 +76,7 @@ function App() {
   const [mypageProfile, setMypageProfile] =
     useState<MyPageProfileSnapshot | null>(null);
   const [recipeNavVisible, setRecipeNavVisible] = useState(true);
+  const [characterNavVisible, setCharacterNavVisible] = useState(true);
   const [goToQuizOnHome, setGoToQuizOnHome] = useState(false);
   const [isTestResultOpen, setIsTestResultOpen] = useState(false);
   const [initialRetestProgress] = useState(() =>
@@ -186,7 +187,12 @@ function App() {
           />
         );
       case "dictionary":
-        return <CharacterPage onGoTest={handleGoToTest} />;
+        return (
+          <CharacterPage
+            onGoTest={handleGoToTest}
+            onNavVisibilityChange={setCharacterNavVisible}
+          />
+        );
       case "home":
         return (
           <MainPage
@@ -440,12 +446,20 @@ function App() {
         className={`app${activeMenu === "history" ? " app--history-responsive" : ""}`}
       >
         {activeMenu === "recipe" && <DexBackground />}
-        <section className="app-content">{renderPage()}</section>
-
-        {(activeMenu !== "recipe" || recipeNavVisible) &&
-          (activeMenu !== "home" || mainNavVisible) && (
-            <BottomNav activeMenu={activeMenu} onChangeMenu={setActiveMenu} />
-          )}
+        {(() => {
+          const navVisible =
+            (activeMenu !== "recipe" || recipeNavVisible) &&
+            (activeMenu !== "home" || mainNavVisible) &&
+            (activeMenu !== "dictionary" || characterNavVisible);
+          return (
+            <>
+              <section className={`app-content${navVisible ? "" : " app-content--no-nav"}`}>
+                {renderPage()}
+              </section>
+              {navVisible && <BottomNav activeMenu={activeMenu} onChangeMenu={setActiveMenu} />}
+            </>
+          );
+        })()}
       </main>
     </div>
   );
