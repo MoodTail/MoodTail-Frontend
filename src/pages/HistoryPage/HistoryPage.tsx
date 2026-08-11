@@ -16,6 +16,10 @@ import HistoryDetailBottomSheet from '../../components/history/HistoryDetailBott
 import EmptyHistoryDateBottomSheet from '../../components/history/EmptyHistoryDateBottomSheet'
 import SaveCompleteModal from '../../components/Modal/SaveCompleteModal'
 import HistoryBackground from '../../components/common/HistoryBackground'
+import {
+  hasSeenHistoryEntryNotice,
+  markHistoryEntryNoticeAsSeen,
+} from '../../utils/historyNotice'
 import '../../styles/HistoryPage.css'
 
 const INITIAL_CALENDAR_DATE = new Date()
@@ -45,7 +49,9 @@ function HistoryPage({
 }: HistoryPageProps) {
   const [activeMonth, setActiveMonth] = useState(INITIAL_CALENDAR_DATE)
   const [selectedDate, setSelectedDate] = useState<Date>()
-  const [isMonthlyReportModalOpen, setIsMonthlyReportModalOpen] = useState(true)
+  const [isMonthlyReportModalOpen, setIsMonthlyReportModalOpen] = useState(
+    () => !hasSeenHistoryEntryNotice(),
+  )
   const [isHistoryDetailOpen, setIsHistoryDetailOpen] = useState(false)
   const [isNoMonthlyReportModalOpen, setIsNoMonthlyReportModalOpen] = useState(false)
   const [monthlyHistory, setMonthlyHistory] = useState<MonthlyHistoryResult>()
@@ -55,7 +61,7 @@ function HistoryPage({
 
   const historyDays = monthlyHistory?.days ?? []
   const markedDates = historyDays
-    .filter((day) => day.hasTestResult || day.hasDrinkingRecord)
+    .filter((day) => day.hasTestResult)
     .map((day) => new Date(`${day.date}T00:00:00`))
   const selectedDay: HistoryCalendarDay | undefined = selectedDate
     ? historyDays.find((day) => day.date === toDateKey(selectedDate))
@@ -134,12 +140,25 @@ function HistoryPage({
     }
   }, [activeMonth])
 
+  useEffect(() => {
+    if (monthlyHistory && isMonthlyReportModalOpen) {
+      markHistoryEntryNoticeAsSeen()
+    }
+  }, [monthlyHistory, isMonthlyReportModalOpen])
+
   const handleDateClick = (date: Date) => {
     setSelectedDate(date)
     setIsHistoryDetailOpen(true)
   }
 
   const handleActiveMonthChange = (date: Date) => {
+    if (
+      date.getFullYear() === activeMonth.getFullYear()
+      && date.getMonth() === activeMonth.getMonth()
+    ) {
+      return
+    }
+
     setActiveMonth(date)
     setSelectedDate(undefined)
     setIsHistoryDetailOpen(false)

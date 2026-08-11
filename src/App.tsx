@@ -41,6 +41,7 @@ import {
 import SocialSignupPage from "./pages/SocialSignupPage/SocialSignupPage";
 import SharedResultPage from "./pages/SharedResultPage/SharedResultPage";
 import SharedCollectionPage from "./pages/SharedCollectionPage/SharedCollectionPage";
+import { resetHistoryEntryNotice } from "./utils/historyNotice";
 import SharedPairResultPage from "./pages/SharedPairResultPage/SharedPairResultPage";
 
 const RETEST_PROGRESS_KEY = "moodtail-retest-progress";
@@ -143,6 +144,7 @@ function App() {
   };
 
   const handleGoToLoginScreen = () => {
+    resetHistoryEntryNotice();
     localStorage.removeItem(LOCAL_AUTH_PREVIEW_KEY);
     setIsLoggedIn(false);
     setIsGuest(false);
@@ -239,6 +241,7 @@ function App() {
         redirectUri={redirectUri}
         onSignupComplete={() => {
           window.history.replaceState({}, "", "/");
+          resetHistoryEntryNotice();
           setOauthCallback(null);
           setIsGuest(localStorage.getItem("isGuest") === "true");
           setIsLoggedIn(true);
@@ -284,6 +287,7 @@ function App() {
     return (
       <LoginPage
         onLogin={() => {
+          resetHistoryEntryNotice();
           setIsGuest(localStorage.getItem("isGuest") === "true");
           setIsLoggedIn(true);
         }}

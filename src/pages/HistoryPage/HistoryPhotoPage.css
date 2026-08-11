@@ -165,13 +165,14 @@
 .history-cocktail-record__selected-item > span {
   position: absolute;
   top: 14px;
+  right: 52px;
   left: 76px;
   display: flex;
   flex-direction: column;
 }
 
 .history-cocktail-record__selected-item strong { font-size: 15px; line-height: 20px; }
-.history-cocktail-record__selected-item small { margin-top: 8px; color: #77716e; font-size: 11px; line-height: 15px; }
+.history-cocktail-record__selected-item small { margin-top: 2px; color: #77716e; font-size: 11px; line-height: 15px; }
 .history-cocktail-record__selected-item > b { position: absolute; top: 14px; right: 16px; color: #ff6f4f; font-size: 13px; line-height: 17px; }
 
 .history-cocktail-record__remove {
@@ -181,18 +182,25 @@
   display: grid;
   width: 26px;
   height: 26px;
-  padding: 0 0 2px;
+  padding: 0;
   place-items: center;
   border: 2px solid #ff6f4f;
   border-radius: 50%;
   background: #ffffff;
   color: #ff6f4f;
   font-family: inherit;
-  font-size: 19px;
+  font-size: 0;
   font-weight: 400;
   line-height: 24px;
   cursor: pointer;
   pointer-events: auto;
+}
+
+.history-cocktail-record__remove::before {
+  content: '−';
+  font-size: 19px;
+  line-height: 1;
+  transform: translateY(-0.5px);
 }
 
 .history-cocktail-record__list-fade {
@@ -268,9 +276,9 @@
 }
 
 .history-test-result__cocktail-card > span { position: absolute; top: 7px; left: 8px; padding: 3px 7px; border-radius: 10px; background: #ff6f4f; color: #fff; font-size: 9px; font-weight: 700; }
-.history-test-result__cocktail-card img { width: 54px; height: 56px; margin-top: 18px; object-fit: contain; }
+.history-test-result__cocktail-card img { width: 59px; height: 60px; margin-top: 24px; object-fit: contain; }
 .history-test-result__cocktail-card strong { margin-top: 3px; font-size: 11px; line-height: 16px; }
-.history-test-result__cocktail-card small { color: #999; font-size: 9px; line-height: 13px; }
+.history-test-result__cocktail-card small { width: 100%; color: #999; font-size: 9px; line-height: 13px; text-align: center; }
 
 .history-test-result__empty-card {
   position: absolute;

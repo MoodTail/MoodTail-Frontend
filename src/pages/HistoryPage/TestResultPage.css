@@ -53,8 +53,9 @@
 .history-full-result-page__type {
   position: absolute;
   top: 435px;
-  left: 144px;
-  width: 104px;
+  right: 20px;
+  left: 20px;
+  width: auto;
   height: 29px;
   margin: 0;
   color: #ff6f4f;
@@ -68,8 +69,9 @@
 .history-full-result-page__description {
   position: absolute;
   top: 468px;
-  left: 101px;
-  width: 191px;
+  right: 20px;
+  left: 20px;
+  width: auto;
   height: 14px;
   margin: 0;
   color: #ff8f7a;
@@ -122,88 +124,77 @@
 .history-full-result-page__cocktails {
   position: absolute;
   top: 39px;
-  left: 29px;
-  width: 325px;
+  left: 20px;
+  width: 353px;
 }
 
 .history-full-result-page__cocktails h2 {
   width: 250px;
-  height: 26px;
-  margin: 0;
+  height: 23px;
+  margin: 0 0 6px 4px;
   color: #181820;
-  font-size: 22px;
+  font-size: 16px;
   font-weight: 700;
-  line-height: 26px;
+  line-height: 23px;
   white-space: nowrap;
 }
 
 .history-full-result-page__cocktail-grid {
   display: grid;
-  grid-template-columns: repeat(2, 151px);
-  gap: 26px 23px;
-  margin-top: 24px;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px 16px;
 }
 
 .history-full-result-page__cocktail-card {
   position: relative;
-  width: 151px;
-  height: 151px;
+  display: flex;
+  height: 125px;
+  flex-direction: column;
+  align-items: center;
+  border: 1px solid #ffd0c5;
   border-radius: 14px;
   background: #ffffff;
-  box-shadow:
-    3px 4px 4px rgba(255, 111, 79, 0.16),
-    inset 0 0 1.9px #ff6f4f;
+  box-shadow: 0 2px 5px rgba(255, 111, 79, 0.12);
 }
 
 .history-full-result-page__cocktail-card > span {
   position: absolute;
-  top: 6px;
-  left: 9px;
-  display: grid;
-  width: 26px;
-  height: 18px;
-  place-items: center;
-  border-radius: 9px;
+  top: 7px;
+  left: 8px;
+  padding: 3px 7px;
+  border-radius: 10px;
   background: #ff6f4f;
   color: #ffffff;
   font-size: 9px;
   font-weight: 700;
-  line-height: 9px;
 }
 
 .history-full-result-page__cocktail-card > img {
-  position: absolute;
-  top: 28px;
-  left: 46px;
-  width: 52px;
-  height: 83px;
+  width: 59px;
+  height: 60px;
+  margin-top: 24px;
   object-fit: contain;
 }
 
 .history-full-result-page__cocktail-card > strong,
 .history-full-result-page__cocktail-card > small {
-  position: absolute;
-  left: 0;
-  width: 100%;
   text-align: center;
 }
 
 .history-full-result-page__cocktail-card > strong {
-  top: 116px;
-  height: 13px;
+  margin-top: 3px;
   color: #181820;
   font-size: 11px;
   font-weight: 700;
-  line-height: 13px;
+  line-height: 16px;
 }
 
 .history-full-result-page__cocktail-card > small {
-  top: 132px;
-  height: 12px;
-  color: #8c8c9e;
-  font-size: 10px;
+  width: 100%;
+  color: #999;
+  font-size: 9px;
   font-weight: 400;
-  line-height: 12px;
+  line-height: 13px;
 }
 
 .history-full-result-page__taste-analysis {
@@ -349,11 +340,9 @@
 }
 
 @media (max-width: 392px) {
-  .history-full-result-page__character,
-  .history-full-result-page__type,
-  .history-full-result-page__description { left: 50%; transform: translateX(-50%); }
+  .history-full-result-page__character { left: 50%; transform: translateX(-50%); }
   .history-full-result-page__quote { right: 24px; left: 24px; width: auto; padding: 0 12px; font-size: 16px; }
-  .history-full-result-page__cocktails { right: 24px; left: 24px; width: auto; }
+  .history-full-result-page__cocktails { right: 20px; left: 20px; width: auto; }
   .history-full-result-page__cocktail-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px 14px; }
   .history-full-result-page__cocktail-card { width: 100%; }
   .history-full-result-page__radar { right: 16px; left: 16px; width: auto; }

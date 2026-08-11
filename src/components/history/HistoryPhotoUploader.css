@@ -262,6 +262,10 @@
   display: grid;
   width: 42px;
   height: 42px;
+  min-width: 42px;
+  min-height: 42px;
+  flex: 0 0 42px;
+  aspect-ratio: 1;
   place-items: center;
   border-radius: 50%;
   background: #ff6f4f;
@@ -274,7 +278,7 @@
   content: '+';
   font-size: 30px;
   line-height: 1;
-  transform: translateY(1px);
+  transform: translateY(-0.5px);
 }
 
 .history-photo-uploader__add-more strong {
