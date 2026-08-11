@@ -2,7 +2,7 @@
   display: block;
   width: 100%;
   max-width: 340px;
-  margin: 0 auto;
+  margin: -33px auto -52px;
   overflow: visible;
 }
 
@@ -59,7 +59,7 @@
 .taste-chips {
   display: flex;
   gap: 6px;
-  margin-top: 20px;
+  margin-top: 25px;
 }
 
 .taste-chips__item {

@@ -43,27 +43,56 @@ function ResultShareModal({
 
   if (!isOpen) return null
 
+  const buildResultShareUrl = (shareToken: string) => {
+    const baseUrl = import.meta.env.VITE_WEB_BASE_URL?.trim() || window.location.origin
+    return new URL(`/share/results/${encodeURIComponent(shareToken)}`, baseUrl).href
+  }
+
   const handleSaveImage = async () => {
     if (!cardRef.current) return
     // TODO: 지금은 웹 다운로드 방식. 실제 처리 방식(앱 내 저장 등) 확정되면 교체
-    const dataUrl = await toPng(cardRef.current, { pixelRatio: 2 })
-    const link = document.createElement('a')
-    link.download = `moodtail-${shareCard.typeName}.png`
-    link.href = dataUrl
-    link.click()
-    onImageSaved()
+    try {
+      const blob = await toBlob(cardRef.current, { pixelRatio: 2, cacheBust: true })
+      if (!blob) throw new Error('이미지 생성에 실패했습니다.')
+
+      const downloadUrl = URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.download = `moodtail-${shareCard.typeName}.png`
+      link.href = downloadUrl
+      document.body.appendChild(link)
+      link.click()
+      link.remove()
+      window.setTimeout(() => URL.revokeObjectURL(downloadUrl), 1000)
+      onImageSaved()
+    } catch (error) {
+      console.error('결과 공유 카드 이미지 저장 실패', error)
+
+      try {
+        const dataUrl = await toPng(cardRef.current, { pixelRatio: 2, cacheBust: true })
+        const link = document.createElement('a')
+        link.download = `moodtail-${shareCard.typeName}.png`
+        link.href = dataUrl
+        document.body.appendChild(link)
+        link.click()
+        link.remove()
+        onImageSaved()
+      } catch (fallbackError) {
+        console.error('결과 공유 카드 이미지 저장 fallback 실패', fallbackError)
+        alert('이미지 저장에 실패했어요. 잠시 후 다시 시도해주세요.')
+      }
+    }
   }
 
   const handleSnsShare = async () => {
     if (!cardRef.current || !tasteProfile) {
-      onSnsShare()
+      alert('공유 링크 생성에 실패했어요. 로그인 상태를 확인한 뒤 다시 시도해주세요.')
       return
     }
     try {
-      const blob = await toBlob(cardRef.current, { pixelRatio: 2 })
+      const blob = await toBlob(cardRef.current, { pixelRatio: 2, cacheBust: true })
       if (!blob) throw new Error('썸네일 이미지 생성에 실패했습니다')
-      const { shareUrl } = await createMoodTestResultShare(tasteProfile, blob)
-      onSnsShare(shareUrl)
+      const { shareToken } = await createMoodTestResultShare(tasteProfile, blob)
+      onSnsShare(buildResultShareUrl(shareToken))
     } catch (err) {
       console.error('공유 URL 생성에 실패했습니다', err)
       onSnsShare()

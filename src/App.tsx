@@ -44,18 +44,22 @@ import SharedCollectionPage from "./pages/SharedCollectionPage/SharedCollectionP
 import SharedPairResultPage from "./pages/SharedPairResultPage/SharedPairResultPage";
 
 const RETEST_PROGRESS_KEY = "moodtail-retest-progress";
+const LOCAL_AUTH_PREVIEW_KEY = "moodtail-local-auth-preview";
 
 export type NavKey = "history" | "dictionary" | "home" | "recipe" | "mypage";
 type HistoryView = "calendar" | "photo" | "test-result" | "monthly-report";
 type MyPageView = "main" | "profile-edit" | "inquiry" | "terms";
 
 function App() {
+  const isLocalAuthPreview =
+    import.meta.env.DEV &&
+    localStorage.getItem(LOCAL_AUTH_PREVIEW_KEY) === "true";
   const [mainNavVisible, setMainNavVisible] = useState(true);
   const [isLoggedIn, setIsLoggedIn] = useState(
-    () => !!localStorage.getItem("accessToken"),
+    () => isLocalAuthPreview || !!localStorage.getItem("accessToken"),
   );
   const [isGuest, setIsGuest] = useState(
-    () => localStorage.getItem("isGuest") === "true",
+    () => !isLocalAuthPreview && localStorage.getItem("isGuest") === "true",
   );
   const [activeMenu, setActiveMenu] = useState<NavKey>("home");
   const [historyView, setHistoryView] = useState<HistoryView>("calendar");
@@ -139,6 +143,7 @@ function App() {
   };
 
   const handleGoToLoginScreen = () => {
+    localStorage.removeItem(LOCAL_AUTH_PREVIEW_KEY);
     setIsLoggedIn(false);
     setIsGuest(false);
     setMypageView("main");
