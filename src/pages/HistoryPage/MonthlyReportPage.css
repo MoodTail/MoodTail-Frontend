@@ -155,6 +155,14 @@
   gap: 7.98px;
 }
 
+.monthly-report-page__type-list--single {
+  right: 20px;
+}
+
+.monthly-report-page__type-list--single .monthly-report-page__type-card {
+  width: 100%;
+}
+
 .monthly-report-page__type-card {
   position: relative;
   width: 148.51px;
@@ -193,7 +201,7 @@
 .monthly-report-page__type-copy {
   position: absolute;
   top: 15px;
-  left: 64.79px;
+  left: 62.79px;
 }
 
 .monthly-report-page__type-copy h3 {

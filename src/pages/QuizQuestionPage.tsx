@@ -159,7 +159,7 @@ export default function QuizQuestionPage({
             다음
           </button>
         </div>
-        <p style={{ fontSize: 10.5, color: COLORS.inkSoft, textAlign: "center", margin: "8px 0 0" }}>
+        <p style={{ fontSize: 10.5, color: COLORS.inkSoft, textAlign: "center", margin: "16px 0 0" }}>
           선택 시 해당 답변이 5가지 맛 지표에 반영됩니다
         </p>
       </div>

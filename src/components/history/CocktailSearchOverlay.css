@@ -95,13 +95,14 @@
 .cocktail-search__copy {
   position: absolute;
   top: 14px;
+  right: 18px;
   left: 76px;
   display: flex;
   flex-direction: column;
 }
 
 .cocktail-search__copy strong { height: 20px; font-size: 15px; font-weight: 700; line-height: 19.8px; }
-.cocktail-search__copy small { height: 15px; margin-top: 8px; color: #77716e; font-size: 11px; font-weight: 400; line-height: 14.52px; }
+.cocktail-search__copy small { height: 15px; margin-top: 2px; color: #77716e; font-size: 11px; font-weight: 400; line-height: 14.52px; }
 
 .cocktail-search__item > b {
   position: absolute;

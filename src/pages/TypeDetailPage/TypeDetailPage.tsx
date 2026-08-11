@@ -16,7 +16,6 @@ import { FitUnfitMatch } from "../../components/fit_unfit";
 interface DisplayCocktail {
   id: string;
   name: string;
-  imageUrl?: string;
   glassNumber?: number;
 }
 
@@ -89,11 +88,12 @@ export default function TypeDetailPage({
     : type.taste;
   // 해당 타입에 배정된 칵테일 8종은 잠금/해금 대상이 아니라 항상 공개되는
   // 기준 정보이므로, 서버 unlocked 값과 무관하게 이름/이미지를 그대로 보여줍니다.
+  // 이미지는 서버 실사진(imageUrl) 대신 로컬 잔 실루엣(glassNumber)을 씁니다.
   const displayCocktails: DisplayCocktail[] = detail
     ? detail.cocktails.map((c) => ({
         id: String(c.cocktailId),
         name: c.nameKo,
-        imageUrl: c.imageUrl,
+        glassNumber: realCocktails.find((rc) => rc.nameKo === c.nameKo)?.glassNumber,
       }))
     : type.cocktails.map((cocktail, index) => {
         const realCocktail = realCocktails[index];
@@ -111,6 +111,8 @@ export default function TypeDetailPage({
           title="타입 상세"
           onBack={onBack}
           titleSize={20}
+          titleGap={2}
+          leftOffset={-8}
           right={
             <button
               onClick={onSetRepresentative}
@@ -118,10 +120,10 @@ export default function TypeDetailPage({
                 border: "none",
                 color: "#fff",
                 background: COLORS.orange,
-                fontSize: 15,
+                fontSize: 12,
                 fontWeight: 600,
-                padding: "6px 10px",
-                borderRadius: 20,
+                padding: "7px 10px",
+                borderRadius: 16,
                 whiteSpace: "nowrap",
                 cursor: "pointer",
               }}
@@ -136,7 +138,7 @@ export default function TypeDetailPage({
     <img
       src={characterImg}
       alt={displayName}
-      style={{ width: 250, height: 250, objectFit: "contain" }}
+      style={{ width: 320, height: 270, objectFit: "contain" }}
     />
   ) : (
     <Mascot size={88} color={characterType.color} />
@@ -158,29 +160,29 @@ export default function TypeDetailPage({
 
         <div
           style={{
-            width: "100%",
+            width: "92%",
+            margin: "14px auto",
             background: characterType.color,
             color: "#fff",
-            borderRadius: 22,
+            borderRadius: 19,
             padding: "14px 0",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
           }}
         >
-          <span style={{ fontSize: 15, fontWeight: 600 }}>"{displayCatchphrase}"</span>
+          <span style={{ fontSize: 19, fontWeight: 600 }}>"{displayCatchphrase}"</span>
         </div>
 
         <div
           style={{
-            width: "100%",
-            height: 220,
+            width: "92%",
+            margin: "14px auto 22px",
+            height: 200,
             background: "#FFF9F5",
             border: "1px solid #F0DDD4",
             borderRadius: 20,
             padding: "18px 20px",
-            marginTop: 14,
-            marginBottom: 22,
             display: "flex",
             flexDirection: "column",
           }}
@@ -188,14 +190,14 @@ export default function TypeDetailPage({
           <div style={{ fontSize: 16, fontWeight: 700, color: "#10161F", marginBottom: 8 }}>
             {displayName}
           </div>
-          <p style={{ fontSize: 13, color: COLORS.inkSoft, lineHeight: 1.6, margin: 0 }}>
+          <p style={{ fontSize: 11, color: COLORS.inkSoft, lineHeight: 1.5, margin: 0, wordBreak: "keep-all" }}>
             {displayDescription}
           </p>
 
           <div
             style={{
-              fontSize: 13,
-              fontWeight: 600,
+              fontSize: 17,
+              fontWeight: 700,
               color: COLORS.orange,
               textAlign: "center",
               marginTop: "auto",
@@ -205,10 +207,10 @@ export default function TypeDetailPage({
           </div>
         </div>
 
-        <div style={{ fontSize: 18, fontWeight: 700, color: "#10161F", marginBottom: 10 }}>
-          맛 프로필
+        <div style={{ fontSize: 22, fontWeight: 700, color: "#10161F", marginLeft: 14, marginBottom: 18 }}>
+            맛 프로필
         </div>
-        <div style={{ display: "flex", gap: 8, marginBottom: 22 }}>
+        <div style={{ display: "flex", gap: 12, marginBottom: 22 }}>
           {TASTE_LABELS.map(({ key, label }, index) => {
             const isPrimary = index % 2 === 0;
             const textColor = isPrimary ? "#FF6120" : "#10161F";
@@ -220,14 +222,14 @@ export default function TypeDetailPage({
                   background: isPrimary ? "#FDF2EF" : "#FFFFFF",
                   border: `1px solid ${isPrimary ? "#FF6F4F" : "#C2C2C2"}`,
                   borderRadius: 12,
-                  padding: "10px 0",
+                  padding: "5px 0",
                   display: "flex",
                   flexDirection: "column",
                   alignItems: "center",
                   gap: 4,
                 }}
               >
-                <span style={{ fontSize: 10.5, fontWeight: 600, color: textColor }}>{label}</span>
+                <span style={{ fontSize: 11, fontWeight: 600, color: textColor, marginTop: 3 }}>{label}</span>
                 <span style={{ fontSize: 17, fontWeight: 800, color: textColor }}>
                   {displayTaste[key]}
                 </span>
@@ -243,14 +245,15 @@ export default function TypeDetailPage({
           badMatchImg={badMatchImg}
         />
 
-        <div style={{ fontSize: 18, fontWeight: 700, color: '#10161F', marginBottom: 10 }}>
+        <div style={{ fontSize: 22, fontWeight: 700, color: '#10161F', marginLeft: 10, marginBottom: 14 }}>
           해당 타입 칵테일 {displayCocktails.length}종
         </div>
         <div
           style={{
             display: "grid",
             gridTemplateColumns: "repeat(2, 1fr)",
-            gap: 10,
+            rowGap: 28,
+            columnGap: 11,
             paddingBottom: 20,
           }}
         >
@@ -258,6 +261,8 @@ export default function TypeDetailPage({
             <div
               key={cocktail.id}
               style={{
+                width: "90%",
+                justifySelf: "center",
                 aspectRatio: "1 / 1",
                 borderRadius: 20,
                 background: "#FFFFFF",
@@ -271,9 +276,9 @@ export default function TypeDetailPage({
               }}
             >
               <img
-                src={cocktail.imageUrl ?? getGlassImage(cocktail.glassNumber)}
+                src={getGlassImage(cocktail.glassNumber)}
                 alt=""
-                style={{ width: 90, height: 90, objectFit: "contain" }}
+                style={{ width: 70, height: 90, objectFit: "contain" }}
               />
               <span style={{ fontSize: 14, fontWeight: 700, color: COLORS.ink }}>
                 {cocktail.name}

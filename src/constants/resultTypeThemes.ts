@@ -7,7 +7,9 @@ import explosiveAdventurerCharacter from "../assets/images/character/character-6
 import star22Shape from "../assets/images/result-shapes/star-22.svg";
 import star23Shape from "../assets/images/result-shapes/star-23.svg";
 import sensitivePerfectionistCharacter from "../assets/images/character/character-7.png";
-import shard9584Shape from "../assets/images/result-shapes/shard-9584.svg";
+import sensitiveShard1Shape from "../assets/images/share-card/sensitive-shard-1.svg";
+import sensitiveShard2Shape from "../assets/images/share-card/sensitive-shard-2.svg";
+import sensitiveShard3Shape from "../assets/images/share-card/sensitive-shard-3.svg";
 import meticulousCriticCharacter from "../assets/images/character/character-5.png";
 import sparkles9585MainShape from "../assets/images/result-shapes/sparkles-9585-main-base.svg";
 import sparkles9585AccentShape from "../assets/images/result-shapes/sparkles-9585-accent.svg";
@@ -65,9 +67,12 @@ export interface ResultTypeTheme {
   // 타입명/설명 글자 크기(px) 오버라이드. 기본은 공통 CSS(32px/12px) 그대로 쓰고,
   // 이 타입만 Figma상 크기가 다를 때만 지정 (다른 타입에 영향 없음)
   typeNameFontSize?: number;
+  typeNameMarginTop?: number;
   typeDescriptionFontSize?: number;
+  typeDescriptionMarginTop?: number;
   // 설명 글자 색 오버라이드. 기본은 공통 CSS(#fff) 그대로 쓰고, 이 타입만 다를 때만 지정
   typeDescriptionColor?: string;
+  quoteMarginTop?: number;
   // "잘 맞는/안 맞는 타입" 작은 카드에서 이 캐릭터가 유독 작게/크게 보일 때만 쓰는 예외적 확대 배율
   // (1 = 원본 그대로, 기본 규칙은 그대로 두고 이 타입만 살짝 키우고 싶을 때 지정)
   matchCardImageScale?: number;
@@ -136,6 +141,10 @@ export const RESULT_TYPE_THEMES: Record<string, ResultTypeTheme> = {
     backgroundColor: "#FDAF7A",
     accentColor: "#FF6F4F",
     characterImage: freeSpiritedRomanticCharacter,
+    typeNameFontSize: 26,
+    typeNameMarginTop: 13,
+    typeDescriptionMarginTop: 11,
+    quoteMarginTop: 19,
   },
   "refreshing-explorer": {
     name: "청량한 탐험가",
@@ -177,6 +186,9 @@ export const RESULT_TYPE_THEMES: Record<string, ResultTypeTheme> = {
     characterPositionWidth: 244.81,
     characterPositionHeight: 315,
     characterShadow: "drop-shadow(13px 6px 4px rgba(0, 0, 0, 0.25))",
+    typeNameMarginTop: 3,
+    typeDescriptionMarginTop: 9,
+    quoteMarginTop: 19,
     // Figma: 작은 별(Star23) top331 left245 104x104
     // -> 무늬 기준 상대좌표: top 331-108=223, left 245-18=227
     accentShape: star23Shape,
@@ -195,12 +207,42 @@ export const RESULT_TYPE_THEMES: Record<string, ResultTypeTheme> = {
     accentColor: "#FD9D78",
     characterImage: sensitivePerfectionistCharacter,
     matchCardImageScale: 0.7,
-    characterWidth: 229,
-    backgroundShape: shard9584Shape,
     backgroundShapeWidth: 600,
     backgroundShapeHeight: 490,
+    hideBackgroundCircle: true,
     contentOffsetY: 65,
-    characterOffsetY: 0,
+    characterLayout: "positioned",
+    characterPositionTop: 8,
+    characterPositionLeft: 185.73,
+    characterPositionWidth: 228.55,
+    characterPositionHeight: 334,
+    typeNameMarginTop: 7,
+    typeDescriptionMarginTop: 10,
+    quoteMarginTop: 19,
+    extraShapes: [
+      {
+        src: sensitiveShard1Shape,
+        width: 346,
+        height: 214,
+        top: 70,
+        left: 120,
+      },
+      // Vector 612: 이 값만 바꾸면 큰 대각선 세모 하나만 움직입니다.
+      {
+        src: sensitiveShard2Shape,
+        width: 516,
+        height: 320,
+        top: 135,
+        left: 47,
+      },
+      {
+        src: sensitiveShard3Shape,
+        width: 265,
+        height: 84,
+        top: 82,
+        left: 105,
+      },
+    ],
   },
   "meticulous-critic": {
     name: "꼼꼼한 평론가",
@@ -221,6 +263,7 @@ export const RESULT_TYPE_THEMES: Record<string, ResultTypeTheme> = {
     contentOffsetY: 20,
     characterOffsetX: 20,
     characterOffsetY: 20,
+    typeNameMarginTop: 9,
     // Figma 원본 좌표(454x543 캔버스) 기준 아래쪽 별 2개 위치를, 표시 크기(420x500)에 맞춰 환산
     accentShape: sparkles9585AccentShape,
     accentShapeWidth: 82,
@@ -255,7 +298,7 @@ export const RESULT_TYPE_THEMES: Record<string, ResultTypeTheme> = {
     characterImage: emotionalThinkerCharacter,
     characterWidth: 275,
     backgroundShape: wave9586Shape,
-    backgroundShapeWidth: 393,
+    backgroundShapeWidth: 400,
     backgroundShapeHeight: 455,
     contentOffsetY: 80,
     characterOffsetY: 10,
@@ -272,6 +315,7 @@ export const RESULT_TYPE_THEMES: Record<string, ResultTypeTheme> = {
     backgroundShape: backdrop9588Shape,
     backgroundShapeWidth: 400,
     backgroundShapeHeight: 223,
+    backgroundShapeOffsetY: 10,
     // 배경판/줄무늬 폭(394)이 프레임 폭과 거의 같아서, 래퍼 폭을 그대로 맞춰
     // 가운데 정렬 계산 때 왼쪽에 여백이 남지 않도록 함
     wrapWidth: 450,
@@ -280,16 +324,19 @@ export const RESULT_TYPE_THEMES: Record<string, ResultTypeTheme> = {
     // Figma 실측: 배경판 top92, 캐릭터(Group9278) top98 left45 303.81x286
     // -> 배경판 기준 상대좌표: top 98-92=6, left 45-0=45 (+20 보정 = 65)
     characterLayout: "positioned",
-    characterPositionTop: 6,
-    characterPositionLeft: 55,
+    characterPositionTop: 15,
+    characterPositionLeft: 50,
     characterPositionWidth: 303.81,
     characterPositionHeight: 286,
+    typeNameMarginTop: 5,
+    typeDescriptionMarginTop: 10,
+    quoteMarginTop: 19,
     characterShadow: "drop-shadow(8px 6px 4px rgba(0, 0, 0, 0.25))",
     // Figma 실측: 줄무늬 5개 top 327/379/405/418/424 -> 배경판 기준 상대좌표 327-92=235
     accentShape: stripes9588Shape,
     accentShapeWidth: 400,
     accentShapeHeight: 99,
-    accentShapeTop: 235,
+    accentShapeTop: 243,
     accentShapeLeft: 0,
   },
   "grounded-realist": {
@@ -304,6 +351,8 @@ export const RESULT_TYPE_THEMES: Record<string, ResultTypeTheme> = {
     characterShadow: "drop-shadow(9px 1px 4px rgba(0, 0, 0, 0.25))",
     hideBackgroundCircle: true,
     typeNameFontSize: 26,
+    typeDescriptionMarginTop: 11,
+    quoteMarginTop: 19,
     characterWidth: 190.24,
     characterOffsetX: -1.38,
     characterOffsetY: 18.11,
@@ -329,6 +378,9 @@ export const RESULT_TYPE_THEMES: Record<string, ResultTypeTheme> = {
     backgroundColor: "#66BC88",
     accentColor: "#66BC88",
     characterImage: easygoingOptimistCharacter,
+    typeNameMarginTop: 5,
+    typeDescriptionMarginTop: 9,
+    quoteMarginTop: 19,
     matchCardImageScale: 1.25,
     matchCardImageOffsetY: -7,
     backgroundShape: circles9596Shape,

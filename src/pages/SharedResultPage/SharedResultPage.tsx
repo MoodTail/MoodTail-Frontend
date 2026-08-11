@@ -12,7 +12,9 @@ export default function SharedResultPage({
   onGoHome: () => void;
 }) {
   const [result, setResult] = useState<MoodTestResult | null>(null);
-  const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
+  const [status, setStatus] = useState<"loading" | "ready" | "error">(
+    "loading",
+  );
 
   useEffect(() => {
     let cancelled = false;
@@ -33,7 +35,15 @@ export default function SharedResultPage({
 
   if (status === "loading") {
     return (
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%", color: COLORS.inkSoft }}>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          height: "100%",
+          color: COLORS.inkSoft,
+        }}
+      >
         불러오는 중...
       </div>
     );
@@ -54,7 +64,8 @@ export default function SharedResultPage({
         }}
       >
         <p style={{ color: COLORS.inkSoft, fontSize: 14 }}>
-          공유된 결과를 찾을 수 없어요.<br />
+          공유된 결과를 찾을 수 없어요.
+          <br />
           링크가 만료되었거나 잘못된 링크일 수 있어요.
         </p>
         <button
@@ -77,5 +88,13 @@ export default function SharedResultPage({
     );
   }
 
-  return <ResultPage isLoggedIn={false} result={result} onBack={onGoHome} onRetest={onGoHome} onGoToLogin={onGoHome} />;
+  return (
+    <ResultPage
+      isLoggedIn={false}
+      result={result}
+      onBack={onGoHome}
+      onRetest={onGoHome}
+      onGoToLogin={onGoHome}
+    />
+  );
 }

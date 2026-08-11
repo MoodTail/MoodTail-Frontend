@@ -9,6 +9,7 @@ import CustomRecommend from "../CustomRecommend/CustomRecommend";
 import CustomRecommendResultPage from "../CustomRecommendResultPage/CustomRecommendResultPage";
 import QuizQuestionPage from "../QuizQuestionPage";
 import LoadingPage from "../LoadingPage";
+import RecipePage from "../RecipePage/RecipePage";
 import {
   buildQuizQuestions,
   toQuizQuestions,
@@ -33,8 +34,6 @@ import {
   saveQuizProgress,
 } from "../../utils/quizProgress";
 
-import cocktail from "../../assets/images/glass/glass-1.png";
-
 const MAIN_QUIZ_PROGRESS_KEY = "moodtail-main-quiz-progress";
 
 interface MenuItem {
@@ -57,7 +56,8 @@ type ViewState =
   | "custom"
   | "customResult"
   | "quiz"
-  | "quizLoading";
+  | "quizLoading"
+  | "recipe";
 
 interface MainPageProps {
   onQuizComplete?: (result: MoodTestResult | null) => void;
@@ -74,9 +74,6 @@ const MainPage: FC<MainPageProps> = ({
   onNavVisibilityChange,
   onGoToLogin,
 }) => {
-  // 앱이 백그라운드로 갔다가 돌아오거나 새로고침돼도 진행 중이던 테스트를 이어할 수 있도록,
-  // sessionStorage에 저장된 진행 상황이 있으면 그대로 복원합니다. 탭을 완전히 닫으면
-  // sessionStorage가 비워지므로 그땐 자연스럽게 홈(시작) 화면이 보입니다.
   const [initialQuizProgress] = useState(() =>
     loadQuizProgress(MAIN_QUIZ_PROGRESS_KEY),
   );
@@ -108,10 +105,6 @@ const MainPage: FC<MainPageProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // 퀴즈 화면에 들어갈 때마다 실제 문항(/api/v1/tests/questions)을 받아와 교체합니다.
-  // 실패하면 조용히 무시하고 로컬 목데이터(buildQuizQuestions)를 그대로 씁니다.
-  // 다만 복원된 진행 상황이 있는 첫 진입 시에는 건너뜁니다 — 이미 답변한 문항 구성을
-  // 실제 서버 문항으로 바꿔치기하면 답변 인덱스가 어긋나 버립니다.
   const skipNextFetchRef = useRef(initialQuizProgress !== null);
   useEffect(() => {
     if (view !== "quiz") return;
@@ -152,7 +145,7 @@ const MainPage: FC<MainPageProps> = ({
   }, []);
 
   useEffect(() => {
-    onNavVisibilityChange?.(view !== "together");
+    onNavVisibilityChange?.(view !== "together" && view !== "quiz" && view !== "quizLoading");
   }, [view, onNavVisibilityChange]);
 
   const exitQuiz = () => {
@@ -278,6 +271,40 @@ const MainPage: FC<MainPageProps> = ({
     );
   }
 
+  if (view === "recipe") {
+    const isLoggedIn = localStorage.getItem("isGuest") !== "true";
+    return (
+      <div style={{ position: "relative", width: "100%", height: "100%" }}>
+        <button
+          type="button"
+          onClick={() => setView("home")}
+          aria-label="뒤로가기"
+          style={{
+            position: "absolute",
+            left: 10,
+            top: 16,
+            zIndex: 10,
+            width: 32,
+            height: 32,
+            borderRadius: "50%",
+            border: "none",
+            background: "rgba(255,255,255,0.9)",
+            boxShadow: "0 2px 6px rgba(0,0,0,0.12)",
+            fontSize: 16,
+            cursor: "pointer",
+          }}
+        >
+          ←
+        </button>
+        <RecipePage
+          onNavVisibilityChange={onNavVisibilityChange}
+          isLoggedIn={isLoggedIn}
+          onGoToLogin={onGoToLogin ?? (() => {})}
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="main-page">
       {/* 배경 블러 */}
@@ -320,15 +347,11 @@ const MainPage: FC<MainPageProps> = ({
       <h2 className="main-page__section-title">오늘의 추천 칵테일</h2>
 
       <div className="main-page__below-title">
-        <div className="main-page__cocktail-card">
-          <div className="main-page__cocktail-thumb">
-            <img
-              src={todayCocktail?.cocktail.imageUrl || cocktail}
-              alt={todayCocktail?.cocktail.nameKo ?? "오늘의 칵테일"}
-              className="main-page__cocktail-image"
-            />
-          </div>
-
+        <button
+          type="button"
+          className="main-page__cocktail-card"
+          onClick={() => setView("recipe")}
+        >
           <div className="main-page__cocktail-info">
             <p className="main-page__cocktail-name">
               {todayCocktail?.cocktail.nameKo ?? "불러오는 중..."}
@@ -337,7 +360,7 @@ const MainPage: FC<MainPageProps> = ({
               {todayCocktail?.cocktail.shortDescription}
             </p>
           </div>
-        </div>
+        </button>
 
         {/* 메뉴 리스트 */}
         <ul className="main-page__menu-list">
@@ -350,7 +373,7 @@ const MainPage: FC<MainPageProps> = ({
               >
                 <span className="main-page__menu-item-label">{item.label}</span>
                 <span className="main-page__menu-item-arrow" aria-hidden="true">
-                  ↗
+                  <span className="main-page__menu-item-arrow-icon">↗</span>
                 </span>
               </button>
             </li>
@@ -362,7 +385,6 @@ const MainPage: FC<MainPageProps> = ({
         <ShareModal
           onClose={() => setIsShareOpen(false)}
           shareUrl="https://moodtail.app/share/example"
-          tipText="TIP: 캐릭터는 무료 12종이나 된답니다! 전부 해금할 수 있을까요?"
           onKakaoShare={() => console.log("카카오톡 공유")}
         />
       )}

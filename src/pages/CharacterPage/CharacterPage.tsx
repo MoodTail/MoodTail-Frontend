@@ -23,10 +23,17 @@ type Screen =
 
 interface CharacterPageProps {
   onGoTest: () => void;
+  onNavVisibilityChange?: (visible: boolean) => void;
 }
 
-function CharacterPage({ onGoTest }: CharacterPageProps) {
+function CharacterPage({ onGoTest, onNavVisibilityChange }: CharacterPageProps) {
   const [screen, setScreen] = useState<Screen>({ name: "typeDex" });
+
+  // 타입 상세/대표 타입 설정 화면은 전체 화면으로 쓰이므로 하단 nav를 숨깁니다.
+  useEffect(() => {
+    onNavVisibilityChange?.(screen.name !== "typeDetail" && screen.name !== "repSetting");
+    return () => onNavVisibilityChange?.(true);
+  }, [screen.name, onNavVisibilityChange]);
   const [repTypeId, setRepTypeId] = useState("idealist");
   const [shareTypeId, setShareTypeId] = useState<string | null>(null);
   const [snsModalOpen, setSnsModalOpen] = useState(false);

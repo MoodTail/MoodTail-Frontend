@@ -59,7 +59,8 @@ function RecipePage({ onNavVisibilityChange, isLoggedIn, onGoToLogin }: RecipePa
 
   // 목록 화면은 실제 API(/api/v1/cocktails)에서 이름/도수/설명을 받아오되,
   // 재료/조리법 등 백엔드에 아직 없는 필드는 이름이 일치하는 로컬 목데이터에서 그대로 가져옵니다.
-  // 잔 실루엣 이미지(glassImage)/상세 히어로 이미지(heroImage)도 서버 실제 칵테일 사진(imageUrl)으로 대체합니다.
+  // 목록 썸네일(glassImage)은 기존 잔 실루엣을 그대로 쓰고, 상세 화면 히어로 이미지(heroImage)만
+  // 서버 실제 칵테일 사진(imageUrl)으로 대체합니다.
   useEffect(() => {
     let cancelled = false;
     getCocktails()
@@ -75,9 +76,7 @@ function RecipePage({ onNavVisibilityChange, isLoggedIn, onGoToLogin }: RecipePa
             description: c.description,
             degree: `${Math.round(c.alcoholDegree)}°`,
             taste: { ...local.taste, 도수: Math.round(c.alcoholDegree) },
-            ...(c.imageUrl
-              ? { glassImage: c.imageUrl, heroImage: c.imageUrl, hasHeroPhoto: true }
-              : {}),
+            ...(c.imageUrl ? { heroImage: c.imageUrl, hasHeroPhoto: true } : {}),
           });
           idMap[local.id] = c.cocktailId;
         });

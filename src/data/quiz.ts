@@ -25,8 +25,8 @@ export interface QuizQuestion {
 export function toQuizQuestions(questions: MoodTestQuestion[]): QuizQuestion[] {
   return questions.map((q) => ({
     id: String(q.questionId),
-    title: q.content,
-    subtitle: "",
+    title: q.title,
+    subtitle: q.subtitle,
     options: q.options.map((o) => ({ id: String(o.optionId), label: o.content })),
   }));
 }

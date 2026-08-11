@@ -21,7 +21,6 @@ function toRadarData(scores: HistoryTestResultDetail['displayTasteScores']): Rad
 
 function TestResultPage({ onBack, result }: TestResultPageProps) {
   const myTaste = toRadarData(result.displayTasteScores)
-  const moodTypeTaste = toRadarData(result.moodType.displayTasteScores)
   const tasteItems = [
     { label: '도수', value: result.displayTasteScores.alcoholIntensity, active: true },
     { label: '당도', value: result.displayTasteScores.sweetness, active: false },
@@ -71,7 +70,7 @@ function TestResultPage({ onBack, result }: TestResultPageProps) {
                   <span>{cocktail.ranking}위</span>
                   <img src={cocktail.cocktailImageUrl} alt="" />
                   <strong>{cocktail.cocktailName}</strong>
-                  <small>{cocktail.shortDescription} · {cocktail.matchScore}%</small>
+                  <small>일치율 {cocktail.matchScore}%</small>
                 </article>
               ))}
             </div>
@@ -80,7 +79,7 @@ function TestResultPage({ onBack, result }: TestResultPageProps) {
           <section className="history-full-result-page__taste-analysis">
             <h2>나의 취향 분석</h2>
             <div className="history-full-result-page__radar">
-              <RadarChart myData={myTaste} compareData={moodTypeTaste} />
+              <RadarChart myData={myTaste} />
             </div>
             <div className="history-full-result-page__taste-values">
               {tasteItems.map((item) => (

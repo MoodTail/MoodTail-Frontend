@@ -17,11 +17,11 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 8px 0 20px;
+  padding: 8px 0 4px;
 }
 
 .inquiry__back {
-  width: 27px;
+  width: 13px;
   height: 27px;
   padding: 0;
   border: 0;
@@ -47,7 +47,7 @@
 }
 
 .inquiry__description {
-  margin: 0 0 16px;
+  margin: 0 0 12px 21px;
   font-size: 13px;
   font-weight: 400;
   line-height: 1.32;

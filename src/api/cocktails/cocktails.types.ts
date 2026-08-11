@@ -296,3 +296,23 @@ export interface GetCocktailTrendResponse {
   message: string;
   result: CocktailTrendResult;
 }
+
+export interface SharedPairRecommendation {
+  compromiseProfile: {
+    alcoholIntensity: number;
+    sweetness: number;
+    sourness: number;
+    refreshing: number;
+    bitterness: number;
+  };
+  recommendations: {
+    ranking: number;
+    cocktailId: number;
+    nameKo: string;
+    nameEn: string;
+    matchScore: number;
+  }[];
+  myMatchScore: number;
+  partnerMatchScore: number;
+  thumbnailImageUrl: string;
+}

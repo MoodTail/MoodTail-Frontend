@@ -79,9 +79,29 @@ function wrapCanvasText(
 
 function getReportCharacterImage(report: MonthlyReportResult) {
   const typeCode = report.monthlyMoodType.typeCode as CharacterType;
-  return CHARACTER_IMAGES[typeCode]
-    ?? report.monthlyMoodType.characterImageUrl
+  return report.monthlyMoodType.characterImageUrl
+    ?? CHARACTER_IMAGES[typeCode]
     ?? monthlyReportCharacter;
+}
+
+function drawImageContained(
+  context: CanvasRenderingContext2D,
+  image: HTMLImageElement,
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+) {
+  const scale = Math.min(width / image.naturalWidth, height / image.naturalHeight);
+  const drawWidth = image.naturalWidth * scale;
+  const drawHeight = image.naturalHeight * scale;
+  context.drawImage(
+    image,
+    x + (width - drawWidth) / 2,
+    y + (height - drawHeight) / 2,
+    drawWidth,
+    drawHeight,
+  );
 }
 
 async function createMonthlyReportPng(report: MonthlyReportResult) {
@@ -128,7 +148,7 @@ async function createMonthlyReportPng(report: MonthlyReportResult) {
   context.fillText('MoodTail', 172.5, 71);
 
   drawCard(18, 102, 309, 184, 24);
-  context.drawImage(character, 26, 125, 134, 134);
+  drawImageContained(context, character, 26, 125, 134, 134);
   context.fillStyle = '#ffe1d8';
   drawRoundedRect(context, 168, 135, 82, 28, 14);
   context.fill();
@@ -219,11 +239,11 @@ async function createMonthlyReportPng(report: MonthlyReportResult) {
 
 const RADAR_CENTER = { x: 132.5, y: 112 };
 const RADAR_ENDPOINTS = [
-  { x: 132.5, y: 29 },
-  { x: 211.4, y: 86.4 },
-  { x: 181.3, y: 179.1 },
-  { x: 83.7, y: 179.1 },
-  { x: 53.6, y: 86.4 },
+  { x: 132.5, y: 22.4 },
+  { x: 217.7, y: 84.4 },
+  { x: 185.2, y: 184.5 },
+  { x: 79.8, y: 184.5 },
+  { x: 47.3, y: 84.4 },
 ];
 
 function toRadarPoints(scores: MonthlyReportTasteProfile) {
@@ -241,6 +261,10 @@ function toRadarPoints(scores: MonthlyReportTasteProfile) {
     const y = RADAR_CENTER.y + (endpoint.y - RADAR_CENTER.y) * ratio;
     return [Number(x.toFixed(1)), Number(y.toFixed(1))] as const;
   });
+}
+
+function hasTasteScore(scores: MonthlyReportTasteProfile | null): scores is MonthlyReportTasteProfile {
+  return scores !== null && Object.values(scores).some((score) => score > 0);
 }
 
 function SummaryCard({ report }: { report: MonthlyReportResult }) {
@@ -345,7 +369,9 @@ function MonthlyReportPage({ onBack, reportMonth }: MonthlyReportPageProps) {
   const currentRadarPoints = report
     ? toRadarPoints(report.displayAverageTasteScores)
     : [];
-  const previousRadarPoints = report?.previousMonthDisplayTasteScores
+  const previousRadarPoints = report
+    && hasTasteScore(report.previousMonthTasteProfile)
+    && hasTasteScore(report.previousMonthDisplayTasteScores)
     ? toRadarPoints(report.previousMonthDisplayTasteScores)
     : [];
 
@@ -522,7 +548,9 @@ function MonthlyReportPage({ onBack, reportMonth }: MonthlyReportPageProps) {
         {hasSecondaryTypeData && (
           <section className="monthly-report-page__box monthly-report-page__types">
             <h2>다음으로 많이 나온 타입</h2>
-            <div className="monthly-report-page__type-list">
+            <div
+              className={`monthly-report-page__type-list${secondaryTypes.length === 1 ? ' monthly-report-page__type-list--single' : ''}`}
+            >
               {secondaryTypes.map((type, index) => (
                 <article
                   className="monthly-report-page__type-card"
@@ -556,24 +584,24 @@ function MonthlyReportPage({ onBack, reportMonth }: MonthlyReportPageProps) {
             aria-label="지난달과 이번달의 맛 지표 비교 그래프"
           >
             <g className="monthly-report-page__radar-grid">
-              <polygon points="132.5,29 211.4,86.4 181.3,179.1 83.7,179.1 53.6,86.4" />
+              <polygon points="132.5,22.4 217.7,84.4 185.2,184.5 79.8,184.5 47.3,84.4" />
               <polygon
-                points="132.5,29 211.4,86.4 181.3,179.1 83.7,179.1 53.6,86.4"
+                points="132.5,22.4 217.7,84.4 185.2,184.5 79.8,184.5 47.3,84.4"
                 transform="translate(132.5 112) scale(.75) translate(-132.5 -112)"
               />
               <polygon
-                points="132.5,29 211.4,86.4 181.3,179.1 83.7,179.1 53.6,86.4"
+                points="132.5,22.4 217.7,84.4 185.2,184.5 79.8,184.5 47.3,84.4"
                 transform="translate(132.5 112) scale(.5) translate(-132.5 -112)"
               />
               <polygon
-                points="132.5,29 211.4,86.4 181.3,179.1 83.7,179.1 53.6,86.4"
+                points="132.5,22.4 217.7,84.4 185.2,184.5 79.8,184.5 47.3,84.4"
                 transform="translate(132.5 112) scale(.25) translate(-132.5 -112)"
               />
-              <line x1="132.5" y1="112" x2="132.5" y2="29" />
-              <line x1="132.5" y1="112" x2="211.4" y2="86.4" />
-              <line x1="132.5" y1="112" x2="181.3" y2="179.1" />
-              <line x1="132.5" y1="112" x2="83.7" y2="179.1" />
-              <line x1="132.5" y1="112" x2="53.6" y2="86.4" />
+              <line x1="132.5" y1="112" x2="132.5" y2="22.4" />
+              <line x1="132.5" y1="112" x2="217.7" y2="84.4" />
+              <line x1="132.5" y1="112" x2="185.2" y2="184.5" />
+              <line x1="132.5" y1="112" x2="79.8" y2="184.5" />
+              <line x1="132.5" y1="112" x2="47.3" y2="84.4" />
             </g>
 
             <g className="monthly-report-page__radar-labels">
