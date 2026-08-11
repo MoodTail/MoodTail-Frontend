@@ -80,7 +80,7 @@
   flex: 1;
   background: #ffffff;
   border-radius: 28px 28px 0 0;
-  margin-top: -32px;
+  margin-top: -55px;
   padding-top: 24px;
   box-shadow: 0 -6px 16px rgba(0, 0, 0, 0.04);
 }
@@ -93,9 +93,14 @@
 
 .mypage__stat-card {
   flex: 1;
+  height: 68px;
   background: var(--color-primary, #ff6f4f);
   border-radius: 14px;
-  padding: 14px 8px;
+  padding: 0 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   text-align: center;
   color: #ffffff;
 }

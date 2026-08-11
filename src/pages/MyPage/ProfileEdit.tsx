@@ -3,14 +3,10 @@ import CompleteModal from '../../components/MyPage/CompleteModal'
 import NicknameEditOverlay from './NicknameEditOverlay'
 import { getMyPage, updateProfile } from '../../api/users/users.api'
 import type { RepresentativeMoodType } from '../../api/users/users.types'
-import {
-  PROFILE_AVATAR_STYLES,
-  type MyPageProfileSnapshot,
-} from './MyPage'
+import type { MyPageProfileSnapshot } from './MyPage'
 import { CHARACTER_IMAGES, CHARACTER_LABELS, type CharacterType } from '../../constants/characters'
+import { PROFILE_AVATAR_STYLES, PROFILE_CHARACTER_CHIP_COLORS } from '../../constants/profileAvatarStyles'
 import { RESULT_TYPE_THEMES } from '../../constants/resultTypeThemes'
-import { DEX_DATA } from '../../data/dexData'
-import { TYPECODE_TO_LOCAL_TYPE } from '../../data/typeCodeMapping'
 import chevronLeftIcon from '../../assets/icons/chevron-left.svg'
 import '../../styles/ProfileEdit.css'
 
@@ -37,14 +33,6 @@ function getNonEmptyValue(value?: string | null): string | null {
   return trimmed ? value! : null
 }
 
-function getDexCharacterName(typeCode?: string | null): string | null {
-  const normalized = normalizeTypeCode(typeCode)
-  if (!normalized) return null
-  const localTypeId = TYPECODE_TO_LOCAL_TYPE[normalized]
-  if (!localTypeId) return null
-  return DEX_DATA.find((dex) => dex.typeId === localTypeId)?.name ?? null
-}
-
 interface ProfileEditProps {
   initialProfileSnapshot?: MyPageProfileSnapshot | null
   onBack?: () => void
@@ -63,6 +51,7 @@ function ProfileEdit({ initialProfileSnapshot, onBack }: ProfileEditProps) {
   const themeTypeCode = normalizeTypeCode(representativeMoodType?.typeCode)
   const resultTheme = themeTypeCode ? RESULT_TYPE_THEMES[themeTypeCode] : undefined
   const characterType =
+    initialProfileSnapshot?.characterType ??
     resolveCharacterType(representativeMoodType?.typeCode) ?? MOCK_PROFILE.characterType
   const avatarImageSrc =
     getNonEmptyValue(initialProfileSnapshot?.avatarImageSrc) ??
@@ -71,12 +60,12 @@ function ProfileEdit({ initialProfileSnapshot, onBack }: ProfileEditProps) {
     CHARACTER_IMAGES[characterType]
   const characterLabel =
     getNonEmptyValue(initialProfileSnapshot?.characterLabel) ??
-    getDexCharacterName(representativeMoodType?.typeCode) ??
-    getNonEmptyValue(representativeMoodType?.name) ??
     resultTheme?.name ??
+    getNonEmptyValue(representativeMoodType?.name) ??
     CHARACTER_LABELS[characterType]
   const avatarStyle =
     initialProfileSnapshot?.avatarStyle ?? PROFILE_AVATAR_STYLES[characterType]
+  const characterChipColors = PROFILE_CHARACTER_CHIP_COLORS[characterType]
 
   useEffect(() => {
     if (!initialProfileSnapshot) return
@@ -178,7 +167,15 @@ function ProfileEdit({ initialProfileSnapshot, onBack }: ProfileEditProps) {
         </button>
 
         <p className="profile-edit__label profile-edit__label--character">대표 캐릭터</p>
-        <button type="button" className="profile-edit__character-chip" onClick={handleSelectCharacter}>
+        <button
+          type="button"
+          className="profile-edit__character-chip"
+          style={{
+            backgroundColor: characterChipColors.background,
+            color: characterChipColors.color,
+          }}
+          onClick={handleSelectCharacter}
+        >
           {characterLabel}
         </button>
       </section>
