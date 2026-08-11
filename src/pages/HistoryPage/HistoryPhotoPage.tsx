@@ -320,7 +320,7 @@ function HistoryPhotoPage({
                       <span>{cocktail.ranking}위</span>
                       <img src={cocktail.cocktailImageUrl} alt="" />
                       <strong>{cocktail.cocktailName}</strong>
-                      <small>{cocktail.shortDescription} · {cocktail.matchScore}%</small>
+                      <small>일치율 {cocktail.matchScore}%</small>
                     </article>
                   ))}
                 </div>
