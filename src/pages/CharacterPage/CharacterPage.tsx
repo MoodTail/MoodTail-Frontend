@@ -12,6 +12,7 @@ import ResultSnsShareModal from "../../components/common/modal/ResultSnsShareMod
 import SaveCompleteToast from "../../components/common/SaveCompleteToast";
 import { getCollection, updateRepresentativeMoodType } from "../../api/collections/collections.api";
 import { TYPECODE_TO_LOCAL_TYPE } from "../../data/typeCodeMapping";
+import { computeCollectionProgress } from "../../utils/collectionProgress";
 
 type DexOrigin = "typeDex" | "characterDex";
 
@@ -24,9 +25,18 @@ type Screen =
 interface CharacterPageProps {
   onGoTest: () => void;
   onNavVisibilityChange?: (visible: boolean) => void;
+  onOpenCocktail?: (name: string) => void;
+  isLoggedIn: boolean;
+  onGoToLogin: () => void;
 }
 
-function CharacterPage({ onGoTest, onNavVisibilityChange }: CharacterPageProps) {
+function CharacterPage({
+  onGoTest,
+  onNavVisibilityChange,
+  onOpenCocktail,
+  isLoggedIn,
+  onGoToLogin,
+}: CharacterPageProps) {
   const [screen, setScreen] = useState<Screen>({ name: "typeDex" });
 
   // 타입 상세/대표 타입 설정 화면은 전체 화면으로 쓰이므로 하단 nav를 숨깁니다.
@@ -49,28 +59,39 @@ function CharacterPage({ onGoTest, onNavVisibilityChange }: CharacterPageProps) 
   // representativeMoodType도 서버 값으로 초기화합니다 — repTypeId를 로컬 state 기본값(idealist)에만
   // 의존하면, 탭을 이동했다가 도감으로 돌아올 때 CharacterPage가 다시 마운트되면서 방금 설정한
   // 대표 타입이 초기값으로 되돌아가 버립니다.
-  // unlocked/collectionRate도 서버 값을 그대로 씁니다 — data/dexData.ts는 전부 unlocked: true로
-  // 고정되어 있어서, 실제로는 아직 안 모은 타입도 항상 해금된 것처럼 보였습니다.
+  // unlocked/collectionRate는 서버 값(mt.unlocked/mt.collectionRate)이 정상 동작하지 않아서 쓰지
+  // 않고, 아래 별도 effect에서 히스토리 기록을 직접 집계해 계산합니다.
   useEffect(() => {
     let cancelled = false;
     getCollection()
       .then((result) => {
         if (cancelled) return;
         const idMap: Record<string, number> = {};
-        const statusMap: Record<string, { unlocked: boolean; collectionRate: number }> = {};
         result.moodTypes.forEach((mt) => {
           const localId = TYPECODE_TO_LOCAL_TYPE[mt.typeCode];
           if (!localId) return;
           idMap[localId] = mt.moodTypeId;
-          statusMap[localId] = { unlocked: mt.unlocked, collectionRate: mt.collectionRate };
         });
         setMoodTypeIdByLocalId(idMap);
-        setDexStatusByLocalId(statusMap);
 
         const repLocalId = TYPECODE_TO_LOCAL_TYPE[result.representativeMoodType?.typeCode];
         if (repLocalId) setRepTypeId(repLocalId);
       })
       .catch((err) => console.error("도감 정보를 불러오지 못했습니다", err));
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  // 해금/수집률은 히스토리에 실제 기록된 칵테일을 최근 12개월치 집계해서 계산합니다
+  // (서버 collectionRate가 정상 동작하지 않아 프론트에서 대체 계산).
+  useEffect(() => {
+    let cancelled = false;
+    computeCollectionProgress()
+      .then((progress) => {
+        if (!cancelled) setDexStatusByLocalId(progress);
+      })
+      .catch((err) => console.error("수집률 계산에 실패했습니다", err));
     return () => {
       cancelled = true;
     };
@@ -111,6 +132,8 @@ function CharacterPage({ onGoTest, onNavVisibilityChange }: CharacterPageProps) 
           onOpenTypeDetail={(typeId) => openTypeDetail(typeId, "typeDex")}
           onShare={() => setShareTypeId(repTypeId)}
           onGoTest={onGoTest}
+          isLoggedIn={isLoggedIn}
+          onGoToLogin={onGoToLogin}
         />
       )}
 
@@ -133,6 +156,7 @@ function CharacterPage({ onGoTest, onNavVisibilityChange }: CharacterPageProps) 
             screen.from === "typeDex" ? goTypeDex() : openCharacterDex(screen.typeId)
           }
           onSetRepresentative={() => openRepSetting(screen.typeId, screen.from)}
+          onOpenCocktail={onOpenCocktail}
         />
       )}
 

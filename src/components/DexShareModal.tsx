@@ -85,36 +85,36 @@ export default function DexShareModal({
             zIndex: 2,
           }}
         >
-          <CloseIcon />
+          <CloseIcon size={28} color={COLORS.orange} />
         </button>
 
         {/* 이미지 저장/공유 시 캡처되는 영역 — 닫기 버튼과 하단 액션 버튼은 이 밖에 있어 캡처에서 제외됩니다 */}
-        <div ref={cardRef} style={{ background: "#fff", padding: 16 }}>
+        <div ref={cardRef} style={{ background: "#fff", padding: 10 }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 16 }}>
-            <span style={{ fontSize: 26, fontWeight: 800, color: COLORS.orange }}>MoodTail</span>
+            <span style={{ fontSize: 35, fontWeight: 700, color: COLORS.orange }}>MoodTail</span>
           </div>
 
           <div
             style={{
               background: COLORS.card,
               border: "1px solid #fff",
-              borderRadius: 20,
-              padding: "19px 18px",
+              borderRadius: 32,
+              padding: "23px 18px",
               display: "flex",
               alignItems: "center",
               gap: 14,
-              marginBottom: 14,
+              marginBottom: 24,
               boxShadow: SHARE_BOX_SHADOW,
             }}
           >
-          <img src={repImg} alt="" style={{ width: 64, height: 64, objectFit: "contain", flexShrink: 0 }} />
+          <img src={repImg} alt="" style={{ width: 74, height: 74, objectFit: "contain", flexShrink: 0 }} />
           <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontSize: 12, color: COLORS.inkSoft, fontWeight: 600, marginBottom: 4 }}>
+            <div style={{ fontSize: 14, color: COLORS.inkSoft, fontWeight: 600, marginBottom: 4 }}>
               대표 타입
             </div>
             <div
               style={{
-                fontSize: 17,
+                fontSize: 21,
                 fontWeight: 800,
                 color: COLORS.ink,
                 whiteSpace: "nowrap",
@@ -131,14 +131,14 @@ export default function DexShareModal({
           style={{
             display: "flex",
             flexWrap: "wrap",
-            gap: 10,
-            marginBottom: 20,
+            gap: 18,
+            marginBottom: 8,
           }}
         >
           {DEX_DATA.map((dex) => {
             const status = dexStatus?.[dex.typeId];
             return (
-              <div key={dex.id} style={{ width: "calc((100% - 20px) / 3)" }}>
+              <div key={dex.id} style={{ width: "calc((100% - 36px) / 3)" }}>
                 <DexBox
                   drinkImg={drinkImages[dex.id]}
                   typeId={dex.typeId}
@@ -147,6 +147,11 @@ export default function DexShareModal({
                   border="1px solid #fff"
                   boxShadow={SHARE_BOX_SHADOW}
                   nameFontSize={8}
+                  nameLineClamp={1}
+                  imageGap={6}
+                  imageWidth="94%"
+                  imageHeight="74%"
+                  borderRadius={20}
                 />
               </div>
             );
@@ -155,7 +160,7 @@ export default function DexShareModal({
         </div>
       </div>
 
-      <div style={{ display: "flex", gap: 8 }}>
+      <div style={{ display: "flex", gap: 8, marginTop: 4, padding: "0 10px" }}>
         <button
           onClick={handleShareSns}
           style={{
@@ -163,10 +168,10 @@ export default function DexShareModal({
             border: "none",
             background: COLORS.orange,
             color: "#fff",
-            fontSize: 13,
+            fontSize: 14,
             fontWeight: 700,
-            padding: "12px 0",
-            borderRadius: 20,
+            padding: "14px 0",
+            borderRadius: 22,
             cursor: "pointer",
           }}
         >
@@ -179,10 +184,10 @@ export default function DexShareModal({
             border: "1px solid #fff",
             background: "#fff",
             color: COLORS.orange,
-            fontSize: 13,
+            fontSize: 14,
             fontWeight: 700,
-            padding: "12px 0",
-            borderRadius: 20,
+            padding: "14px 0",
+            borderRadius: 22,
             boxShadow: SHARE_BOX_SHADOW,
             cursor: "pointer",
           }}

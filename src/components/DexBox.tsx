@@ -9,6 +9,11 @@ export default function DexBox({
   border,
   boxShadow,
   nameFontSize,
+  nameLineClamp,
+  imageGap,
+  imageWidth,
+  imageHeight,
+  borderRadius,
 }: {
   drinkImg: string;
   typeId: string;
@@ -18,6 +23,11 @@ export default function DexBox({
   border?: string;
   boxShadow?: string;
   nameFontSize?: number;
+  nameLineClamp?: number;
+  imageGap?: number;
+  imageWidth?: string;
+  imageHeight?: string;
+  borderRadius?: number;
 }) {
   if (unlocked) {
     // number가 아니라 typeId로 직접 찾습니다 — number는 characterType.ts에서 중복될 수 있어서
@@ -32,7 +42,7 @@ export default function DexBox({
         style={{
           width: "100%",
           aspectRatio: "1 / 1",
-          borderRadius: 18,
+          borderRadius: borderRadius ?? 18,
           background: '#FFFAF9',
           border: border ?? "none",
           boxShadow: boxShadow ?? "0 6px 20px rgba(255, 111, 79, 0.12), 0 2px 6px rgba(43, 35, 28, 0.06)",
@@ -40,12 +50,16 @@ export default function DexBox({
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          gap: 2,
+          gap: imageGap ?? 5,
           padding: 8,
           cursor: onClick ? "pointer" : "default",
         }}
       >
-        <img src={drinkImg} alt="" style={{ width: "90%", height: "70%", objectFit: "contain" }} />
+        <img
+          src={drinkImg}
+          alt=""
+          style={{ width: imageWidth ?? "94%", height: imageHeight ?? "74%", objectFit: "contain" }}
+        />
         <span
           style={{
             fontSize: nameFontSize ?? 11,
@@ -54,7 +68,7 @@ export default function DexBox({
             textAlign: "center",
             lineHeight: 1.2,
             display: "-webkit-box",
-            WebkitLineClamp: 2,
+            WebkitLineClamp: nameLineClamp ?? 2,
             WebkitBoxOrient: "vertical",
             overflow: "hidden",
           }}

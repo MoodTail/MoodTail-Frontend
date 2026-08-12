@@ -37,9 +37,19 @@ interface RecipePageProps {
   onNavVisibilityChange?: (visible: boolean) => void;
   isLoggedIn: boolean;
   onGoToLogin: () => void;
+  // 다른 화면(캐릭터 상세 등)에서 특정 칵테일을 눌러 들어온 경우, 목록을 거치지 않고
+  // 이름이 일치하는 레시피의 상세 화면을 바로 엽니다.
+  initialDetailName?: string | null;
+  onInitialDetailConsumed?: () => void;
 }
 
-function RecipePage({ onNavVisibilityChange, isLoggedIn, onGoToLogin }: RecipePageProps) {
+function RecipePage({
+  onNavVisibilityChange,
+  isLoggedIn,
+  onGoToLogin,
+  initialDetailName,
+  onInitialDetailConsumed,
+}: RecipePageProps) {
   const [view, setView] = useState<View>({ name: "list" });
   const [activeFilter, setActiveFilter] = useState(FILTERS[0].label);
   const [query, setQuery] = useState("");
@@ -53,14 +63,21 @@ function RecipePage({ onNavVisibilityChange, isLoggedIn, onGoToLogin }: RecipePa
   >({});
 
   useEffect(() => {
+    if (!initialDetailName) return;
+    const match = recipes.find((r) => r.name === initialDetailName);
+    if (match) setView({ name: "detail", id: match.id });
+    onInitialDetailConsumed?.();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialDetailName]);
+
+  useEffect(() => {
     onNavVisibilityChange?.(view.name === "list");
     return () => onNavVisibilityChange?.(true);
   }, [view.name, onNavVisibilityChange]);
 
   // 목록 화면은 실제 API(/api/v1/cocktails)에서 이름/도수/설명을 받아오되,
   // 재료/조리법 등 백엔드에 아직 없는 필드는 이름이 일치하는 로컬 목데이터에서 그대로 가져옵니다.
-  // 목록 썸네일(glassImage)은 기존 잔 실루엣을 그대로 쓰고, 상세 화면 히어로 이미지(heroImage)만
-  // 서버 실제 칵테일 사진(imageUrl)으로 대체합니다.
+  // 목록 썸네일(glassImage)/상세 히어로 이미지(heroImage) 둘 다 서버 실제 칵테일 사진(imageUrl)으로 대체합니다.
   useEffect(() => {
     let cancelled = false;
     getCocktails()
@@ -76,7 +93,7 @@ function RecipePage({ onNavVisibilityChange, isLoggedIn, onGoToLogin }: RecipePa
             description: c.description,
             degree: `${Math.round(c.alcoholDegree)}°`,
             taste: { ...local.taste, 도수: Math.round(c.alcoholDegree) },
-            ...(c.imageUrl ? { heroImage: c.imageUrl, hasHeroPhoto: true } : {}),
+            ...(c.imageUrl ? { glassImage: c.imageUrl, heroImage: c.imageUrl, hasHeroPhoto: true } : {}),
           });
           idMap[local.id] = c.cocktailId;
         });

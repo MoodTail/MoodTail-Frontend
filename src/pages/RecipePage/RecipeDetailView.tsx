@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type { Recipe, TasteProfile } from "./recipeData";
 import TwoButtonModal from "../../components/common/modal/TwoButtonModal";
+import TasteProfileGrid from "../../components/TasteProfileGrid";
 import "../../styles/RecipeDetailView.css";
 
 const TASTE_LABELS: { key: keyof TasteProfile; label: string }[] = [
@@ -78,18 +79,10 @@ function RecipeDetailView({
 
       <div className="recipe-detail__section-title">맛 지표</div>
       <div className="recipe-detail__taste-grid">
-        {TASTE_LABELS.map(({ key, label }, i) => {
-          const isOrange = i % 2 === 0;
-          return (
-            <div
-              key={key}
-              className={`recipe-detail__taste-chip ${isOrange ? "recipe-detail__taste-chip--orange" : "recipe-detail__taste-chip--gray"}`}
-            >
-              <span className="recipe-detail__taste-label">{label}</span>
-              <span className="recipe-detail__taste-value">{recipe.taste[key]}</span>
-            </div>
-          );
-        })}
+        <TasteProfileGrid
+          variant="recipe"
+          items={TASTE_LABELS.map(({ key, label }) => ({ key, label, value: recipe.taste[key] }))}
+        />
       </div>
 
       <div className="recipe-detail__section-title">재료</div>

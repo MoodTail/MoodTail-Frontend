@@ -12,10 +12,12 @@ import PhoneFrame from "../../components/PhoneFrame";
 import TypeDetailBackground from "../../components/TypeDetailBackground";
 import { Mascot } from "../../components/icons";
 import { FitUnfitMatch } from "../../components/fit_unfit";
+import TasteProfileGrid from "../../components/TasteProfileGrid";
 
 interface DisplayCocktail {
   id: string;
   name: string;
+  imageUrl?: string;
   glassNumber?: number;
 }
 
@@ -32,11 +34,13 @@ export default function TypeDetailPage({
   moodTypeId,
   onBack,
   onSetRepresentative,
+  onOpenCocktail,
 }: {
   type: PersonalityType;
   moodTypeId?: number;
   onBack: () => void;
   onSetRepresentative: () => void;
+  onOpenCocktail?: (name: string) => void;
 }) {
   const [detail, setDetail] = useState<MoodTypeDetailResult | null>(null);
   const localMatch = getCharacterMatch(type.id);
@@ -88,11 +92,12 @@ export default function TypeDetailPage({
     : type.taste;
   // 해당 타입에 배정된 칵테일 8종은 잠금/해금 대상이 아니라 항상 공개되는
   // 기준 정보이므로, 서버 unlocked 값과 무관하게 이름/이미지를 그대로 보여줍니다.
-  // 이미지는 서버 실사진(imageUrl) 대신 로컬 잔 실루엣(glassNumber)을 씁니다.
+  // 이미지는 서버 실사진(imageUrl)을 우선 쓰고, 없으면 로컬 잔 실루엣(glassNumber)으로 대체합니다.
   const displayCocktails: DisplayCocktail[] = detail
     ? detail.cocktails.map((c) => ({
         id: String(c.cocktailId),
         name: c.nameKo,
+        imageUrl: c.imageUrl,
         glassNumber: realCocktails.find((rc) => rc.nameKo === c.nameKo)?.glassNumber,
       }))
     : type.cocktails.map((cocktail, index) => {
@@ -110,7 +115,7 @@ export default function TypeDetailPage({
         <Header
           title="타입 상세"
           onBack={onBack}
-          titleSize={20}
+          titleSize={22}
           titleGap={2}
           leftOffset={-8}
           right={
@@ -210,32 +215,11 @@ export default function TypeDetailPage({
         <div style={{ fontSize: 22, fontWeight: 700, color: "#10161F", marginLeft: 14, marginBottom: 18 }}>
             맛 프로필
         </div>
-        <div style={{ display: "flex", gap: 12, marginBottom: 22 }}>
-          {TASTE_LABELS.map(({ key, label }, index) => {
-            const isPrimary = index % 2 === 0;
-            const textColor = isPrimary ? "#FF6120" : "#10161F";
-            return (
-              <div
-                key={key}
-                style={{
-                  flex: 1,
-                  background: isPrimary ? "#FDF2EF" : "#FFFFFF",
-                  border: `1px solid ${isPrimary ? "#FF6F4F" : "#C2C2C2"}`,
-                  borderRadius: 12,
-                  padding: "5px 0",
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  gap: 4,
-                }}
-              >
-                <span style={{ fontSize: 11, fontWeight: 600, color: textColor, marginTop: 3 }}>{label}</span>
-                <span style={{ fontSize: 17, fontWeight: 800, color: textColor }}>
-                  {displayTaste[key]}
-                </span>
-              </div>
-            );
-          })}
+        <div style={{ marginBottom: 22 }}>
+          <TasteProfileGrid
+            variant="type"
+            items={TASTE_LABELS.map(({ key, label }) => ({ key, label, value: displayTaste[key] }))}
+          />
         </div>
 
         <FitUnfitMatch
@@ -258,8 +242,10 @@ export default function TypeDetailPage({
           }}
         >
           {displayCocktails.map((cocktail) => (
-            <div
+            <button
               key={cocktail.id}
+              type="button"
+              onClick={() => onOpenCocktail?.(cocktail.name)}
               style={{
                 width: "90%",
                 justifySelf: "center",
@@ -273,17 +259,18 @@ export default function TypeDetailPage({
                 alignItems: "center",
                 justifyContent: "center",
                 gap: 6,
+                cursor: onOpenCocktail ? "pointer" : "default",
               }}
             >
               <img
-                src={getGlassImage(cocktail.glassNumber)}
+                src={cocktail.imageUrl ?? getGlassImage(cocktail.glassNumber)}
                 alt=""
                 style={{ width: 70, height: 90, objectFit: "contain" }}
               />
               <span style={{ fontSize: 14, fontWeight: 700, color: COLORS.ink }}>
                 {cocktail.name}
               </span>
-            </div>
+            </button>
           ))}
         </div>
       </div>

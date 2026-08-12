@@ -1,4 +1,4 @@
-import TwoButtonModal from "./common/modal/TwoButtonModal";
+import TwoButtonModalLeftAligned from "./common/modal/TwoButtonModalLeftAligned";
 
 export default function LockedCocktailModal({
   name,
@@ -19,7 +19,7 @@ export default function LockedCocktailModal({
   const description = conditions.map((line) => `· ${line}`).join("\n");
 
   return (
-    <TwoButtonModal
+    <TwoButtonModalLeftAligned
       isOpen
       title={"아래 조건 중 하나를 달성하면\n캐릭터가 해금돼요!"}
       description={description}
