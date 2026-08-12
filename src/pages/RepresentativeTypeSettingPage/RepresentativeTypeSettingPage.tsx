@@ -33,7 +33,7 @@ export default function RepresentativeTypeSettingPage({
           flexDirection: "column",
         }}
       >
-        <Header title="대표 타입 설정" onBack={onBack} />
+        <Header title="대표 타입 설정" onBack={onBack} titleSize={20} titleGap={3} leftOffset={-8} />
 
         <div
           style={{
@@ -51,11 +51,10 @@ export default function RepresentativeTypeSettingPage({
               background: "rgba(255,255,255,0.55)",
               border: "1px solid rgba(255,255,255,0.8)",
               borderRadius: 24,
-              padding: "28px 22px 22px",
+              padding: "32px 22px 26px",
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
-              gap: 14,
               boxShadow: "0 8px 24px rgba(255,107,53,0.12)",
             }}
           >
@@ -63,13 +62,13 @@ export default function RepresentativeTypeSettingPage({
               <img
                 src={PERSONALITY_DRINK_IMAGES[type.id]}
                 alt=""
-                style={{ width: 200, height: 250, objectFit: "contain" }}
+                style={{ width: 212, height: 262, objectFit: "contain" }}
               />
             ) : (
               <Mascot size={120} color={characterType.color} />
             )}
-            <div style={{ fontSize: 25, fontWeight: 700, color: "#FD881C" }}>{characterType.name}</div>
-            <div style={{ fontSize: 12, color: "#FD881C", textAlign: "center", lineHeight: 1.5 }}>
+            <div style={{ fontSize: 25, fontWeight: 700, color: "#FD881C", marginTop: 14 }}>{characterType.name}</div>
+            <div style={{ fontSize: 12, color: "#FD881C", textAlign: "center", lineHeight: 1.5, marginTop: 6 }}>
               {characterType.description}
             </div>
             <p
@@ -78,7 +77,7 @@ export default function RepresentativeTypeSettingPage({
                 color: COLORS.inkSoft,
                 textAlign: "center",
                 lineHeight: 1.6,
-                margin: 0,
+                margin: "24px 0 0",
                 maxWidth: 260,
               }}
             >
@@ -94,9 +93,10 @@ export default function RepresentativeTypeSettingPage({
                 color: "#fff",
                 fontSize: 14.5,
                 fontWeight: 600,
-                padding: "15px 0",
+                padding: "19px 0",
                 borderRadius: 24,
                 cursor: "pointer",
+                marginTop: 14,
               }}
             >
               대표 캐릭터로 지정

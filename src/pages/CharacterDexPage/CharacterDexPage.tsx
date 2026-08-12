@@ -38,7 +38,8 @@ export default function CharacterDexPage({
       <div style={{ padding: "18px 20px 0", flex: 1 }}>
         <Header
           title="캐릭터 도감"
-          titleSize={20}
+          titleSize={22}
+          leftOffset={14}
           right={
             <button
               onClick={onShare}
@@ -65,12 +66,12 @@ export default function CharacterDexPage({
           style={{
             background: '#FEFAF9',
             border: "1px solid white",
-            borderRadius: 20,
+            borderRadius: 22,
             padding: 18,
             display: "flex",
             alignItems: "center",
             gap: 14,
-            marginBottom: 22,
+            marginBottom: 34,
             width: "100%",
             cursor: "pointer",
             textAlign: "left",
@@ -104,8 +105,8 @@ export default function CharacterDexPage({
           style={{
             display: "grid",
             gridTemplateColumns: "repeat(3, 1fr)",
-            rowGap: 22,
-            columnGap: 12,
+            rowGap: 26,
+            columnGap: 22,
             paddingBottom: 20,
           }}
         >

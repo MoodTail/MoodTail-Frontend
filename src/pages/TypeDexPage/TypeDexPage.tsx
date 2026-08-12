@@ -11,6 +11,7 @@ import PhoneFrame from "../../components/PhoneFrame";
 import DexBackground from "../../components/DexBackground";
 import LockedCocktailModal from "../../components/LockedCocktailModal";
 import DexBox from "../../components/DexBox";
+import TwoButtonModal from "../../components/common/modal/TwoButtonModal";
 
 export default function TypeDexPage({
   repTypeId,
@@ -18,6 +19,8 @@ export default function TypeDexPage({
   onOpenTypeDetail,
   onShare,
   onGoTest,
+  isLoggedIn,
+  onGoToLogin,
 }: {
   repTypeId: string;
   dexStatus?: Record<string, { unlocked: boolean; collectionRate: number }>;
@@ -25,12 +28,15 @@ export default function TypeDexPage({
   onOpenTypeDetail: (typeId: string) => void;
   onShare: () => void;
   onGoTest: () => void;
+  isLoggedIn: boolean;
+  onGoToLogin: () => void;
 }) {
   const repType = TYPES.find((t) => t.id === repTypeId)!;
   const repCharacterType = getCharacterType(repTypeId);
   const repDexEntry = DEX_DATA.find((d) => d.typeId === repTypeId);
   const repImg = repDexEntry ? drinkImages[repDexEntry.id] : drink0;
   const [lockedName, setLockedName] = useState<string | null>(null);
+  const [showLoginModal, setShowLoginModal] = useState(false);
 
   return (
     <PhoneFrame background={<DexBackground />}>
@@ -60,13 +66,13 @@ export default function TypeDexPage({
         />
 
         <button
-          onClick={() => onOpenTypeDetail(repType.id)}
+          onClick={() => (isLoggedIn ? onOpenTypeDetail(repType.id) : setShowLoginModal(true))}
           style={{
             background: '#FFFAF9',
             border: "1px solid #fff",
             borderRadius: 20,
             boxShadow: "0 6px 20px rgba(255, 111, 79, 0.12), 0 2px 6px rgba(43, 35, 28, 0.06)",
-            padding: "20px 18px",
+            padding: "10px 18px",
             display: "flex",
             alignItems: "center",
             gap: 14,
@@ -76,7 +82,7 @@ export default function TypeDexPage({
             textAlign: "left",
           }}
         >
-          <img src={repImg} alt="" style={{ width: 84, height: 84, objectFit: "contain" }} />
+          <img src={repImg} alt="" style={{ width: 104, height: 104, objectFit: "contain", flexShrink: 0 }} />
           <div style={{ flex: 1 }}>
             <div style={{ fontSize: 14, color: COLORS.inkSoft, fontWeight: 600, marginBottom: 4 }}>
               대표 타입
@@ -105,11 +111,17 @@ export default function TypeDexPage({
                 typeId={dex.typeId}
                 unlocked={unlocked}
                 collectionRate={collectionRate}
-                onClick={
-                  unlocked
-                    ? () => onOpenTypeDetail(dex.typeId)
-                    : () => setLockedName(getCharacterType(dex.typeId).name)
-                }
+                onClick={() => {
+                  if (!isLoggedIn) {
+                    setShowLoginModal(true);
+                    return;
+                  }
+                  if (unlocked) {
+                    onOpenTypeDetail(dex.typeId);
+                  } else {
+                    setLockedName(getCharacterType(dex.typeId).name);
+                  }
+                }}
               />
             );
           })}
@@ -124,6 +136,25 @@ export default function TypeDexPage({
             setLockedName(null);
             onGoTest();
           }}
+        />
+      )}
+
+      {showLoginModal && (
+        <TwoButtonModal
+          isOpen
+          title="로그인하고 기록을 저장해요"
+          description="테스트 결과, 도감, 즐겨찾기를 이어서 사용할 수 있어요."
+          leftButton={{
+            label: "로그인하기",
+            variant: "primary",
+            onClick: onGoToLogin,
+          }}
+          rightButton={{
+            label: "닫기",
+            variant: "secondary",
+            onClick: () => setShowLoginModal(false),
+          }}
+          onOverlayClick={() => setShowLoginModal(false)}
         />
       )}
     </PhoneFrame>
