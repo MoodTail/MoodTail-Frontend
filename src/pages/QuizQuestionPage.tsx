@@ -26,14 +26,14 @@ export default function QuizQuestionPage({
   onExit: () => void;
 }) {
   const progress = (step + 1) / totalSteps;
-  const [pendingLeave, setPendingLeave] = useState<"exit" | "back" | null>(null);
+  const [showExitConfirm, setShowExitConfirm] = useState(false);
 
   return (
     <PhoneFrame background={<TypeDetailBackground />}>
       <div style={{ padding: "18px 20px 24px", flex: 1, display: "flex", flexDirection: "column" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 24 }}>
           <button
-            onClick={() => setPendingLeave("exit")}
+            onClick={() => setShowExitConfirm(true)}
             style={{ background: "none", border: "none", cursor: "pointer", padding: 2, display: "flex" }}
           >
             <ChevronLeft />
@@ -123,7 +123,7 @@ export default function QuizQuestionPage({
         <div style={{ display: "flex", gap: 8 }}>
           {onPrevious && (
             <button
-              onClick={() => setPendingLeave("back")}
+              onClick={onPrevious}
               style={{
                 flex: 1,
                 border: `1.5px solid ${COLORS.border}`,
@@ -164,26 +164,25 @@ export default function QuizQuestionPage({
         </p>
       </div>
 
-      {pendingLeave && (
+      {showExitConfirm && (
         <TwoButtonModal
           isOpen
           title="뒤로가시겠어요?"
           description="뒤로가시면 진행사항은 저장이 불가합니다"
           leftButton={{
             label: "계속 진행하기",
-            onClick: () => setPendingLeave(null),
+            onClick: () => setShowExitConfirm(false),
             variant: "primary",
           }}
           rightButton={{
             label: "나가기",
             onClick: () => {
-              setPendingLeave(null);
-              if (pendingLeave === "exit") onExit();
-              else onPrevious?.();
+              setShowExitConfirm(false);
+              onExit();
             },
             variant: "secondary",
           }}
-          onOverlayClick={() => setPendingLeave(null)}
+          onOverlayClick={() => setShowExitConfirm(false)}
         />
       )}
     </PhoneFrame>

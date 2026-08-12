@@ -77,6 +77,10 @@ function App() {
     useState<MyPageProfileSnapshot | null>(null);
   const [recipeNavVisible, setRecipeNavVisible] = useState(true);
   const [characterNavVisible, setCharacterNavVisible] = useState(true);
+  // 캐릭터 상세의 "해당 타입 칵테일 8종" 박스를 누르면 레시피 탭으로 이동해 해당
+  // 칵테일의 상세 화면을 바로 엽니다. 이름으로만 연결되므로(별도 id 매핑이 없음)
+  // 레시피 쪽 로컬 데이터와 이름이 일치하는 칵테일이 없으면 목록 화면이 그대로 보입니다.
+  const [pendingCocktailName, setPendingCocktailName] = useState<string | null>(null);
   const [goToQuizOnHome, setGoToQuizOnHome] = useState(false);
   const [isTestResultOpen, setIsTestResultOpen] = useState(false);
   const [initialRetestProgress] = useState(() =>
@@ -193,6 +197,12 @@ function App() {
           <CharacterPage
             onGoTest={handleGoToTest}
             onNavVisibilityChange={setCharacterNavVisible}
+            onOpenCocktail={(name) => {
+              setPendingCocktailName(name);
+              setActiveMenu("recipe");
+            }}
+            isLoggedIn={!isGuest}
+            onGoToLogin={handleGoToLoginScreen}
           />
         );
       case "home":
@@ -214,6 +224,8 @@ function App() {
             onNavVisibilityChange={setRecipeNavVisible}
             isLoggedIn={!isGuest}
             onGoToLogin={handleGoToLoginScreen}
+            initialDetailName={pendingCocktailName}
+            onInitialDetailConsumed={() => setPendingCocktailName(null)}
           />
         );
       case "mypage":

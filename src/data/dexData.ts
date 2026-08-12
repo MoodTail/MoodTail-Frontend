@@ -9,9 +9,9 @@ export interface DexEntry {
 
 // typeNumber는 data/characterType.ts의 CHARACTER_TYPES[].number와 반드시 일치해야
 // 도감 그리드에 표시되는 이름과 실제 이동하는 타입 상세 화면이 서로 어긋나지 않습니다.
-// unlocked: false가 기본값입니다 — 로그인한 사용자는 CharacterPage.tsx가 getCollection()의
-// 실제 unlocked/collectionRate로 이 값을 덮어쓰고, 서버 값이 없는 경우(게스트 등)에만 이
-// 기본값(전부 잠김)이 그대로 쓰입니다.
+// unlocked는 서버/히스토리 데이터를 못 받아올 때만 쓰이는 폴백 기본값입니다 —
+// CharacterPage.tsx가 히스토리 기반 계산 결과(dexStatusByLocalId)로 이 값을 덮어쓰므로,
+// 정상적으로 데이터가 로드되면 실제 해금 여부가 우선 적용됩니다.
 export const DEX_DATA: DexEntry[] = [
   { id: 0, name: "이상주의자", unlocked: false, typeId: "idealist", typeNumber: 1 },
   { id: 1, name: "낭만주의자", unlocked: false, typeId: "romantic", typeNumber: 4 },
