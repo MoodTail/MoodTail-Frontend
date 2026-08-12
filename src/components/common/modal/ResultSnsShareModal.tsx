@@ -19,6 +19,7 @@ function ResultSnsShareModal({ isOpen, url, onClose, onKakaoShare, kakaoShare }:
   if (!isOpen) return null
 
   const handleCopy = async () => {
+    if (!url) return
     // TODO: 클립보드 API 미지원 환경(구형 브라우저 등) 폴백 처리 필요 시 추가
     await navigator.clipboard.writeText(url)
     setCopied(true)
@@ -27,6 +28,7 @@ function ResultSnsShareModal({ isOpen, url, onClose, onKakaoShare, kakaoShare }:
 
   const handleKakaoShare = () => {
     try {
+      if (!url) return
       if (kakaoShare) shareToKakao(kakaoShare)
       else onKakaoShare?.()
     } catch (error) {

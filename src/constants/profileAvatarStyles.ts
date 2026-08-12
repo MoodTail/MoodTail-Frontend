@@ -18,6 +18,10 @@ export const PROFILE_AVATAR_STYLES: Record<CharacterType, ProfileAvatarStyle> = 
   'balanced-mediator': { scale: 1.3, x: 0, y: 24 },
 }
 
+export const MOCK_PROFILE_AVATAR_STYLES: Partial<Record<CharacterType, ProfileAvatarStyle>> = {
+  'refreshing-explorer': { scale: 1, x: 1, y: 11 },
+}
+
 export const PROFILE_CHARACTER_CHIP_COLORS: Record<CharacterType, ProfileCharacterChipColors> = {
   'easygoing-optimist': { background: '#3C9857', color: '#F7F0BB' },
   'free-spirited-romantic': { background: '#FE8A42', color: '#FEE8B1' },
