@@ -96,61 +96,66 @@ const TasteRadarChart: FC<TasteRadarChartProps> = ({
         {/* 나(seriesA)를 선+채우기+원까지 통째로 먼저 그리고,
             상대방(seriesB)을 선+채우기+원까지 통째로 나중에 그린다.
             이렇게 하면 상대방 영역(채우기)이 내 원 위를 지나가면서
-            겹치는 부분의 내 원이 상대방 색으로 덮여 보이게 된다. */}
-        <polygon
-          className="taste-radar-chart__line taste-radar-chart__line--mine"
-          points={pointsToString(pointsA)}
-          fill="none"
-          stroke={seriesA.color}
-          strokeWidth={2}
-        />
-        <polygon
-          className="taste-radar-chart__fill taste-radar-chart__fill--mine"
-          points={pointsToString(pointsA)}
-          fill={seriesA.color}
-          fillOpacity={seriesA.fillOpacity}
-          stroke="none"
-        />
-        <g className="taste-radar-chart__points taste-radar-chart__points--mine">
-          {pointsA.map((p, i) => (
-            <circle
-              key={`mine-${i}`}
-              cx={p.x}
-              cy={p.y}
-              r={POINT_RADIUS}
-              fill="#fff"
-              stroke={seriesA.color}
-              strokeWidth={2}
-            />
-          ))}
+            겹치는 부분의 내 원이 상대방 색으로 덮여 보이게 된다.
+            선+원은 하나의 <g>로 묶어서 완전히 같은 타이밍으로 커지게 한다. */}
+        <g className="taste-radar-chart__series taste-radar-chart__series--mine">
+          <polygon
+            className="taste-radar-chart__line"
+            points={pointsToString(pointsA)}
+            fill="none"
+            stroke={seriesA.color}
+            strokeWidth={2}
+          />
+          <polygon
+            className="taste-radar-chart__fill taste-radar-chart__fill--mine"
+            points={pointsToString(pointsA)}
+            fill={seriesA.color}
+            fillOpacity={seriesA.fillOpacity}
+            stroke="none"
+          />
+          <g className="taste-radar-chart__points">
+            {pointsA.map((p, i) => (
+              <circle
+                key={`mine-${i}`}
+                cx={p.x}
+                cy={p.y}
+                r={POINT_RADIUS}
+                fill="#fff"
+                stroke={seriesA.color}
+                strokeWidth={2}
+              />
+            ))}
+          </g>
         </g>
 
-        <polygon
-          className="taste-radar-chart__line taste-radar-chart__line--friend"
-          points={pointsToString(pointsB)}
-          fill="none"
-          stroke={seriesB.color}
-          strokeWidth={2}
-        />
-        <polygon
-          className="taste-radar-chart__fill taste-radar-chart__fill--friend"
-          points={pointsToString(pointsB)}
-          fill={seriesB.color}
-          fillOpacity={seriesB.fillOpacity}
-          stroke="none"
-        />
-        <g className="taste-radar-chart__points taste-radar-chart__points--friend">
-          {pointsB.map((p, i) => (
-            <circle
-              key={`friend-${i}`}
-              cx={p.x}
-              cy={p.y}
-              r={POINT_RADIUS}
-              fill="#fff"
-              stroke={seriesB.color}
-              strokeWidth={2}
-            />
-          ))}
+        <g className="taste-radar-chart__series taste-radar-chart__series--friend">
+          <polygon
+            className="taste-radar-chart__line"
+            points={pointsToString(pointsB)}
+            fill="none"
+            stroke={seriesB.color}
+            strokeWidth={2}
+          />
+          <polygon
+            className="taste-radar-chart__fill taste-radar-chart__fill--friend"
+            points={pointsToString(pointsB)}
+            fill={seriesB.color}
+            fillOpacity={seriesB.fillOpacity}
+            stroke="none"
+          />
+          <g className="taste-radar-chart__points">
+            {pointsB.map((p, i) => (
+              <circle
+                key={`friend-${i}`}
+                cx={p.x}
+                cy={p.y}
+                r={POINT_RADIUS}
+                fill="#fff"
+                stroke={seriesB.color}
+                strokeWidth={2}
+              />
+            ))}
+          </g>
         </g>
       </svg>
 

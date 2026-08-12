@@ -6,7 +6,7 @@
 }
 
 .taste-comparison-bar__value {
-  font-size: 11px;
+  font-size: 16px;
   font-weight: 700;
   color: #68646a;
   margin-bottom: 8px;
@@ -15,7 +15,7 @@
 .taste-comparison-bar__track {
   display: flex;
   align-items: flex-end;
-  gap: 8px;
+  gap: 6px;
 }
 
 .taste-comparison-bar__fill {

@@ -8,15 +8,16 @@
   transform: scale(1);
 }
 
-.taste-radar-chart__line {
+/* 선 + 원을 한 그룹으로 묶어서 완전히 같은 타이밍으로 커지게 함 */
+.taste-radar-chart__series {
   transform: scale(0);
   transform-origin: center;
   animation: radar-line-expand 2.4s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
 }
-.taste-radar-chart__line--mine {
+.taste-radar-chart__series--mine {
   animation-delay: 0.2s;
 }
-.taste-radar-chart__line--friend {
+.taste-radar-chart__series--friend {
   animation-delay: 0.35s;
 }
 

@@ -147,6 +147,7 @@
   font-size: 14px;
   line-height: 1.5;
   color: #373750;
+  word-break: keep-all;
 }
 
 .main-page__menu-list {
