@@ -18,6 +18,7 @@ import glass3 from '../../assets/images/glass/glass-3.png'
 import glass4 from '../../assets/images/glass/glass-4.png'
 import { saveMoodTestResult } from '../../api/mood-tests/moodTests.api'
 import type { MoodTestResult } from '../../api/mood-tests/moodTests.types'
+import { markTypeReceivedAsTestResult } from '../../utils/testResultDex'
 import '../../styles/ResultPage.css'
 
 // TODO: 실제 테스트 결과 API 연동 후 실제 응답으로 대체
@@ -140,6 +141,14 @@ function ResultPage({
   // TODO: 실제 저장 상태 API 연동 후 아래 mock state를 실제 값으로 교체
   const [saveStatusOverride, setSaveStatusOverride] = useState<boolean | null>(null)
   const isResultSaved = saveStatusOverride ?? Boolean(result?.saved || result?.resultId) // 지금 보고 있는 결과를 저장했는지
+
+  // 캐릭터 도감의 "테스트에서 결과 받기" 해금 조건은 히스토리 API로는 알 수 없어서,
+  // 실제 결과를 받는 이 시점에 로컬에 기록해둡니다(로그인 여부와 무관하게 동작).
+  useEffect(() => {
+    if (!result?.moodType.typeCode) return
+    const localId = TYPECODE_TO_LOCAL_TYPE[result.moodType.typeCode]
+    if (localId) markTypeReceivedAsTestResult(localId)
+  }, [result])
 
   // typeCode로 로컬 테마(캐릭터/배경무늬/카피)를 찾음. 실제 결과가 있으면 그 typeCode를,
   // 없으면(로컬 미리보기) PREVIEW_TYPE_CODE를 씀. 아직 테마가 없는 타입(easygoing-optimist 등)은
