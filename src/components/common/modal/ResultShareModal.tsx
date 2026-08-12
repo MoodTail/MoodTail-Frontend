@@ -91,11 +91,11 @@ function ResultShareModal({
     try {
       const blob = await toBlob(cardRef.current, { pixelRatio: 2, cacheBust: true })
       if (!blob) throw new Error('썸네일 이미지 생성에 실패했습니다')
-      const { shareToken } = await createMoodTestResultShare(tasteProfile, blob)
-      onSnsShare(buildResultShareUrl(shareToken))
+      const { shareToken, shareUrl } = await createMoodTestResultShare(tasteProfile, blob)
+      onSnsShare(shareUrl || buildResultShareUrl(shareToken))
     } catch (err) {
       console.error('공유 URL 생성에 실패했습니다', err)
-      onSnsShare()
+      alert('공유 링크 생성에 실패했어요. 잠시 후 다시 시도해주세요.')
     }
   }
 
