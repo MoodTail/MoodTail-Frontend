@@ -500,12 +500,16 @@ function ResultPage({
           <div className="result-page__sheet-handle" aria-hidden="true" />
 
           <section className="result-page__section">
-            <h2 className="result-page__section-title">나와 일치하는 칵테일 TOP 4</h2>
+            <h2 className="result-page__section-title result-page__section-title--cocktail">
+              나와 일치하는 칵테일 TOP 4
+            </h2>
             <CocktailTopList items={topCocktails} />
           </section>
 
           <section className="result-page__section">
-            <h2 className="result-page__section-title">나의 취향 분석</h2>
+            <h2 className="result-page__section-title result-page__section-title--taste">
+              나의 취향 분석
+            </h2>
             <RadarChart myData={myTaste} />
             <div className="taste-chips">
               {TASTE_CHIP_ORDER.map(({ key, label, active }) => (
@@ -605,14 +609,14 @@ function ResultPage({
 
       <ResultSnsShareModal
         isOpen={isSnsModalOpen}
-        url={shareUrl ?? window.location.href}
+        url={shareUrl ?? ''}
         onClose={() => setIsSnsModalOpen(false)}
         onKakaoShare={handleKakaoShare}
         kakaoShare={{
           title: `MoodTail - ${typeName}`,
           description: shareDescription,
           imageUrl: characterImage,
-          webUrl: shareUrl ?? window.location.href,
+          webUrl: shareUrl ?? '',
           buttonTitle: '결과 확인하기',
         }}
       />

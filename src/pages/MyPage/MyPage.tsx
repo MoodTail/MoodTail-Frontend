@@ -12,6 +12,7 @@ import {
 } from "../../constants/characters";
 import { RESULT_TYPE_THEMES } from "../../constants/resultTypeThemes";
 import {
+  MOCK_PROFILE_AVATAR_STYLES,
   PROFILE_AVATAR_STYLES,
   type ProfileAvatarStyle,
 } from "../../constants/profileAvatarStyles";
@@ -60,10 +61,6 @@ const MOCK_USER = {
 };
 
 // TODO: 실제 게스트 ID는 백엔드에서 발급, 지금은 화면 확인용으로 임시 생성
-function generateGuestId() {
-  return Math.random().toString(36).slice(2, 14);
-}
-
 type ModalStep =
   | "none"
   | "logout-confirm"
@@ -104,7 +101,6 @@ function MyPage({
     import.meta.env.DEV &&
     localStorage.getItem(LOCAL_AUTH_PREVIEW_KEY) === "true";
   const [modalStep, setModalStep] = useState<ModalStep>("none");
-  const [guestId] = useState(generateGuestId);
   const [profile, setProfile] = useState<MyPageResult | null>(null);
 
   useEffect(() => {
@@ -136,9 +132,10 @@ function MyPage({
     resolveCharacterType(profile?.representativeMoodType?.typeCode) ??
     MOCK_USER.characterType;
   // API가 실제 캐릭터 이미지 URL을 내려주면 그걸 우선 사용, 없으면 로컬 mock 이미지로 폴백
+  const apiAvatarImageSrc = getNonEmptyValue(profile?.representativeMoodType?.characterImageUrl);
   const avatarImageSrc =
     PREVIEW_MY_PAGE_BACKEND_IMAGE_URL ??
-    (previewThemeTypeCode ? resultTheme?.characterImage : getNonEmptyValue(profile?.representativeMoodType?.characterImageUrl)) ??
+    (previewThemeTypeCode ? resultTheme?.characterImage : apiAvatarImageSrc) ??
     resultTheme?.characterImage ??
     CHARACTER_IMAGES[characterType];
   const characterLabel =
@@ -149,7 +146,10 @@ function MyPage({
   const monthlyCount = profile?.monthlyRecordCount ?? MOCK_USER.monthlyCount;
   const collectedCount =
     profile?.unlockedMoodTypeCount ?? MOCK_USER.collectedCount;
-  const avatarStyle = PROFILE_AVATAR_STYLES[characterType];
+  const isMockAvatar = !PREVIEW_MY_PAGE_BACKEND_IMAGE_URL && !previewThemeTypeCode && !apiAvatarImageSrc;
+  const avatarStyle =
+    (isMockAvatar ? MOCK_PROFILE_AVATAR_STYLES[characterType] : undefined) ??
+    PROFILE_AVATAR_STYLES[characterType];
 
   const closeModal = () => setModalStep("none");
 
@@ -228,7 +228,7 @@ function MyPage({
         }
       >
         {isLoggedIn ? (
-          <>
+          <div className="mypage__profile-trigger">
             <div className="mypage__avatar" aria-hidden="true">
               {avatarImageSrc ? (
                 <img
@@ -244,9 +244,9 @@ function MyPage({
               )}
             </div>
             <p className="mypage__nickname">{nickname}</p>
-          </>
+          </div>
         ) : (
-          <div className="mypage__profile-trigger">
+          <div className="mypage__profile-trigger mypage__profile-trigger--guest">
             <div
               className="mypage__avatar mypage__avatar--empty"
               aria-hidden="true"
@@ -255,12 +255,11 @@ function MyPage({
                 로그인이 필요해요!
               </span>
             </div>
-            <p className="mypage__guest-id">user: {guestId}</p>
           </div>
         )}
       </section>
 
-      <div className="mypage__panel">
+      <div className={`mypage__panel${isLoggedIn ? "" : " mypage__panel--guest"}`}>
         {isLoggedIn && (
           <section className="mypage__stats">
             <div className="mypage__stat-card">

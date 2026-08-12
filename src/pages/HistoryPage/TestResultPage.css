@@ -132,8 +132,9 @@
   width: 250px;
   height: 23px;
   margin: 0 0 6px 4px;
+  transform: translateY(5px);
   color: #181820;
-  font-size: 16px;
+  font-size: 23px;
   font-weight: 700;
   line-height: 23px;
   white-space: nowrap;
@@ -143,12 +144,13 @@
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 8px 16px;
+  transform: translateY(30px);
 }
 
 .history-full-result-page__cocktail-card {
   position: relative;
   display: flex;
-  height: 125px;
+  height: 135px;
   flex-direction: column;
   align-items: center;
   border: 1px solid #ffd0c5;
@@ -204,7 +206,7 @@
 
 .history-full-result-page__taste-analysis > h2 {
   position: absolute;
-  top: 449px;
+  top: 419px;
   left: 29px;
   width: 125px;
   height: 26px;
@@ -218,7 +220,7 @@
 
 .history-full-result-page__radar {
   position: absolute;
-  top: 469px;
+  top: 439px;
   left: 26px;
   width: 340px;
   height: 340px;
@@ -232,7 +234,7 @@
 
 .history-full-result-page__taste-values {
   position: absolute;
-  top: 788px;
+  top: 758px;
   left: 19px;
   display: flex;
   gap: 10px;
@@ -280,7 +282,7 @@
 
 .history-full-result-page__type-matches {
   position: absolute;
-  top: 872px;
+  top: 842px;
   left: 19px;
   display: flex;
   gap: 17px;

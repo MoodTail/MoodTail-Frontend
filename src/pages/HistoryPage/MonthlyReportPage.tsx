@@ -693,6 +693,7 @@ function MonthlyReportPage({ onBack, reportMonth }: MonthlyReportPageProps) {
             aria-label="월간 리포트 공유 미리보기"
             onClick={(event) => event.stopPropagation()}
           >
+            <h2 className="monthly-report-share-modal__title">MoodTail</h2>
             <button
               type="button"
               className="monthly-report-share-modal__close"

@@ -184,6 +184,8 @@ function App() {
             }
             onOpenMonthlyReport={openMonthlyReportPage}
             onStartTest={startTestFromHistory}
+            isLoggedIn={!isGuest}
+            onGoToLogin={handleGoToLoginScreen}
           />
         );
       case "dictionary":

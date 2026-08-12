@@ -200,24 +200,28 @@
 
 .monthly-report-page__type-copy {
   position: absolute;
-  top: 15px;
-  left: 62.79px;
+  top: 9px;
+  left: 60.79px;
+  right: 8px;
 }
 
 .monthly-report-page__type-copy h3 {
-  width: 61px;
-  height: 19px;
+  display: flex;
+  min-height: 38px;
+  align-items: center;
   margin: 0;
+  transform: translateY(-2px);
   font-size: 12px;
   font-weight: 700;
-  line-height: 19px;
-  white-space: nowrap;
+  line-height: 16px;
+  word-break: keep-all;
 }
 
 .monthly-report-page__type-count {
   width: 25px;
   height: 21px;
-  margin: 5px 0 0;
+  margin: 0;
+  transform: translateY(-9px);
   font-size: 15px;
   font-weight: 700;
   line-height: 21px;
@@ -569,13 +573,13 @@
 }
 
 .monthly-report-share-modal__overlay {
-  position: fixed;
+  position: absolute;
   z-index: 1000;
   top: 0;
-  left: 50%;
-  width: min(393px, 100vw);
-  height: min(824px, 100dvh);
-  transform: translateX(-50%);
+  left: 0;
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
   display: flex;
   align-items: flex-start;
   justify-content: center;
@@ -599,12 +603,10 @@
 }
 
 .monthly-report-share-modal__close {
-  position: sticky;
+  position: absolute;
   z-index: 2;
-  top: 0;
-  float: right;
-  margin-top: -32px;
-  margin-right: -2px;
+  top: 6px;
+  right: 8px;
   width: 28px;
   height: 28px;
   padding: 0;
@@ -637,6 +639,7 @@
   width: 100%;
   display: flex;
   flex-direction: column;
+  margin-top: 54px;
   gap: 16px;
 }
 

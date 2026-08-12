@@ -45,6 +45,13 @@
   cursor: pointer;
 }
 
+.history-calendar .react-calendar__navigation__prev-button:disabled,
+.history-calendar .react-calendar__navigation__next-button:disabled {
+  background: transparent;
+  color: #c7c7c7;
+  cursor: not-allowed;
+}
+
 .history-calendar .react-calendar__month-view__weekdays {
   margin-bottom: 14px;
   color: #777777;
