@@ -145,7 +145,9 @@ const MainPage: FC<MainPageProps> = ({
   }, []);
 
   useEffect(() => {
-    onNavVisibilityChange?.(view !== "together" && view !== "quiz" && view !== "quizLoading");
+    onNavVisibilityChange?.(
+      view !== "together" && view !== "quiz" && view !== "quizLoading",
+    );
   }, [view, onNavVisibilityChange]);
 
   const exitQuiz = () => {
@@ -352,6 +354,15 @@ const MainPage: FC<MainPageProps> = ({
           className="main-page__cocktail-card"
           onClick={() => setView("recipe")}
         >
+          {todayCocktail?.cocktail.imageUrl && (
+            <div className="main-page__cocktail-thumb">
+              <img
+                src={todayCocktail.cocktail.imageUrl}
+                alt={todayCocktail.cocktail.nameKo}
+                className="main-page__cocktail-image"
+              />
+            </div>
+          )}
           <div className="main-page__cocktail-info">
             <p className="main-page__cocktail-name">
               {todayCocktail?.cocktail.nameKo ?? "불러오는 중..."}

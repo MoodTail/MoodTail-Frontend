@@ -156,7 +156,7 @@ const CocktailRecommendPage: FC<CocktailRecommendPageProps> = ({
                   나와의 일치율 {topPick.myMatchPercent}%
                 </span>
                 <span className="cocktail-recommend-page__top-badge cocktail-recommend-page__top-badge--friend">
-                  친구와의 일치율 {topPick.partnerMatchPercent}%
+                  상대와의 일치율 {topPick.partnerMatchPercent}%
                 </span>
               </div>
             </div>

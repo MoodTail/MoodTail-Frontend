@@ -14,6 +14,8 @@
   color: #17182f;
   text-align: center;
   line-height: 25px;
+  position: relative;
+  top: 3px;
 }
 
 .top-type-card__list {
@@ -51,6 +53,7 @@
   font-size: 14px;
   font-weight: 700;
   color: #17182f;
+  word-break: keep-all;
 }
 
 .top-type-item__percent {

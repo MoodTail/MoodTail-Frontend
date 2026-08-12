@@ -95,8 +95,19 @@ const CustomRecommendResultPage: FC<CustomRecommendResultPageProps> = ({
             추천 칵테일 맛 강도
           </p>
           <p className="custom-recommend-result-page__chart-desc">
-            연한색은 내 입력값, 진한색은 추천 칵테일 값이에요
+            파란색은 내 입력값, 주황색은 추천 칵테일 값이에요
           </p>
+
+          <div className="custom-recommend-result-page__bars">
+            {bars.map((bar) => (
+              <TasteComparisonBar
+                key={bar.key}
+                label={bar.label}
+                myValue={myValues[bar.key]}
+                cocktailValue={cocktailValues[bar.key]}
+              />
+            ))}
+          </div>
 
           <div className="custom-recommend-result-page__legend">
             <span className="custom-recommend-result-page__legend-item">
@@ -113,17 +124,6 @@ const CustomRecommendResultPage: FC<CustomRecommendResultPageProps> = ({
               />
               칵테일
             </span>
-          </div>
-
-          <div className="custom-recommend-result-page__bars">
-            {bars.map((bar) => (
-              <TasteComparisonBar
-                key={bar.key}
-                label={bar.label}
-                myValue={myValues[bar.key]}
-                cocktailValue={cocktailValues[bar.key]}
-              />
-            ))}
           </div>
         </div>
 

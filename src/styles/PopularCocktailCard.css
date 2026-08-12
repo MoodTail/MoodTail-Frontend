@@ -71,6 +71,7 @@
   font-size: 11px;
   font-weight: 500;
   color: #68646a;
+  word-break: keep-all;
 }
 
 .cocktail-rank-item__percent {
