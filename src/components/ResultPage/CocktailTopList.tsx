@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import '../../styles/CocktailTopList.css'
 
 interface CocktailTopItem {
@@ -26,5 +27,5 @@ function CocktailTopList({ items }: CocktailTopListProps) {
   )
 }
 
-export default CocktailTopList
+export default memo(CocktailTopList)
 export type { CocktailTopItem, CocktailTopListProps }

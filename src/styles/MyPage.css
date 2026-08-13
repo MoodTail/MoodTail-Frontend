@@ -12,6 +12,10 @@
   background: linear-gradient(180deg, #e3f9f3 -30%, #ffda61 70%, #fd7a15 100%);
 }
 
+.mypage__profile--loading {
+  background: linear-gradient(180deg, #f4f4f4 0%, #eeeeee 56%, #f7f7f7 100%);
+}
+
 .mypage__profile--guest {
   background: linear-gradient(
     179.29deg,
@@ -39,6 +43,19 @@
   background: #ffffff;
 }
 
+.mypage__avatar--loading {
+  background: rgba(255, 255, 255, 0.82);
+}
+
+.mypage__avatar-skeleton {
+  width: 92px;
+  height: 92px;
+  border-radius: 50%;
+  background: linear-gradient(90deg, #f2f2f2 0%, #ffffff 50%, #f2f2f2 100%);
+  background-size: 200% 100%;
+  animation: mypage-skeleton-shimmer 1.2s ease-in-out infinite;
+}
+
 .mypage__avatar-image {
   width: 100%;
   height: 100%;
@@ -60,6 +77,13 @@
   text-align: center;
   padding: 0 8px;
   color: var(--color-primary, #ff6f4f);
+}
+
+.mypage__nickname--loading {
+  width: 86px;
+  height: 18px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.72);
 }
 
 .mypage__profile-trigger {
@@ -129,6 +153,14 @@
   letter-spacing: 0;
 }
 
+.mypage__stat-skeleton {
+  display: inline-block;
+  width: 34px;
+  height: 17px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.72);
+}
+
 .mypage__menu {
   display: flex;
   flex-direction: column;
@@ -154,6 +186,10 @@
   text-align: left;
   text-decoration: none;
   cursor: pointer;
+}
+
+.mypage__menu-item:disabled {
+  cursor: default;
 }
 
 .mypage__menu-item:last-child {
@@ -189,6 +225,15 @@
   width: 6px;
   height: 10.5px;
   flex: 0 0 6px;
+}
+
+@keyframes mypage-skeleton-shimmer {
+  0% {
+    background-position: 100% 0;
+  }
+  100% {
+    background-position: -100% 0;
+  }
 }
 
 @media (max-width: 392px) {
