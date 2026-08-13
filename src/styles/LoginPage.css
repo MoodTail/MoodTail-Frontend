@@ -1,6 +1,7 @@
 .login-page {
-  width: 393px;
-  height: 824px;
+  width: min(100%, 393px);
+  height: min(824px, 100dvh);
+  min-height: 568px;
   position: relative;
   overflow: hidden;
   box-sizing: border-box;
