@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { toBlob } from "html-to-image";
+import { toBlob, toPng } from "html-to-image";
 import {
   getSharedMonthlyReport,
   getMonthlyReport,
@@ -358,6 +358,7 @@ function MonthlyReportPage({ onBack, reportMonth }: MonthlyReportPageProps) {
   const [isSaving, setIsSaving] = useState(false);
   const [isShareImageUploading, setIsShareImageUploading] = useState(false);
   const [monthlyReportShareImageUrl, setMonthlyReportShareImageUrl] = useState<string>();
+  const [monthlyReportShareUrl, setMonthlyReportShareUrl] = useState<string>();
   const [shareImageError, setShareImageError] = useState<string>();
   const sharePreviewRef = useRef<HTMLDivElement>(null);
   const mobileFrame = document.querySelector<HTMLElement>(".app");
@@ -417,13 +418,33 @@ function MonthlyReportPage({ onBack, reportMonth }: MonthlyReportPageProps) {
       if (!report) throw new Error('월간 리포트 데이터가 없습니다.');
       return createMonthlyReportPng(report);
     }
-    const blob = await toBlob(sharePreviewRef.current, {
+
+    const captureOptions = {
       pixelRatio: 2,
       cacheBust: true,
       backgroundColor: '#fffaf8',
-    });
-    if (!blob) throw new Error('공유 카드 이미지를 생성하지 못했습니다.');
-    return blob;
+    };
+
+    try {
+      const blob = await toBlob(sharePreviewRef.current, captureOptions);
+      if (!blob) throw new Error('toBlob returned null');
+      return blob;
+    } catch (error) {
+      console.error('월간 리포트 카드 toBlob 캡처 실패, toPng로 재시도', error);
+
+      try {
+        const dataUrl = await toPng(sharePreviewRef.current, captureOptions);
+        const response = await fetch(dataUrl);
+        if (!response.ok) throw new Error(`PNG 변환 실패: ${response.status}`);
+
+        const blob = await response.blob();
+        if (!blob.size) throw new Error('toPng returned an empty image');
+        return blob;
+      } catch (fallbackError) {
+        console.error('월간 리포트 카드 toPng 캡처도 실패', fallbackError);
+        throw fallbackError;
+      }
+    }
   };
 
   const handleSaveImage = async () => {
@@ -475,13 +496,10 @@ function MonthlyReportPage({ onBack, reportMonth }: MonthlyReportPageProps) {
         month: reportMonthNumber,
         image,
       });
-      await getSharedMonthlyReport(result.shareToken);
-      const shareImageUrl = new URL(
-        `/api/v1/reports/monthly/shares/${encodeURIComponent(result.shareToken)}/image`,
-        import.meta.env.VITE_API_BASE_URL,
-      ).href;
+      const sharedReport = await getSharedMonthlyReport(result.shareToken);
 
-      setMonthlyReportShareImageUrl(shareImageUrl);
+      setMonthlyReportShareUrl(result.shareUrl);
+      setMonthlyReportShareImageUrl(sharedReport.shareImageUrl);
       setIsSnsShareModalOpen(true);
     } catch (error) {
       console.error("월간 리포트 공유 이미지 업로드 실패", error);
@@ -734,17 +752,17 @@ function MonthlyReportPage({ onBack, reportMonth }: MonthlyReportPageProps) {
         mobileFrame ?? document.body,
       )}
 
-      {isSnsShareModalOpen && monthlyReportShareImageUrl &&
+      {isSnsShareModalOpen && monthlyReportShareUrl && monthlyReportShareImageUrl &&
         createPortal(
           <ResultSnsShareModal
             isOpen
-            url={monthlyReportShareImageUrl}
+            url={monthlyReportShareUrl}
             onClose={() => setIsSnsShareModalOpen(false)}
             kakaoShare={{
               title: `MoodTail ${reportYear}년 ${reportMonthNumber}월 리포트`,
               description: `${report.monthlyMoodType.name} 유형의 월간 취향 리포트예요.`,
               imageUrl: monthlyReportShareImageUrl,
-              webUrl: monthlyReportShareImageUrl,
+              webUrl: monthlyReportShareUrl,
               buttonTitle: '결과 이미지 보기',
             }}
           />,

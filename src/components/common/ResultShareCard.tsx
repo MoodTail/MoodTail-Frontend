@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import passionateCardBg from '../../assets/images/share-card/passionate-card-bg.svg'
 import passionateStar from '../../assets/images/share-card/passionate-star.svg'
 import sparkleLarge from '../../assets/images/share-card/sparkle-large.svg'
@@ -258,5 +259,5 @@ function ResultShareCard({ typeCode, characterImage, typeName, typeDescription, 
   )
 }
 
-export default ResultShareCard
+export default memo(ResultShareCard)
 export type { ResultShareCardProps }

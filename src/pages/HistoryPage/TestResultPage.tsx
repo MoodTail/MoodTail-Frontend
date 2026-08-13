@@ -1,5 +1,7 @@
+import type { CSSProperties } from 'react'
 import chevronLeftIcon from '../../assets/icons/chevron-left.svg'
 import type { HistoryTestResultDetail } from '../../api/histories/histories.types'
+import { RESULT_TYPE_THEMES } from '../../constants/resultTypeThemes'
 import RadarChart, { type RadarChartData } from '../../components/ResultPage/RadarChart'
 import MonthlyReportBackground from '../../components/common/MonthlyReportBackground'
 import './TestResultPage.css'
@@ -20,6 +22,11 @@ function toRadarData(scores: HistoryTestResultDetail['displayTasteScores']): Rad
 }
 
 function TestResultPage({ onBack, result }: TestResultPageProps) {
+  const resultTheme = RESULT_TYPE_THEMES[result.moodType.typeCode]
+  const pageThemeStyle = {
+    '--history-result-accent': resultTheme?.accentColor ?? '#ff6f4f',
+  } as CSSProperties
+
   const myTaste = toRadarData(result.displayTasteScores)
   const tasteItems = [
     { label: '도수', value: result.displayTasteScores.alcoholIntensity, active: true },
@@ -34,7 +41,7 @@ function TestResultPage({ onBack, result }: TestResultPageProps) {
 
   return (
     <div className="history-full-result-page">
-      <div className="history-full-result-page__canvas">
+      <div className="history-full-result-page__canvas" style={pageThemeStyle}>
         <MonthlyReportBackground variant="long" />
         <button
           type="button"

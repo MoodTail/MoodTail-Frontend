@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import '../../styles/TypeMatchCard.css'
 
 interface TypeMatchCardProps {
@@ -33,5 +34,5 @@ function TypeMatchCard({ label, typeName, typeNameColor, image, imageScale, imag
   )
 }
 
-export default TypeMatchCard
+export default memo(TypeMatchCard)
 export type { TypeMatchCardProps }
