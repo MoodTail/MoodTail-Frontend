@@ -150,6 +150,8 @@ export default function DexShareModal({
                   imageWidth="94%"
                   imageHeight="74%"
                   borderRadius={20}
+                  lockedNameFontSize={8}
+                  lockedRateFontSize={6}
                 />
               </div>
             );
