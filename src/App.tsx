@@ -63,7 +63,7 @@ function App() {
     () => !isLocalAuthPreview && localStorage.getItem("isGuest") === "true",
   );
   const [activeMenu, setActiveMenu] = useState<NavKey>("home");
-  const [showNavLoginModal, setShowNavLoginModal] = useState(false);
+  const [loginRequiredMenu, setLoginRequiredMenu] = useState<"history" | "dictionary" | null>(null);
   const [historyView, setHistoryView] = useState<HistoryView>("calendar");
   const [historyPhotoHasTestResult, setHistoryPhotoHasTestResult] =
     useState(true);
@@ -474,10 +474,9 @@ function App() {
     );
   }
 
-  // 비회원이 캐릭터 도감 탭을 누르면 화면 전환 대신 로그인 안내 모달을 띄웁니다.
   const handleNavChange = (menu: NavKey) => {
-    if (isGuest && menu === "dictionary") {
-      setShowNavLoginModal(true);
+    if (isGuest && (menu === "history" || menu === "dictionary")) {
+      setLoginRequiredMenu(menu);
       return;
     }
     setActiveMenu(menu);
@@ -500,32 +499,36 @@ function App() {
                 {renderPage()}
               </section>
               {navVisible && <BottomNav activeMenu={activeMenu} onChangeMenu={handleNavChange} />}
+              {loginRequiredMenu && (
+                <TwoButtonModal
+                  isOpen
+                  title={loginRequiredMenu === "history" ? "로그인이 필요해요" : "로그인하고 도감을 확인해요"}
+                  description={
+                    loginRequiredMenu === "history"
+                      ? "히스토리는 로그인 후 이용할 수 있어요.\n로그인 화면으로 이동할까요?"
+                      : "테스트 결과, 도감, 즐겨찾기를 이어서 사용할 수 있어요."
+                  }
+                  leftButton={{
+                    label: "로그인하기",
+                    variant: "primary",
+                    onClick: () => {
+                      setLoginRequiredMenu(null);
+                      handleGoToLoginScreen();
+                    },
+                  }}
+                  rightButton={{
+                    label: "닫기",
+                    variant: "secondary",
+                    onClick: () => setLoginRequiredMenu(null),
+                  }}
+                  onOverlayClick={() => setLoginRequiredMenu(null)}
+                />
+              )}
             </>
           );
         })()}
       </main>
 
-      {showNavLoginModal && (
-        <TwoButtonModal
-          isOpen
-          title="로그인하고 도감을 확인해요"
-          description="테스트 결과, 도감, 즐겨찾기를 이어서 사용할 수 있어요."
-          leftButton={{
-            label: "로그인하기",
-            variant: "primary",
-            onClick: () => {
-              setShowNavLoginModal(false);
-              handleGoToLoginScreen();
-            },
-          }}
-          rightButton={{
-            label: "닫기",
-            variant: "secondary",
-            onClick: () => setShowNavLoginModal(false),
-          }}
-          onOverlayClick={() => setShowNavLoginModal(false)}
-        />
-      )}
     </div>
   );
 }
