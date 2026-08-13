@@ -296,7 +296,10 @@ function SummaryCard({
         <span className="monthly-report-page__summary-rank">
           {primaryType?.ranking ?? 1}위 · {primaryType?.count ?? 0}회
         </span>
-        <h2 className="monthly-report-page__summary-type">
+        <h2
+          className="monthly-report-page__summary-type"
+          style={{ fontSize: report.monthlyMoodType.name.length > 8 ? '18px' : undefined }}
+        >
           {report.monthlyMoodType.name}
         </h2>
         <p className="monthly-report-page__summary-description">

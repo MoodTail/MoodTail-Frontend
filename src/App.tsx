@@ -1,14 +1,15 @@
 import { useEffect, useState } from "react";
 import BottomNav from "./components/common/BottomNav";
+import TwoButtonModal from "./components/common/modal/TwoButtonModal";
 import DexBackground from "./components/DexBackground";
 import HistoryPage from "./pages/HistoryPage/HistoryPage";
 import HistoryPhotoPage from "./pages/HistoryPage/HistoryPhotoPage";
 import type { HistoryRecordTab } from "./pages/HistoryPage/HistoryPhotoPage";
 import MonthlyReportPage from "./pages/HistoryPage/MonthlyReportPage";
 import TestResultPage from "./pages/HistoryPage/TestResultPage";
-import CharacterPage from "./pages/CharacterPage/CharacterPage";
+import CharacterPage, { prefetchCharacterDex } from "./pages/CharacterPage/CharacterPage";
 import MainPage from "./pages/MainPage/MainPage";
-import RecipePage from "./pages/RecipePage/RecipePage";
+import RecipePage, { prefetchRecipes, prefetchSavedRecipes } from "./pages/RecipePage/RecipePage";
 import MyPage, { type MyPageProfileSnapshot } from "./pages/MyPage/MyPage";
 import ProfileEdit from "./pages/MyPage/ProfileEdit";
 import Inquiry from "./pages/MyPage/Inquiry";
@@ -18,13 +19,12 @@ import ResultPage from "./pages/ResultPage/ResultPage";
 import QuizQuestionPage from "./pages/QuizQuestionPage";
 import {
   buildQuizQuestions,
-  toQuizQuestions,
+  fetchAndCacheQuizQuestions,
+  getCachedQuizQuestions,
+  prefetchQuizQuestions,
   type QuizQuestion,
 } from "./data/quiz";
-import {
-  getMoodTestQuestions,
-  postMoodTestResult,
-} from "./api/mood-tests/moodTests.api";
+import { postMoodTestResult } from "./api/mood-tests/moodTests.api";
 import type {
   MoodTestAnswer,
   MoodTestResult,
@@ -63,6 +63,7 @@ function App() {
     () => !isLocalAuthPreview && localStorage.getItem("isGuest") === "true",
   );
   const [activeMenu, setActiveMenu] = useState<NavKey>("home");
+  const [showNavLoginModal, setShowNavLoginModal] = useState(false);
   const [historyView, setHistoryView] = useState<HistoryView>("calendar");
   const [historyPhotoHasTestResult, setHistoryPhotoHasTestResult] =
     useState(true);
@@ -117,15 +118,32 @@ function App() {
     });
   }, [isRetestOpen, retestStep, retestAnswers, retestQuestions]);
 
+  // 로그인 직후 캐릭터 도감/레시피 탭의 데이터를 미리 받아와 각 페이지 컴포넌트의 모듈
+  // 캐시를 채워둡니다 — 사용자가 실제로 그 탭을 눌렀을 때 로딩 없이 바로 보여주기 위함입니다.
+  // 초기 렌더를 막지 않도록 약간 지연시키고, 게스트는 도감 API 호출 권한이 없어 레시피만
+  // 미리 받습니다.
+  useEffect(() => {
+    if (!isLoggedIn) return;
+    const timer = window.setTimeout(() => {
+      prefetchRecipes();
+      prefetchQuizQuestions();
+      if (!isGuest) {
+        prefetchCharacterDex();
+        prefetchSavedRecipes();
+      }
+    }, 300);
+    return () => window.clearTimeout(timer);
+  }, [isLoggedIn, isGuest]);
+
   const startRetest = () => {
     setIsTestResultOpen(false);
     setRetestStep(0);
     setRetestAnswers({});
-    setRetestQuestions(buildQuizQuestions());
+    setRetestQuestions(getCachedQuizQuestions() ?? buildQuizQuestions());
     setIsRetestOpen(true);
-    getMoodTestQuestions()
-      .then(({ questions }) => setRetestQuestions(toQuizQuestions(questions)))
-      .catch((err) => console.error("테스트 질문을 불러오지 못했습니다", err));
+    fetchAndCacheQuizQuestions().then((questions) => {
+      if (questions) setRetestQuestions(questions);
+    });
   };
 
   const exitRetest = () => {
@@ -226,6 +244,7 @@ function App() {
             onGoToLogin={handleGoToLoginScreen}
             initialDetailName={pendingCocktailName}
             onInitialDetailConsumed={() => setPendingCocktailName(null)}
+            onExitToOrigin={() => setActiveMenu("dictionary")}
           />
         );
       case "mypage":
@@ -454,6 +473,15 @@ function App() {
     );
   }
 
+  // 비회원이 캐릭터 도감 탭을 누르면 화면 전환 대신 로그인 안내 모달을 띄웁니다.
+  const handleNavChange = (menu: NavKey) => {
+    if (isGuest && menu === "dictionary") {
+      setShowNavLoginModal(true);
+      return;
+    }
+    setActiveMenu(menu);
+  };
+
   return (
     <div className="app-shell">
       <main
@@ -470,11 +498,33 @@ function App() {
               <section className={`app-content${navVisible ? "" : " app-content--no-nav"}`}>
                 {renderPage()}
               </section>
-              {navVisible && <BottomNav activeMenu={activeMenu} onChangeMenu={setActiveMenu} />}
+              {navVisible && <BottomNav activeMenu={activeMenu} onChangeMenu={handleNavChange} />}
             </>
           );
         })()}
       </main>
+
+      {showNavLoginModal && (
+        <TwoButtonModal
+          isOpen
+          title="로그인하고 도감을 확인해요"
+          description="테스트 결과, 도감, 즐겨찾기를 이어서 사용할 수 있어요."
+          leftButton={{
+            label: "로그인하기",
+            variant: "primary",
+            onClick: () => {
+              setShowNavLoginModal(false);
+              handleGoToLoginScreen();
+            },
+          }}
+          rightButton={{
+            label: "닫기",
+            variant: "secondary",
+            onClick: () => setShowNavLoginModal(false),
+          }}
+          onOverlayClick={() => setShowNavLoginModal(false)}
+        />
+      )}
     </div>
   );
 }

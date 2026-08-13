@@ -77,8 +77,8 @@ export default function DexShareModal({
           onClick={onClose}
           style={{
             position: "absolute",
-            top: 0,
-            right: 0,
+            top: -6,
+            right: -12,
             background: "none",
             border: "none",
             cursor: "pointer",
@@ -90,7 +90,7 @@ export default function DexShareModal({
 
         {/* 이미지 저장/공유 시 캡처되는 영역 — 닫기 버튼과 하단 액션 버튼은 이 밖에 있어 캡처에서 제외됩니다 */}
         <div ref={cardRef} style={{ background: "#fff", padding: 10 }}>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 16 }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", marginTop: -6, marginBottom: 16, paddingLeft: 20 }}>
             <span style={{ fontSize: 35, fontWeight: 700, color: COLORS.orange }}>MoodTail</span>
           </div>
 
@@ -138,7 +138,7 @@ export default function DexShareModal({
           {DEX_DATA.map((dex) => {
             const status = dexStatus?.[dex.typeId];
             return (
-              <div key={dex.id} style={{ width: "calc((100% - 36px) / 3)" }}>
+              <div key={dex.id} style={{ width: "calc((100% - 36px) / 3)", transform: "scale(1.02)" }}>
                 <DexBox
                   drinkImg={drinkImages[dex.id]}
                   typeId={dex.typeId}
@@ -146,9 +146,11 @@ export default function DexShareModal({
                   collectionRate={status?.collectionRate ?? dex.collectionRate}
                   border="1px solid #fff"
                   boxShadow={SHARE_BOX_SHADOW}
-                  nameFontSize={8}
-                  nameLineClamp={1}
-                  imageGap={6}
+                  nameFontSize={9}
+                  nameLineClamp={2}
+                  nameOverflowVisible
+                  nameSplitAtSpace
+                  imageGap={3}
                   imageWidth="94%"
                   imageHeight="74%"
                   borderRadius={20}
