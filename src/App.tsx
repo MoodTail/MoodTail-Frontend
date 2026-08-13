@@ -282,7 +282,8 @@ function App() {
           window.history.replaceState({}, "", "/");
           resetHistoryEntryNotice();
           setOauthCallback(null);
-          setIsGuest(localStorage.getItem("isGuest") === "true");
+          localStorage.removeItem("isGuest");
+          setIsGuest(false);
           setIsLoggedIn(true);
         }}
         onLoginFailed={() => {

@@ -46,6 +46,7 @@ function TogetherPickPage({
     null,
   );
   const [topPickDescription, setTopPickDescription] = useState("");
+  const [topPickImageUrl, setTopPickImageUrl] = useState("");
 
   const [showLoginModal, setShowLoginModal] = useState(
     () => !isLoggedIn || localStorage.getItem("isGuest") === "true",
@@ -67,11 +68,17 @@ function TogetherPickPage({
       pairResult.recommendations[0];
     if (!first) return;
 
+    setTopPickDescription("");
+    setTopPickImageUrl("");
     getCocktailDetail(first.cocktailId)
-      .then((detail) => setTopPickDescription(detail.shortDescription))
+      .then((detail) => {
+        setTopPickDescription(detail.shortDescription);
+        setTopPickImageUrl(detail.imageUrl);
+      })
       .catch((error) => {
         console.error(error);
         setTopPickDescription("");
+        setTopPickImageUrl("");
       });
   }, [step, pairResult]);
 
@@ -178,6 +185,7 @@ function TogetherPickPage({
           tagline: "둘의 최적 타협점",
           name: first?.nameKo ?? "",
           description: topPickDescription,
+          imageUrl: topPickImageUrl,
           myMatchPercent: first?.myMatchScore ?? 0,
           partnerMatchPercent: first?.partnerMatchScore ?? 0,
         }}
