@@ -354,6 +354,25 @@ function ResultPage({
     setIsSaveToastVisible(true)
   }
 
+  if (!result && !import.meta.env.DEV && !FORCE_PREVIEW_TYPE) {
+    return (
+      <div className="result-page result-page--empty">
+        <div className="result-page__empty">
+          <p className="result-page__empty-title">결과를 불러오지 못했어요</p>
+          <p className="result-page__empty-description">
+            테스트 결과 데이터가 준비되지 않아 목업 화면 대신 안내를 표시합니다.
+          </p>
+          <button type="button" className="result-page__retest" onClick={handleRetest}>
+            다시 테스트하기
+          </button>
+          <button type="button" className="result-page__save" onClick={goBack}>
+            홈으로 돌아가기
+          </button>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <>
       <div className="result-page">

@@ -17,6 +17,40 @@
   display: none; /* Chrome/Safari */
 }
 
+.result-page--empty {
+  justify-content: center;
+  padding: 32px 20px;
+  background-size: cover;
+}
+
+.result-page__empty {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 317px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.result-page__empty-title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.35;
+  letter-spacing: 0;
+  color: #10161f;
+}
+
+.result-page__empty-description {
+  margin: 10px 0 24px;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.55;
+  letter-spacing: 0;
+  color: #6f6f6f;
+  word-break: keep-all;
+}
+
 .result-page__header {
   position: relative;
   overflow: hidden;

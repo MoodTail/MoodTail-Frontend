@@ -236,7 +236,7 @@ function HistoryPage({
         <p className="history-page__status history-page__status--error">{errorMessage}</p>
       )}
 
-      <MonthlyRecordCard records={monthlyRecords} />
+      <MonthlyRecordCard records={monthlyRecords} isLoading={isLoading} />
 
       <button
         type="button"

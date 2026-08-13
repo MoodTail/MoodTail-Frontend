@@ -10,9 +10,10 @@ interface MonthlyTestRecord {
 
 interface MonthlyRecordCardProps {
   records: MonthlyTestRecord[]
+  isLoading?: boolean
 }
 
-function MonthlyRecordCard({ records }: MonthlyRecordCardProps) {
+function MonthlyRecordCard({ records, isLoading = false }: MonthlyRecordCardProps) {
   const hasRecords = records.length > 0
   const sortedRecords = [...records].sort((a, b) => a.date.localeCompare(b.date))
   const dragStateRef = useRef({ isDragging: false, startY: 0, scrollTop: 0 })
@@ -54,12 +55,13 @@ function MonthlyRecordCard({ records }: MonthlyRecordCardProps) {
         hasRecords ? 'monthly-record-card--filled' : 'monthly-record-card--empty'
       }`}
       aria-labelledby="monthly-record-card-title"
+      aria-busy={isLoading}
     >
       <h2 id="monthly-record-card-title" className="monthly-record-card__title">
         이번 달 테스트 기록
       </h2>
 
-      {hasRecords ? (
+      {!isLoading && (hasRecords ? (
         <ul
           className="monthly-record-card__list"
           onPointerDown={handlePointerDown}
@@ -87,7 +89,7 @@ function MonthlyRecordCard({ records }: MonthlyRecordCardProps) {
           />
           <p className="monthly-record-card__empty-text">이번달 테스트 기록이 없어요...</p>
         </div>
-      )}
+      ))}
     </section>
   )
 }

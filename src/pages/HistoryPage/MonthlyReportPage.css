@@ -110,13 +110,13 @@
 .monthly-report-page__summary .monthly-report-page__summary-type {
   width: 100%;
   max-width: 147px;
-  height: 34px;
+  min-height: 34px;
   margin: 9px 0 0;
   font-size: 26px;
   font-weight: 800;
   line-height: 34px;
-  white-space: nowrap;
-  overflow: hidden;
+  white-space: normal;
+  word-break: keep-all;
 }
 
 .monthly-report-page__summary-description {
@@ -597,7 +597,7 @@
   max-width: 100%;
   height: auto;
   max-height: calc(100dvh - 32px);
-  padding: 44px 10px 16px;
+  padding: 98px 10px 16px;
   overflow-y: auto;
   border-radius: 23px;
   background: linear-gradient(180deg, #fff 0%, #fffaf8 58%, #f7fffc 100%);
@@ -641,7 +641,7 @@
   width: 100%;
   display: flex;
   flex-direction: column;
-  margin-top: 54px;
+  margin-top: 0;
   gap: 16px;
 }
 
