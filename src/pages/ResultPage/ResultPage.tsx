@@ -1,4 +1,4 @@
-import { useEffect, useState, type CSSProperties } from 'react'
+import { useEffect, useMemo, useState, type CSSProperties } from 'react'
 import chevronLeftIcon from '../../assets/icons/chevron-left-white.svg'
 import shareIcon from '../../assets/icons/share.svg'
 import RadarChart, { type RadarChartData } from '../../components/ResultPage/RadarChart'
@@ -159,7 +159,7 @@ function ResultPage({
 
   const wrapWidth = theme?.wrapWidth ?? 355
   const wrapHeight = theme?.wrapHeight ?? 355
-  const contentBounds = getContentBounds(theme)
+  const contentBounds = useMemo(() => getContentBounds(theme), [theme])
   const shapeOffsetX =
     (wrapWidth - (contentBounds.right - contentBounds.left)) / 2 -
     contentBounds.left +
@@ -186,14 +186,18 @@ function ResultPage({
   const shareDescription = theme?.description ?? result?.moodType.shortDescription ?? MOCK_RESULT.shareDescription
   const matchPercent = FORCE_PREVIEW_TYPE ? MOCK_RESULT.matchPercent : (result?.moodType.matchPercent ?? MOCK_RESULT.matchPercent)
 
-  const topCocktails: CocktailTopItem[] = result
-    ? result.recommendations.map((r) => ({
-        rank: r.ranking,
-        name: r.nameKo,
-        matchRate: r.matchScore,
-        glassImage: r.imageUrl,
-      }))
-    : MOCK_TOP_COCKTAILS
+  const topCocktails = useMemo<CocktailTopItem[]>(
+    () =>
+      result
+        ? result.recommendations.map((r) => ({
+            rank: r.ranking,
+            name: r.nameKo,
+            matchRate: r.matchScore,
+            glassImage: r.imageUrl,
+          }))
+        : MOCK_TOP_COCKTAILS,
+    [result],
+  )
 
   const myTaste: RadarChartData = result
     ? {
@@ -212,8 +216,10 @@ function ResultPage({
     bitterness: MOCK_MY_TASTE.쓴맛,
   }
 
-  const currentCharacterType = resolveCharacterType(typeCode)
-  const fallbackMatch = currentCharacterType ? getCharacterMatch(currentCharacterType.id) : {}
+  const fallbackMatch = useMemo(() => {
+    const currentCharacterType = resolveCharacterType(typeCode)
+    return currentCharacterType ? getCharacterMatch(currentCharacterType.id) : {}
+  }, [typeCode])
   const fallbackGoodMatchTypeCode = fallbackMatch.good ? LOCAL_TYPE_TO_TYPECODE[fallbackMatch.good.id] : undefined
   const fallbackBadMatchTypeCode = fallbackMatch.bad ? LOCAL_TYPE_TO_TYPECODE[fallbackMatch.bad.id] : undefined
   const goodMatch = result?.compatibilities.best

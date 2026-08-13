@@ -49,8 +49,6 @@ function ResultSnsShareModal({ isOpen, url, onClose, onKakaoShare, kakaoShare }:
           <img src={closeIcon} alt="" aria-hidden="true" />
         </button>
 
-        <p className="result-sns-share-modal__tip">TIP: 캐릭터는 무료 12종이나 된답니다! 전부 해금할 수 있을까요?</p>
-
         <button type="button" className="result-sns-share-modal__copy-button" onClick={handleCopy}>
           <span>{copied ? '복사됨' : 'URL 복사하기'}</span>
           <img src={copyIcon} alt="" aria-hidden="true" />

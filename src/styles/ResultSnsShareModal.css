@@ -11,9 +11,11 @@
 
 .result-sns-share-modal {
   position: relative;
+  box-sizing: border-box;
   width: 319px;
+  height: 163px;
   max-width: 100%;
-  padding: 36px 32px 24px;
+  padding: 47px 32px 0;
   border-radius: 23px;
   background: #ffffff;
   box-shadow: 9px 13px 22px rgba(255, 92, 46, 0.15);
@@ -21,10 +23,10 @@
 
 .result-sns-share-modal__close {
   position: absolute;
-  top: 12px;
-  right: 12px;
-  width: 16px;
-  height: 17px;
+  top: 20px;
+  right: 20px;
+  width: 13.5px;
+  height: 14.5px;
   padding: 0;
   border: 0;
   background: transparent;
@@ -37,16 +39,6 @@
   height: 100%;
 }
 
-.result-sns-share-modal__tip {
-  margin: 0 0 12px;
-  font-family: "Pretendard", sans-serif;
-  font-size: 10px;
-  font-weight: 600;
-  line-height: 22px;
-  letter-spacing: 0;
-  color: rgba(255, 111, 79, 0.59);
-}
-
 .result-sns-share-modal__copy-button,
 .result-sns-share-modal__kakao-button {
   display: flex;
@@ -54,7 +46,7 @@
   justify-content: space-between;
   width: 255px;
   max-width: 100%;
-  padding: 0 12px 0 10.72px;
+  padding: 0 14px 0 10.72px;
   border: 0;
   border-radius: 6px;
   cursor: pointer;
@@ -75,8 +67,8 @@
 }
 
 .result-sns-share-modal__copy-button img {
-  width: 18px;
-  height: auto;
+  width: 22.64px;
+  height: 22px;
 }
 
 .result-sns-share-modal__kakao-button {
@@ -95,6 +87,6 @@
 }
 
 .result-sns-share-modal__kakao-button img {
-  width: 18px;
-  height: auto;
+  width: 21.67px;
+  height: 20px;
 }
