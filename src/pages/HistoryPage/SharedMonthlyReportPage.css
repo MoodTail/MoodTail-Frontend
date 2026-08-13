@@ -1,10 +1,12 @@
 .shared-monthly-report-page {
-  min-height: 100dvh;
+  box-sizing: border-box;
+  height: 100dvh;
   padding: 28px 16px;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 20px;
+  overflow: hidden;
   background: linear-gradient(180deg, #fff 0%, #fffaf8 58%, #f7fffc 100%);
   color: #171717;
 }
@@ -18,8 +20,12 @@
 
 .shared-monthly-report-page img {
   display: block;
-  width: min(100%, 393px);
+  width: auto;
+  max-width: min(100%, 393px);
+  max-height: calc(100dvh - 104px);
   height: auto;
+  min-height: 0;
+  object-fit: contain;
   border-radius: 23px;
   box-shadow: 0 14px 34px rgba(30, 24, 21, 0.14);
 }
