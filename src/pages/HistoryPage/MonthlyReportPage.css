@@ -46,8 +46,8 @@
 .monthly-report-page__header p {
   margin: 7px 0 0;
   color: #8b8b8b;
-  font-size: 10px;
-  line-height: 14px;
+  font-size: 12px;
+  line-height: 16px;
 }
 
 .monthly-report-page__content {
@@ -89,7 +89,7 @@
 .monthly-report-page__summary-copy {
   position: absolute;
   top: 34px;
-  left: 177px;
+  left: 157px;
   width: 147px;
 }
 
@@ -112,7 +112,7 @@
   max-width: 147px;
   height: 34px;
   margin: 9px 0 0;
-  font-size: 24px;
+  font-size: 26px;
   font-weight: 800;
   line-height: 34px;
   white-space: nowrap;
@@ -122,11 +122,11 @@
 .monthly-report-page__summary-description {
   width: 147px;
   height: 42px;
-  margin: 7px 0 0;
+  margin: 4px 0 0;
   color: #666;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 500;
-  line-height: 21px;
+  line-height: 18px;
 }
 
 .monthly-report-page__types {
@@ -176,7 +176,7 @@
 .monthly-report-page__type-rank {
   position: absolute;
   top: 17px;
-  left: 14.95px;
+  left: 8px;
   width: 37.88px;
   height: 38px;
   display: flex;
@@ -201,16 +201,17 @@
 .monthly-report-page__type-copy {
   position: absolute;
   top: 9px;
-  left: 60.79px;
+  left: 54px;
   right: 8px;
+  height: 56px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: 8px;
 }
 
 .monthly-report-page__type-copy h3 {
-  display: flex;
-  min-height: 38px;
-  align-items: center;
   margin: 0;
-  transform: translateY(-2px);
   font-size: 12px;
   font-weight: 700;
   line-height: 16px;
@@ -218,10 +219,9 @@
 }
 
 .monthly-report-page__type-count {
-  width: 25px;
+  width: auto;
   height: 21px;
   margin: 0;
-  transform: translateY(-9px);
   font-size: 15px;
   font-weight: 700;
   line-height: 21px;
@@ -259,6 +259,8 @@
   left: 39px;
   width: 265px;
   height: 228.7px;
+  transform: translateY(4px) scale(1.1);
+  transform-origin: center;
   overflow: visible;
 }
 
@@ -414,9 +416,9 @@
   width: 169px;
   height: 25px;
   margin: 0;
-  font-size: 17px;
+  font-size: 19px;
   font-weight: 700;
-  line-height: 25px;
+  line-height: 27px;
   white-space: nowrap;
 }
 
@@ -428,8 +430,8 @@
   height: 17px;
   margin: 0;
   color: #777;
-  font-size: 10px;
-  line-height: 17px;
+  font-size: 12px;
+  line-height: 19px;
   white-space: nowrap;
 }
 

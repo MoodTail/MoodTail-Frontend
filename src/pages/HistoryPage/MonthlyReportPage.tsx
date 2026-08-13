@@ -288,12 +288,12 @@ function SummaryCard({ report }: { report: MonthlyReportResult }) {
         </span>
         <h2
           className="monthly-report-page__summary-type"
-          style={{ fontSize: report.monthlyMoodType.name.length > 8 ? '16px' : undefined }}
+          style={{ fontSize: report.monthlyMoodType.name.length > 8 ? '18px' : undefined }}
         >
           {report.monthlyMoodType.name}
         </h2>
         <p className="monthly-report-page__summary-description">
-          {report.monthlyMoodType.shortDescription}
+          “{report.monthlyMoodType.shortDescription}”
         </p>
       </div>
     </section>
@@ -449,6 +449,7 @@ function MonthlyReportPage({ onBack, reportMonth }: MonthlyReportPageProps) {
     } catch (error) {
       if (error instanceof DOMException && error.name === 'AbortError') return;
       console.error('월간 리포트 이미지 저장 실패', error);
+      alert('이미지 저장에 실패했어요. 잠시 후 다시 시도해주세요.');
     } finally {
       setIsSaving(false);
     }
@@ -484,11 +485,8 @@ function MonthlyReportPage({ onBack, reportMonth }: MonthlyReportPageProps) {
       setIsSnsShareModalOpen(true);
     } catch (error) {
       console.error("월간 리포트 공유 이미지 업로드 실패", error);
-      setShareImageError(
-        error instanceof Error
-          ? error.message
-          : "공유 이미지를 저장하지 못했습니다.",
-      );
+      setShareImageError(undefined);
+      alert('공유 링크 생성에 실패했어요. 잠시 후 다시 시도해주세요.');
     } finally {
       setIsShareImageUploading(false);
     }
