@@ -88,7 +88,7 @@
 
 .monthly-report-page__summary-copy {
   position: absolute;
-  top: 34px;
+  top: 22px;
   left: 157px;
   width: 147px;
 }
@@ -110,13 +110,13 @@
 .monthly-report-page__summary .monthly-report-page__summary-type {
   width: 100%;
   max-width: 147px;
-  height: 34px;
+  min-height: 34px;
   margin: 9px 0 0;
-  font-size: 26px;
+  font-size: 24px;
   font-weight: 800;
   line-height: 34px;
-  white-space: nowrap;
-  overflow: hidden;
+  white-space: normal;
+  word-break: keep-all;
 }
 
 .monthly-report-page__summary-description {

@@ -58,7 +58,7 @@
   width: auto;
   height: 29px;
   margin: 0;
-  color: #ff6f4f;
+  color: var(--history-result-accent, #ff6f4f);
   font-size: 24px;
   font-weight: 700;
   line-height: 29px;
@@ -74,7 +74,7 @@
   width: auto;
   height: 14px;
   margin: 0;
-  color: #ff8f7a;
+  color: var(--history-result-accent, #ff8f7a);
   font-size: 10px;
   font-weight: 500;
   line-height: 14px;
@@ -90,9 +90,9 @@
   width: 317px;
   height: 56px;
   place-items: center;
-  border: 1px solid #ff6f4f;
+  border: 1px solid var(--history-result-accent, #ff6f4f);
   border-radius: 24px;
-  background: #ff6f4f;
+  background: var(--history-result-accent, #ff6f4f);
   color: #ffffff;
   font-size: 18px;
   font-weight: 600;
