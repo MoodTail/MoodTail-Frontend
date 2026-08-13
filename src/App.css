@@ -70,3 +70,12 @@
 .app-content--no-nav {
   padding-bottom: 0;
 }
+
+.public-term-page {
+  min-height: 100dvh;
+  background: #ffffff;
+}
+
+.public-term-page .term-view-modal__overlay {
+  background: #ffffff;
+}

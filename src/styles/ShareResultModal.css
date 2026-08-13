@@ -8,10 +8,10 @@
   background: rgba(0, 0, 0, 0.4);
 }
 
-.share-result-modal__overlay > .save-complete-toast {
-  bottom: 49px;
-  width: 359px;
-  max-width: calc(100% - 34px);
+.share-result-modal > .save-complete-toast {
+  bottom: -55px;
+  width: 286px;
+  max-width: calc(100% - 40px);
 }
 
 .share-result-modal {
