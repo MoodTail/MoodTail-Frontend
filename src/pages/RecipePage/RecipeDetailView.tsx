@@ -56,7 +56,9 @@ function RecipeDetailView({
 
       <div className="recipe-detail__badges">
       <span className="recipe-detail__badge recipe-detail__badge--primary">도수 {recipe.degree}</span>
-      <span className="recipe-detail__badge recipe-detail__badge--outline">일치율 {recipe.matchRate}</span>
+      {isLoggedIn && (
+        <span className="recipe-detail__badge recipe-detail__badge--outline">일치율 {recipe.matchRate}</span>
+      )}
 
         <button
           type="button"
