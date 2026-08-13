@@ -49,25 +49,45 @@ const ShareResultModal: FC<ShareResultModalProps> = ({
   const [isSharing, setIsSharing] = useState(false);
   const [shareUrl, setShareUrl] = useState("");
   const [shareImageUrl, setShareImageUrl] = useState("");
+  const [capturedImageBlob, setCapturedImageBlob] = useState<Blob | null>(null);
 
   const captureCard = async (): Promise<Blob | null> => {
     if (!cardRef.current) return null;
     try {
-      const blob = await toBlob(cardRef.current, {
+      const card = cardRef.current;
+      const images = Array.from(card.querySelectorAll("img"));
+      await Promise.all(
+        images.map(async (image) => {
+          if (image.complete && image.naturalWidth > 0) return;
+          await image.decode();
+        }),
+      );
+      await document.fonts.ready;
+
+      const captureOptions = {
         pixelRatio: 2,
-        cacheBust: true,
-      });
+        cacheBust: false,
+        backgroundColor: "#ffffff",
+      };
+
+      const blob = await toBlob(card, captureOptions);
       if (!blob) throw new Error("이미지 생성에 실패했습니다.");
       return blob;
     } catch (error) {
       console.error("결과 카드 toBlob 캡처 실패, toPng로 재시도", error);
       try {
-        const dataUrl = await toPng(cardRef.current, {
+        const card = cardRef.current;
+        const captureOptions = {
           pixelRatio: 2,
-          cacheBust: true,
-        });
+          cacheBust: false,
+          backgroundColor: "#ffffff",
+        };
+        const dataUrl = await toPng(card, captureOptions);
         const res = await fetch(dataUrl);
-        return await res.blob();
+        if (!res.ok) throw new Error(`PNG 변환 실패: ${res.status}`);
+        const blob = await res.blob();
+        if (!blob.size) throw new Error("빈 이미지가 생성되었습니다.");
+        return blob;
       } catch (fallbackError) {
         console.error("결과 카드 toPng 캡처도 실패", fallbackError);
         return null;
@@ -76,11 +96,12 @@ const ShareResultModal: FC<ShareResultModalProps> = ({
   };
 
   const handleSaveImage = async () => {
-    const blob = await captureCard();
+    const blob = capturedImageBlob ?? (await captureCard());
     if (!blob) {
       alert("이미지 저장에 실패했어요. 잠시 후 다시 시도해주세요.");
       return;
     }
+    if (!capturedImageBlob) setCapturedImageBlob(blob);
     const fileName = `moodtail-${topPick.name || "result"}.png`;
     const objectUrl = URL.createObjectURL(blob);
     const link = document.createElement("a");
@@ -96,11 +117,12 @@ const ShareResultModal: FC<ShareResultModalProps> = ({
   const handleOpenSnsShare = async () => {
     setIsSharing(true);
     try {
-      const blob = await captureCard();
+      const blob = capturedImageBlob ?? (await captureCard());
       if (!blob) {
         alert("공유 링크 생성에 실패했어요. 잠시 후 다시 시도해주세요.");
         return;
       }
+      if (!capturedImageBlob) setCapturedImageBlob(blob);
       const shareData = await onGenerateShare(blob);
       if (!shareData) {
         alert("공유 링크 생성에 실패했어요. 잠시 후 다시 시도해주세요.");
@@ -220,12 +242,6 @@ const ShareResultModal: FC<ShareResultModalProps> = ({
           </Button>
         </div>
 
-        <SaveCompleteToast
-          message="저장 완료되었습니다"
-          isVisible={showSaveToast}
-          onHide={() => setShowSaveToast(false)}
-        />
-
         <ResultSnsShareModal
           isOpen={isSnsModalOpen}
           url={shareUrl}
@@ -239,6 +255,12 @@ const ShareResultModal: FC<ShareResultModalProps> = ({
           }}
         />
       </div>
+
+      <SaveCompleteToast
+        message="저장 완료되었습니다"
+        isVisible={showSaveToast}
+        onHide={() => setShowSaveToast(false)}
+      />
     </div>
   );
 };
