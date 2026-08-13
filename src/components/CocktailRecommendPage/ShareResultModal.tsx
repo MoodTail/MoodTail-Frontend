@@ -1,4 +1,5 @@
-import { useState, type FC } from "react";
+import { useRef, useState, type FC } from "react";
+import { toBlob, toPng } from "html-to-image";
 import cocktail from "../../assets/images/glass/glass-1.png";
 import MatchSummaryCard from "./MatchSummaryCard";
 import SaveCompleteToast from "../common/SaveCompleteToast";
@@ -14,19 +15,11 @@ interface RankEntry {
   color: string;
 }
 
-interface KakaoShareData {
-  title: string;
-  description: string;
-  imageUrl: string;
-  webUrl: string;
-  buttonTitle: string;
-}
-
 interface ShareResultModalProps {
   onClose: () => void;
-  onSaveImage: () => void;
-  shareUrl: string;
-  kakaoShare: KakaoShareData;
+  onGenerateShare: (
+    imageBlob: Blob,
+  ) => Promise<{ shareUrl: string; shareImageUrl: string } | null>;
   topPick: {
     tagline: string;
     name: string;
@@ -43,21 +36,82 @@ interface ShareResultModalProps {
 
 const ShareResultModal: FC<ShareResultModalProps> = ({
   onClose,
-  onSaveImage,
-  shareUrl,
-  kakaoShare,
+  onGenerateShare,
   topPick,
   ranking,
   matchPercent,
   myAvatarUrl,
   partnerAvatarUrl,
 }) => {
+  const cardRef = useRef<HTMLDivElement>(null);
   const [showSaveToast, setShowSaveToast] = useState(false);
   const [isSnsModalOpen, setIsSnsModalOpen] = useState(false);
+  const [isSharing, setIsSharing] = useState(false);
+  const [shareUrl, setShareUrl] = useState("");
+  const [shareImageUrl, setShareImageUrl] = useState("");
 
-  const handleSaveImage = () => {
-    onSaveImage();
+  const captureCard = async (): Promise<Blob | null> => {
+    if (!cardRef.current) return null;
+    try {
+      const blob = await toBlob(cardRef.current, {
+        pixelRatio: 2,
+        cacheBust: true,
+      });
+      if (!blob) throw new Error("이미지 생성에 실패했습니다.");
+      return blob;
+    } catch (error) {
+      console.error("결과 카드 toBlob 캡처 실패, toPng로 재시도", error);
+      try {
+        const dataUrl = await toPng(cardRef.current, {
+          pixelRatio: 2,
+          cacheBust: true,
+        });
+        const res = await fetch(dataUrl);
+        return await res.blob();
+      } catch (fallbackError) {
+        console.error("결과 카드 toPng 캡처도 실패", fallbackError);
+        return null;
+      }
+    }
+  };
+
+  const handleSaveImage = async () => {
+    const blob = await captureCard();
+    if (!blob) {
+      alert("이미지 저장에 실패했어요. 잠시 후 다시 시도해주세요.");
+      return;
+    }
+    const fileName = `moodtail-${topPick.name || "result"}.png`;
+    const objectUrl = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = objectUrl;
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(objectUrl);
     setShowSaveToast(true);
+  };
+
+  const handleOpenSnsShare = async () => {
+    setIsSharing(true);
+    try {
+      const blob = await captureCard();
+      if (!blob) {
+        alert("공유 링크 생성에 실패했어요. 잠시 후 다시 시도해주세요.");
+        return;
+      }
+      const shareData = await onGenerateShare(blob);
+      if (!shareData) {
+        alert("공유 링크 생성에 실패했어요. 잠시 후 다시 시도해주세요.");
+        return;
+      }
+      setShareUrl(shareData.shareUrl);
+      setShareImageUrl(shareData.shareImageUrl);
+      setIsSnsModalOpen(true);
+    } finally {
+      setIsSharing(false);
+    }
   };
 
   return (
@@ -85,79 +139,82 @@ const ShareResultModal: FC<ShareResultModalProps> = ({
           </svg>
         </button>
 
-        <p className="share-result-modal__brand">MoodTail</p>
+        <div ref={cardRef}>
+          <p className="share-result-modal__brand">MoodTail</p>
 
-        <div className="share-result-modal__top-card">
-          <div className="share-result-modal__top-main">
-            <img
-              src={topPick.imageUrl || cocktail}
-              alt={topPick.name}
-              className="share-result-modal__top-image"
-            />
-            <div className="share-result-modal__top-text">
-              <p className="share-result-modal__top-tagline">
-                {topPick.tagline}
-              </p>
-              <p className="share-result-modal__top-name">{topPick.name}</p>
-              <p className="share-result-modal__top-desc">
-                {topPick.description}
-              </p>
-              <div className="share-result-modal__top-badges">
-                <span className="share-result-modal__top-badge share-result-modal__top-badge--mine">
-                  나와의 일치율 {topPick.myMatchPercent}%
-                </span>
-                <span className="share-result-modal__top-badge share-result-modal__top-badge--friend">
-                  상대방과의 일치율 {topPick.partnerMatchPercent}%
-                </span>
+          <div className="share-result-modal__top-card">
+            <div className="share-result-modal__top-main">
+              <img
+                src={topPick.imageUrl || cocktail}
+                alt={topPick.name}
+                className="share-result-modal__top-image"
+              />
+              <div className="share-result-modal__top-text">
+                <p className="share-result-modal__top-tagline">
+                  {topPick.tagline}
+                </p>
+                <p className="share-result-modal__top-name">{topPick.name}</p>
+                <p className="share-result-modal__top-desc">
+                  {topPick.description}
+                </p>
+                <div className="share-result-modal__top-badges">
+                  <span className="share-result-modal__top-badge share-result-modal__top-badge--mine">
+                    나와의 일치율 {topPick.myMatchPercent}%
+                  </span>
+                  <span className="share-result-modal__top-badge share-result-modal__top-badge--friend">
+                    상대방과의 일치율 {topPick.partnerMatchPercent}%
+                  </span>
+                </div>
               </div>
             </div>
           </div>
-        </div>
 
-        <p className="share-result-modal__rank-title">추천 순위</p>
-        <div className="share-result-modal__rank-list">
-          {ranking.map((item) => (
-            <div key={item.rank} className="share-result-modal__rank-item">
-              <span
-                className="share-result-modal__rank-badge"
-                style={{ background: item.color }}
-              >
-                {item.rank}
-              </span>
-              <div className="share-result-modal__rank-info">
-                <p className="share-result-modal__rank-name">{item.name}</p>
-                <p className="share-result-modal__rank-desc">
-                  {item.description}
-                </p>
+          <p className="share-result-modal__rank-title">추천 순위</p>
+          <div className="share-result-modal__rank-list">
+            {ranking.map((item) => (
+              <div key={item.rank} className="share-result-modal__rank-item">
+                <span
+                  className="share-result-modal__rank-badge"
+                  style={{ background: item.color }}
+                >
+                  {item.rank}
+                </span>
+                <div className="share-result-modal__rank-info">
+                  <p className="share-result-modal__rank-name">{item.name}</p>
+                  <p className="share-result-modal__rank-desc">
+                    {item.description}
+                  </p>
+                </div>
+                <span className="share-result-modal__rank-percent">
+                  {item.percent}%
+                </span>
               </div>
-              <span className="share-result-modal__rank-percent">
-                {item.percent}%
-              </span>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
 
-        <div className="share-result-modal__match-wrap">
-          <MatchSummaryCard
-            matchPercent={matchPercent}
-            myAvatarUrl={myAvatarUrl}
-            partnerAvatarUrl={partnerAvatarUrl}
-            compact
-          />
+          <div className="share-result-modal__match-wrap">
+            <MatchSummaryCard
+              matchPercent={matchPercent}
+              myAvatarUrl={myAvatarUrl}
+              partnerAvatarUrl={partnerAvatarUrl}
+              compact
+            />
+          </div>
         </div>
 
         <div className="share-result-modal__actions">
           <Button
             variant="share"
             className="share-result-modal__sns"
-            onClick={() => setIsSnsModalOpen(true)}
+            onClick={() => void handleOpenSnsShare()}
+            disabled={isSharing}
           >
-            SNS 공유하기
+            {isSharing ? "준비 중..." : "SNS 공유하기"}
           </Button>
           <Button
             variant="shareLight"
             className="share-result-modal__save"
-            onClick={handleSaveImage}
+            onClick={() => void handleSaveImage()}
           >
             이미지 저장
           </Button>
@@ -173,7 +230,13 @@ const ShareResultModal: FC<ShareResultModalProps> = ({
           isOpen={isSnsModalOpen}
           url={shareUrl}
           onClose={() => setIsSnsModalOpen(false)}
-          kakaoShare={kakaoShare}
+          kakaoShare={{
+            title: `MoodTail - ${topPick.name}`,
+            description: topPick.description,
+            imageUrl: shareImageUrl,
+            webUrl: shareUrl,
+            buttonTitle: "결과 확인하기",
+          }}
         />
       </div>
     </div>
