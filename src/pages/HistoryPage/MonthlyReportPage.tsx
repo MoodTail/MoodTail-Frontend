@@ -429,21 +429,29 @@ function MonthlyReportPage({ onBack, reportMonth }: MonthlyReportPageProps) {
       return createMonthlyReportPng(report);
     }
 
+    const preview = sharePreviewRef.current;
+    const previewImages = Array.from(preview.querySelectorAll('img'));
+    await Promise.all(previewImages.map(async (image) => {
+      if (image.complete && image.naturalWidth > 0) return;
+      await image.decode();
+    }));
+    await document.fonts.ready;
+
     const captureOptions = {
       pixelRatio: 2,
-      cacheBust: true,
+      cacheBust: false,
       backgroundColor: '#fffaf8',
     };
 
     try {
-      const blob = await toBlob(sharePreviewRef.current, captureOptions);
+      const blob = await toBlob(preview, captureOptions);
       if (!blob) throw new Error('toBlob returned null');
       return blob;
     } catch (error) {
       console.error('월간 리포트 카드 toBlob 캡처 실패, toPng로 재시도', error);
 
       try {
-        const dataUrl = await toPng(sharePreviewRef.current, captureOptions);
+        const dataUrl = await toPng(preview, captureOptions);
         const response = await fetch(dataUrl);
         if (!response.ok) throw new Error(`PNG 변환 실패: ${response.status}`);
 
