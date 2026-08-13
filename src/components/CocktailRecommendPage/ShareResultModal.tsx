@@ -242,6 +242,12 @@ const ShareResultModal: FC<ShareResultModalProps> = ({
           </Button>
         </div>
 
+        <SaveCompleteToast
+          message="저장 완료되었습니다"
+          isVisible={showSaveToast}
+          onHide={() => setShowSaveToast(false)}
+        />
+
         <ResultSnsShareModal
           isOpen={isSnsModalOpen}
           url={shareUrl}
@@ -255,12 +261,6 @@ const ShareResultModal: FC<ShareResultModalProps> = ({
           }}
         />
       </div>
-
-      <SaveCompleteToast
-        message="저장 완료되었습니다"
-        isVisible={showSaveToast}
-        onHide={() => setShowSaveToast(false)}
-      />
     </div>
   );
 };
