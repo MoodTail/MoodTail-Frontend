@@ -35,10 +35,7 @@ export default function DexBox({
   boxAspectRatio?: string;
   contentJustify?: "center" | "flex-start";
   imageGap?: number;
-  // contentJustify="flex-start"일 때, 이미지를 박스 상단 padding 기준에서 더 아래로
-  // 내립니다. imageGap(이미지-이름 간격)과는 별개로 캐릭터 자체의 세로 위치만 조절합니다.
   imageMarginTop?: number;
-  // 캐릭터의 가로 위치를 조절합니다(양수면 오른쪽으로).
   imageMarginLeft?: number;
   imageWidth?: string;
   imageHeight?: string;
@@ -126,8 +123,8 @@ export default function DexBox({
         cursor: onClick ? "pointer" : "default",
       }}
     >
-      <div style={{ fontSize: 18, fontWeight: 700, color: "#323232" }}>타입명</div>
-      <div style={{ fontSize: 11, fontWeight: 600, color: "#8E8A88" }}>수집률 {(collectionRate ?? 0).toFixed(1)}%</div>
+      <div style={{ fontSize: 20, fontWeight: 700, color: "#323232" }}>타입명</div>
+      <div style={{ fontSize: 13, fontWeight: 600, color: "#8E8A88" }}>수집률 {(collectionRate ?? 0).toFixed(1)}%</div>
     </button>
   );
 }

@@ -34,7 +34,6 @@ export const postMoodTestResult = async (
   return response.data.result;
 };
 
-// Swagger(/v3/api-docs) 예시 응답 기준으로 MoodTestResult와 동일한 형태임을 확인했습니다. 인증 불필요.
 export const getSharedMoodTestResult = async (
   shareToken: string,
 ): Promise<MoodTestResult> => {
@@ -44,8 +43,6 @@ export const getSharedMoodTestResult = async (
   return response.data.result;
 };
 
-// 인증 필요. 게스트 토큰으로는 AUTH027("기록을 저장하려면 로그인하세요")이 반환됩니다.
-// recommendedCocktails는 정확히 4개여야 합니다 (postMoodTestResult 응답의 recommendations를 그대로 매핑).
 export const saveMoodTestResult = async (
   body: SaveMoodTestResultRequest,
 ): Promise<SaveMoodTestResultResult> => {
@@ -56,8 +53,6 @@ export const saveMoodTestResult = async (
   return response.data.result;
 };
 
-// 인증 필요(Swagger 문서상 "인증 불필요"로 잘못 표기되어 있으나 실제로는 bearerAuth 필요).
-// 프론트에서 생성한 결과 공유 썸네일(PNG/JPG/JPEG/WEBP, 5MB 이하)을 업로드합니다.
 export const createMoodTestResultShare = async (
   tasteProfile: MoodTasteScores,
   thumbnail: Blob,
@@ -71,8 +66,6 @@ export const createMoodTestResultShare = async (
     new Blob([JSON.stringify(request)], { type: "application/json" }),
   );
   formData.append("thumbnail", thumbnail, "mood-test-result-share.png");
-  // Content-Type은 지정하지 않습니다 — axios가 FormData를 보고 boundary가 포함된
-  // multipart/form-data 헤더를 자동으로 설정합니다.
   const response = await axios.post<CreateMoodTestResultShareResponse>(
     new URL("/api/v1/tests/results/share", baseURL).href,
     formData,

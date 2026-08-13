@@ -21,8 +21,6 @@ export interface QuizQuestion {
   options: QuizOption[];
 }
 
-// 실제 API(/api/v1/tests/questions)에서 받아온 문항을 화면에서 쓰는 QuizQuestion 형태로 변환합니다.
-// id는 questionId/optionId를 그대로 문자열화해서, 제출할 때 다시 숫자로 되돌릴 수 있게 합니다.
 export function toQuizQuestions(questions: MoodTestQuestion[]): QuizQuestion[] {
   return questions.map((q) => ({
     id: String(q.questionId),
@@ -95,7 +93,6 @@ const BASE_QUESTIONS: QuizQuestion[] = [
   },
 ];
 
-// 6, 7번 문항은 매 테스트마다 아래 문항 풀에서 무작위로 2개를 뽑아 사용합니다.
 export const QUIZ_QUESTION_POOL: QuizQuestion[] = [
   {
     id: "pool1",
@@ -464,22 +461,16 @@ function pickRandom<T>(items: T[], count: number): T[] {
   return shuffled.slice(0, count);
 }
 
-// 1~5번은 고정 문항, 6~7번은 QUIZ_QUESTION_POOL에서 매번 무작위로 2개를 뽑아 채웁니다.
 export function buildQuizQuestions(): QuizQuestion[] {
   return [...BASE_QUESTIONS, ...pickRandom(QUIZ_QUESTION_POOL, 2)];
 }
 
-// 로그인 직후처럼 퀴즈 화면에 들어가기 전에 미리 받아둔 실제 문항을 캐시해서, 처음 테스트를
-// 시작할 때 로컬 목데이터(제목/부제목 포함)로 잠깐 보였다가 서버 문항으로 바뀌는 지연/깜빡임을
-// 없앱니다. MainPage/QuizQuestionPage(App.tsx 재테스트)가 이 캐시를 공유합니다.
 let cachedQuizQuestions: QuizQuestion[] | null = null;
 
 export function getCachedQuizQuestions(): QuizQuestion[] | null {
   return cachedQuizQuestions;
 }
 
-// 실제 문항을 받아와 캐시에 반영합니다. 컴포넌트 effect(항상 최신으로 갱신)와
-// prefetchQuizQuestions()가 이 로직을 공유합니다.
 export async function fetchAndCacheQuizQuestions(): Promise<QuizQuestion[] | null> {
   try {
     const { questions } = await getMoodTestQuestions();
@@ -492,8 +483,6 @@ export async function fetchAndCacheQuizQuestions(): Promise<QuizQuestion[] | nul
   }
 }
 
-// 로그인 직후(예: PostLoginScreen이 도는 동안) 미리 호출해 캐시를 채워둡니다. 이미 캐시가
-// 있으면 중복 요청을 건너뜁니다.
 export function prefetchQuizQuestions(): Promise<void> {
   if (cachedQuizQuestions) return Promise.resolve();
   return fetchAndCacheQuizQuestions().then(() => undefined);

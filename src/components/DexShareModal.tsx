@@ -36,15 +36,12 @@ export default function DexShareModal({
       onSaveImage();
       return;
     }
-    // TODO: 지금은 웹 다운로드 방식. 실제 처리 방식(앱 내 저장 등) 확정되면 교체
     const dataUrl = await toPng(cardRef.current, { pixelRatio: 2 });
     const link = document.createElement("a");
     link.download = "MoodTail_Result.png";
     link.href = dataUrl;
     link.click();
 
-    // 도감 공유 이미지 저장은 최선 노력으로만 시도합니다 — 실패해도(비로그인 등) 위의
-    // 로컬 다운로드는 이미 끝났으므로 사용자 입장에서는 정상적으로 동작합니다.
     try {
       const blob = await toBlob(cardRef.current, { pixelRatio: 2 });
       if (blob) await createOrUpdateCollectionShare(blob);
@@ -88,7 +85,6 @@ export default function DexShareModal({
           <CloseIcon size={28} color={COLORS.orange} />
         </button>
 
-        {/* 이미지 저장/공유 시 캡처되는 영역 — 닫기 버튼과 하단 액션 버튼은 이 밖에 있어 캡처에서 제외됩니다 */}
         <div ref={cardRef} style={{ background: "#fff", padding: 10 }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "center", marginTop: -6, marginBottom: 16, paddingLeft: 20 }}>
             <span style={{ fontSize: 35, fontWeight: 700, color: COLORS.orange }}>MoodTail</span>
