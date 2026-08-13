@@ -96,7 +96,6 @@ export interface SaveMoodTestResultRecommendedCocktail {
 export interface SaveMoodTestResultRequest {
   moodType: SaveMoodTestResultMoodType;
   tasteProfile: MoodTasteScores;
-  // 정확히 4개여야 합니다.
   recommendedCocktails: SaveMoodTestResultRecommendedCocktail[];
 }
 

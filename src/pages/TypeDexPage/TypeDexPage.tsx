@@ -104,8 +104,6 @@ export default function TypeDexPage({
             const status = dexStatus?.[dex.typeId];
             const unlocked = status?.unlocked ?? dex.unlocked;
             const collectionRate = status?.collectionRate ?? dex.collectionRate;
-            // 열정적인 도전가/자유로운 낭만주의자/청량한 탐험가/폭발적인 모험가/예민한 완벽주의자/
-            // 꼼꼼한 평론가/여유로운 낙관자/조용한 지지자 8종만 이미지 위치를 조금 위로 올립니다.
             const raiseImage = [
               "idealist",
               "romantic",

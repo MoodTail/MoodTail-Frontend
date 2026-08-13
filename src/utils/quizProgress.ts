@@ -21,15 +21,13 @@ export function loadQuizProgress(key: string): QuizProgress | null {
 export function saveQuizProgress(key: string, progress: QuizProgress): void {
   try {
     sessionStorage.setItem(key, JSON.stringify(progress));
-  } catch {
-    // 저장 실패(프라이빗 브라우징 등)는 무시 — 진행 상황 복원만 안 될 뿐 앱 동작에는 영향 없습니다.
-  }
+    // eslint-disable-next-line no-empty
+  } catch {}
 }
 
 export function clearQuizProgress(key: string): void {
   try {
     sessionStorage.removeItem(key);
-  } catch {
-    // ignore
-  }
+    // eslint-disable-next-line no-empty
+  } catch {}
 }

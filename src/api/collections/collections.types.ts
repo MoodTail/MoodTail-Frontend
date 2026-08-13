@@ -10,7 +10,11 @@ export interface CollectionMoodType {
   typeCode: string;
   name: string;
   unlocked: boolean;
+  unlockedAt: string | null;
   collectionRate: number;
+  collectedCocktailCount: number;
+  totalCocktailCount: number;
+  requiredCocktailCount: number;
   collectedUserCount: number;
   characterImageUrl: string;
 }

@@ -10,9 +10,6 @@ export interface CharacterType {
   number?: number;
 }
 
-// color를 흰색 쪽으로 섞어서 네임태그 배경용 파스텔 톤을 만듭니다.
-// 디자인팀이 확정한 nameTagColor 값이 따로 있으면 아래 CHARACTER_TYPES_BASE에 직접
-// 채워 넣고 이 함수는 안 쓰면 됩니다(지금은 color 기반 임시값입니다).
 function lighten(hex: string, amount: number): string {
   const num = parseInt(hex.replace("#", ""), 16);
   const r = (num >> 16) & 0xff;
@@ -161,7 +158,6 @@ function getCharacterTypeByNumber(number: number): CharacterType | undefined {
   return CHARACTER_TYPES.find((t) => t.number === number);
 }
 
-// 타입 간 특성 벡터 거리 기반 궁합 매핑입니다 (number 기준, 거리가 가까울수록 잘 맞음).
 const MATCH_TABLE: {
   number: number;
   goodMatchNumber: number;
@@ -190,9 +186,6 @@ export interface CharacterMatch {
   badDistance?: number;
 }
 
-// number가 characterType.ts 안에서 중복되거나(realist/straightforward가 둘 다 3) 비어있는
-// 경우(11번 없음)가 있어서, 매칭 상대를 못 찾을 수 있습니다. 그럴 땐 던지지 않고 undefined로
-// 돌려주고, 호출하는 쪽(TypeDetailPage)에서 "-"로 안전하게 표시합니다.
 export function getCharacterMatch(id: string): CharacterMatch {
   const type = getCharacterType(id);
   const entry = MATCH_TABLE.find((m) => m.number === type.number);
