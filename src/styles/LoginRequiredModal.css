@@ -11,13 +11,12 @@
 .login-required-modal {
   position: relative;
   width: 305px;
-  height: 190px;
   border-radius: 30px;
   background: #fff;
   box-shadow: 9px 13px 22px 0 rgba(255, 92, 46, 0.09);
   box-sizing: border-box;
   text-align: center;
-  padding-top: 26px;
+  padding: 26px 0;
 }
 
 .login-required-modal__title {
@@ -29,8 +28,8 @@
 
 .login-required-modal__description {
   margin: 10px auto 0;
-  width: 253px;
-  font-size: 14px;
+  width: 265px;
+  font-size: 13px;
   color: #656565;
   line-height: 20px;
 }
