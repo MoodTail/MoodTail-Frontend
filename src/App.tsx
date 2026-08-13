@@ -43,6 +43,9 @@ import SharedResultPage from "./pages/SharedResultPage/SharedResultPage";
 import SharedCollectionPage from "./pages/SharedCollectionPage/SharedCollectionPage";
 import { resetHistoryEntryNotice } from "./utils/historyNotice";
 import SharedPairResultPage from "./pages/SharedPairResultPage/SharedPairResultPage";
+import TermViewModal from "./components/Modal/TermViewModal";
+import { getTerms } from "./api/terms/terms.api";
+import type { Term, TermType } from "./api/terms/terms.types";
 
 const RETEST_PROGRESS_KEY = "moodtail-retest-progress";
 const LOCAL_AUTH_PREVIEW_KEY = "moodtail-local-auth-preview";
@@ -51,7 +54,35 @@ export type NavKey = "history" | "dictionary" | "home" | "recipe" | "mypage";
 type HistoryView = "calendar" | "photo" | "test-result" | "monthly-report";
 type MyPageView = "main" | "profile-edit" | "inquiry" | "terms";
 
+function PublicTermPage({ termType }: { termType: TermType }) {
+  const [term, setTerm] = useState<Term | null>(null);
+
+  useEffect(() => {
+    void getTerms({ termType })
+      .then((terms) => setTerm(terms.find((item) => item.termType === termType) ?? null))
+      .catch((error) => console.error(error));
+  }, [termType]);
+
+  return (
+    <div className="public-term-page">
+      {term && (
+        <TermViewModal
+          title={term.title}
+          content={term.content}
+          onClose={() => window.location.assign("/")}
+        />
+      )}
+    </div>
+  );
+}
+
 function App() {
+  const publicTermType: TermType | null =
+    window.location.pathname === "/privacy"
+      ? "PRIVACY"
+      : window.location.pathname === "/terms"
+        ? "SERVICE"
+        : null;
   const isLocalAuthPreview =
     import.meta.env.DEV &&
     localStorage.getItem(LOCAL_AUTH_PREVIEW_KEY) === "true";
@@ -265,6 +296,10 @@ function App() {
         return <MainPage />;
     }
   };
+
+  if (publicTermType) {
+    return <PublicTermPage termType={publicTermType} />;
+  }
 
   if (oauthCallback) {
     const redirectUri =
