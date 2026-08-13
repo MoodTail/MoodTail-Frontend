@@ -20,6 +20,8 @@ export default function DexBox({
   imageWidth,
   imageHeight,
   borderRadius,
+  lockedNameFontSize,
+  lockedRateFontSize,
 }: {
   drinkImg: string;
   typeId: string;
@@ -40,6 +42,8 @@ export default function DexBox({
   imageWidth?: string;
   imageHeight?: string;
   borderRadius?: number;
+  lockedNameFontSize?: number;
+  lockedRateFontSize?: number;
 }) {
   if (unlocked) {
     const characterType = getCharacterType(typeId);
@@ -123,8 +127,8 @@ export default function DexBox({
         cursor: onClick ? "pointer" : "default",
       }}
     >
-      <div style={{ fontSize: 20, fontWeight: 700, color: "#323232" }}>타입명</div>
-      <div style={{ fontSize: 13, fontWeight: 600, color: "#8E8A88" }}>수집률 {(collectionRate ?? 0).toFixed(1)}%</div>
+      <div style={{ fontSize: lockedNameFontSize ?? 20, fontWeight: 700, color: "#323232" }}>타입명</div>
+      <div style={{ fontSize: lockedRateFontSize ?? 13, fontWeight: 600, color: "#8E8A88" }}>수집률 {(collectionRate ?? 0).toFixed(1)}%</div>
     </button>
   );
 }
