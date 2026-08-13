@@ -1,5 +1,6 @@
 .main-page {
-  width: 393px;
+  width: 100%;
+  max-width: 393px;
   height: 848px;
   position: relative;
   overflow: hidden;
@@ -198,8 +199,4 @@
 .main-page__menu-item-arrow-icon {
   position: relative;
   top: 2px;
-}
-
-.app-content:has(> .main-page) {
-  overflow: hidden;
 }
