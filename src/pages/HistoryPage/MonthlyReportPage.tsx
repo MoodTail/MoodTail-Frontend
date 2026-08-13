@@ -17,6 +17,7 @@ import ActionCompleteToast from "../../components/Modal/ActionCompleteToast";
 import MonthlyReportBackground from "../../components/common/MonthlyReportBackground";
 import ResultSnsShareModal from "../../components/common/modal/ResultSnsShareModal";
 import { CHARACTER_IMAGES, type CharacterType } from "../../constants/characters";
+import { RESULT_TYPE_THEMES } from "../../constants/resultTypeThemes";
 import "./MonthlyReportPage.css";
 
 interface MonthlyReportPageProps {
@@ -267,10 +268,17 @@ function hasTasteScore(scores: MonthlyReportTasteProfile | null): scores is Mont
   return scores !== null && Object.values(scores).some((score) => score > 0);
 }
 
-function SummaryCard({ report }: { report: MonthlyReportResult }) {
+function SummaryCard({
+  report,
+  useLocalCharacterImage = false,
+}: {
+  report: MonthlyReportResult;
+  useLocalCharacterImage?: boolean;
+}) {
   const primaryType = report.topMoodTypes.find(
     (type) => type.moodTypeId === report.monthlyMoodType.moodTypeId,
   );
+  const localCharacterImage = RESULT_TYPE_THEMES[report.monthlyMoodType.typeCode]?.characterImage;
 
   return (
     <section
@@ -279,7 +287,9 @@ function SummaryCard({ report }: { report: MonthlyReportResult }) {
     >
       <img
         className="monthly-report-page__summary-character"
-        src={getReportCharacterImage(report)}
+        src={useLocalCharacterImage && localCharacterImage
+          ? localCharacterImage
+          : getReportCharacterImage(report)}
         alt={`${report.monthlyMoodType.name} 캐릭터`}
       />
       <div className="monthly-report-page__summary-copy">
@@ -716,7 +726,7 @@ function MonthlyReportPage({ onBack, reportMonth }: MonthlyReportPageProps) {
               ×
             </button>
             <div ref={sharePreviewRef} className="monthly-report-share-modal__preview">
-              <SummaryCard report={report} />
+              <SummaryCard report={report} useLocalCharacterImage />
               <CocktailsCard report={report} />
               <ActivityCard report={report} />
             </div>
