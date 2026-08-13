@@ -1,8 +1,8 @@
 .post-login-screen {
   position: relative;
-  width: 100%;
-  max-width: 393px;
-  height: 824px;
+  width: min(100%, 393px);
+  height: min(824px, 100dvh);
+  min-height: 568px;
   margin: 0 auto;
   overflow: hidden;
   background: linear-gradient(
@@ -54,43 +54,6 @@
   30% {
     transform: translateY(-6px);
   }
-}
-
-.post-login-screen__welcome-text {
-  position: absolute;
-  left: 122px;
-  top: 378px;
-  margin: 0;
-  font-size: 32px;
-  font-weight: 700;
-  background: linear-gradient(
-    90deg,
-    #ffe3d7 0%,
-    #ff9a7a 45%,
-    #ff6f4f 75%,
-    #ff6f4f 100%
-  );
-  background-size: 250% 100%;
-  background-position: 150% 0;
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  color: #ff6f4f;
-  animation: post-login-welcome-sweep 0.75s ease-out forwards;
-}
-
-@keyframes post-login-welcome-sweep {
-  from {
-    background-position: 150% 0;
-  }
-  to {
-    background-position: 0% 0;
-  }
-}
-
-.post-login-screen__blend {
-  position: absolute;
-  inset: 0;
 }
 
 .post-login-screen__welcome-text {
