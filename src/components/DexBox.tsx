@@ -10,7 +10,13 @@ export default function DexBox({
   boxShadow,
   nameFontSize,
   nameLineClamp,
+  nameOverflowVisible,
+  nameSplitAtSpace,
+  boxAspectRatio,
+  contentJustify,
   imageGap,
+  imageMarginTop,
+  imageMarginLeft,
   imageWidth,
   imageHeight,
   borderRadius,
@@ -24,14 +30,21 @@ export default function DexBox({
   boxShadow?: string;
   nameFontSize?: number;
   nameLineClamp?: number;
+  nameOverflowVisible?: boolean;
+  nameSplitAtSpace?: boolean;
+  boxAspectRatio?: string;
+  contentJustify?: "center" | "flex-start";
   imageGap?: number;
+  // contentJustify="flex-start"일 때, 이미지를 박스 상단 padding 기준에서 더 아래로
+  // 내립니다. imageGap(이미지-이름 간격)과는 별개로 캐릭터 자체의 세로 위치만 조절합니다.
+  imageMarginTop?: number;
+  // 캐릭터의 가로 위치를 조절합니다(양수면 오른쪽으로).
+  imageMarginLeft?: number;
   imageWidth?: string;
   imageHeight?: string;
   borderRadius?: number;
 }) {
   if (unlocked) {
-    // number가 아니라 typeId로 직접 찾습니다 — number는 characterType.ts에서 중복될 수 있어서
-    // (예: realist/straightforward가 둘 다 number 3) number 기준 조회는 틀린 항목을 찾을 수 있습니다.
     const characterType = getCharacterType(typeId);
 
     return (
@@ -41,7 +54,7 @@ export default function DexBox({
         disabled={!onClick}
         style={{
           width: "100%",
-          aspectRatio: "1 / 1",
+          aspectRatio: boxAspectRatio ?? "1 / 1",
           borderRadius: borderRadius ?? 18,
           background: '#FFFAF9',
           border: border ?? "none",
@@ -49,7 +62,7 @@ export default function DexBox({
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
-          justifyContent: "center",
+          justifyContent: contentJustify ?? "center",
           gap: imageGap ?? 5,
           padding: 8,
           cursor: onClick ? "pointer" : "default",
@@ -58,7 +71,13 @@ export default function DexBox({
         <img
           src={drinkImg}
           alt=""
-          style={{ width: imageWidth ?? "94%", height: imageHeight ?? "74%", objectFit: "contain" }}
+          style={{
+            width: imageWidth ?? "80%",
+            height: imageHeight ?? "74%",
+            objectFit: "contain",
+            marginTop: imageMarginTop,
+            marginLeft: imageMarginLeft,
+          }}
         />
         <span
           style={{
@@ -67,13 +86,21 @@ export default function DexBox({
             color: characterType?.color,
             textAlign: "center",
             lineHeight: 1.2,
+            wordBreak: "keep-all",
             display: "-webkit-box",
             WebkitLineClamp: nameLineClamp ?? 2,
             WebkitBoxOrient: "vertical",
-            overflow: "hidden",
+            overflow: nameOverflowVisible ? "visible" : "hidden",
           }}
         >
-          {characterType?.name}
+          {nameSplitAtSpace && characterType
+            ? characterType.name.split(" ").map((part, i, parts) => (
+                <span key={i}>
+                  {part}
+                  {i < parts.length - 1 && <br />}
+                </span>
+              ))
+            : characterType?.name}
         </span>
       </button>
     );
@@ -86,7 +113,7 @@ export default function DexBox({
       disabled={!onClick}
       style={{
         width: "100%",
-        aspectRatio: "1 / 1",
+        aspectRatio: boxAspectRatio ?? "1 / 1",
         borderRadius: 18,
         background: "#CAB8B3",
         border: border ? "1px solid #CAB8B3" : "none",
@@ -100,7 +127,7 @@ export default function DexBox({
       }}
     >
       <div style={{ fontSize: 18, fontWeight: 700, color: "#323232" }}>타입명</div>
-      <div style={{ fontSize: 11, fontWeight: 600, color: "#8E8A88" }}>수집률 {collectionRate ?? 0}%</div>
+      <div style={{ fontSize: 11, fontWeight: 600, color: "#8E8A88" }}>수집률 {(collectionRate ?? 0).toFixed(1)}%</div>
     </button>
   );
 }

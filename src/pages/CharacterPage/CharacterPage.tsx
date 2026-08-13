@@ -5,14 +5,71 @@ import { DEX_DATA } from "../../data/dexData";
 import drinkImages from "../../assets/drinks";
 import CharacterDexPage from "../CharacterDexPage/CharacterDexPage";
 import RepresentativeTypeSettingPage from "../RepresentativeTypeSettingPage/RepresentativeTypeSettingPage";
-import TypeDetailPage from "../TypeDetailPage/TypeDetailPage";
+import TypeDetailPage, { prefetchTypeDetail } from "../TypeDetailPage/TypeDetailPage";
 import TypeDexPage from "../TypeDexPage/TypeDexPage";
 import DexShareModal from "../../components/DexShareModal";
 import ResultSnsShareModal from "../../components/common/modal/ResultSnsShareModal";
 import SaveCompleteToast from "../../components/common/SaveCompleteToast";
 import { getCollection, updateRepresentativeMoodType } from "../../api/collections/collections.api";
 import { TYPECODE_TO_LOCAL_TYPE } from "../../data/typeCodeMapping";
-import { computeCollectionProgress } from "../../utils/collectionProgress";
+import { computeCollectionProgress, type TypeCollectionProgress } from "../../utils/collectionProgress";
+
+// 탭을 옮겼다가 돌아오면 CharacterPage가 매번 다시 마운트되면서 useState 초기값(빈 값)으로
+// 리셋되고, 서버 응답이 돌아올 때까지 화면이 잠깐 기본/잠금 상태로 보였다가 다시 채워지는
+// 지연이 생깁니다. useMemo는 컴포넌트가 리마운트되면 함께 초기화되어 이 문제를 못 없애므로,
+// 컴포넌트 바깥(모듈 스코프)에 마지막으로 받아온 값을 캐시해뒀다가 다음 마운트의 useState
+// 초기값으로 재사용합니다 — 새로고침 전까지는 즉시 이전 화면을 보여주고, 그 사이에도
+// 아래 effect가 여전히 최신 데이터로 갱신합니다.
+let cachedMoodTypeIdByLocalId: Record<string, number> | null = null;
+let cachedRepTypeId: string | null = null;
+let cachedDexStatusByLocalId: Record<string, { unlocked: boolean; collectionRate: number }> | null = null;
+
+// 도감 정보(실제 moodTypeId 매핑 + 대표 타입)를 받아와 모듈 캐시에 반영합니다. 컴포넌트
+// effect와 아래 프리캐치용 prefetchCharacterDex()가 이 로직을 공유합니다.
+async function fetchAndCacheCollection(): Promise<{
+  idMap: Record<string, number>;
+  repLocalId: string | null;
+}> {
+  const result = await getCollection();
+  const idMap: Record<string, number> = {};
+  result.moodTypes.forEach((mt) => {
+    const localId = TYPECODE_TO_LOCAL_TYPE[mt.typeCode];
+    if (!localId) return;
+    idMap[localId] = mt.moodTypeId;
+  });
+  cachedMoodTypeIdByLocalId = idMap;
+
+  const repLocalId = TYPECODE_TO_LOCAL_TYPE[result.representativeMoodType?.typeCode] ?? null;
+  if (repLocalId) cachedRepTypeId = repLocalId;
+
+  // 타입 상세 화면(TypeDetailPage)의 "불러오는 중" 로딩을 없애기 위해, 도감에 있는 모든
+  // 타입의 상세 정보를 여기서 함께 미리 받아둡니다. moodTypeId만 있으면 되는 정적 정보라
+  // 결과를 기다리지 않고(내부에서 각자 알아서 캐시) 바로 진행합니다.
+  Object.values(idMap).forEach((moodTypeId) => {
+    prefetchTypeDetail(moodTypeId);
+  });
+
+  return { idMap, repLocalId };
+}
+
+// 해금/수집률(최근 12개월 히스토리 집계)을 받아와 모듈 캐시에 반영합니다.
+async function fetchAndCacheDexStatus(): Promise<Record<string, TypeCollectionProgress>> {
+  const progress = await computeCollectionProgress();
+  cachedDexStatusByLocalId = progress;
+  return progress;
+}
+
+// 캐릭터 도감 탭에 들어가기 전에(예: 로그인 성공 직후, PostLoginScreen이 도는 동안) 위 두
+// 정보를 미리 받아와 모듈 캐시를 채워둡니다. CharacterPage가 마운트될 때 캐시가 이미 채워져
+// 있으면 로딩 지연 없이 바로 최신 도감 상태를 보여줄 수 있습니다. 로그인 직후와 App.tsx의
+// 로그인 상태 진입 시점 둘 다에서 호출될 수 있어, 이미 캐시가 있으면 중복 요청을 건너뜁니다.
+export function prefetchCharacterDex(): Promise<void> {
+  if (cachedMoodTypeIdByLocalId && cachedDexStatusByLocalId) return Promise.resolve();
+  return Promise.all([
+    fetchAndCacheCollection().catch((err) => console.error("도감 정보를 불러오지 못했습니다", err)),
+    fetchAndCacheDexStatus().catch((err) => console.error("수집률 계산에 실패했습니다", err)),
+  ]).then(() => undefined);
+}
 
 type DexOrigin = "typeDex" | "characterDex";
 
@@ -44,15 +101,17 @@ function CharacterPage({
     onNavVisibilityChange?.(screen.name !== "typeDetail" && screen.name !== "repSetting");
     return () => onNavVisibilityChange?.(true);
   }, [screen.name, onNavVisibilityChange]);
-  const [repTypeId, setRepTypeId] = useState("idealist");
+  const [repTypeId, setRepTypeId] = useState(cachedRepTypeId ?? "idealist");
   const [shareTypeId, setShareTypeId] = useState<string | null>(null);
   const [snsModalOpen, setSnsModalOpen] = useState(false);
   const [snsShareUrl, setSnsShareUrl] = useState<string | null>(null);
   const [showSavedToast, setShowSavedToast] = useState(false);
-  const [moodTypeIdByLocalId, setMoodTypeIdByLocalId] = useState<Record<string, number>>({});
+  const [moodTypeIdByLocalId, setMoodTypeIdByLocalId] = useState<Record<string, number>>(
+    cachedMoodTypeIdByLocalId ?? {},
+  );
   const [dexStatusByLocalId, setDexStatusByLocalId] = useState<
     Record<string, { unlocked: boolean; collectionRate: number }>
-  >({});
+  >(cachedDexStatusByLocalId ?? {});
 
   // 도감 정보를 실제 API로 받아와 실제 moodTypeId를 로컬 타입에 매핑해둡니다.
   // 로컬 typeId ↔ 실제 typeCode 매핑(data/typeCodeMapping.ts)은 사용자가 직접 확정한 값입니다.
@@ -63,18 +122,10 @@ function CharacterPage({
   // 않고, 아래 별도 effect에서 히스토리 기록을 직접 집계해 계산합니다.
   useEffect(() => {
     let cancelled = false;
-    getCollection()
-      .then((result) => {
+    fetchAndCacheCollection()
+      .then(({ idMap, repLocalId }) => {
         if (cancelled) return;
-        const idMap: Record<string, number> = {};
-        result.moodTypes.forEach((mt) => {
-          const localId = TYPECODE_TO_LOCAL_TYPE[mt.typeCode];
-          if (!localId) return;
-          idMap[localId] = mt.moodTypeId;
-        });
         setMoodTypeIdByLocalId(idMap);
-
-        const repLocalId = TYPECODE_TO_LOCAL_TYPE[result.representativeMoodType?.typeCode];
         if (repLocalId) setRepTypeId(repLocalId);
       })
       .catch((err) => console.error("도감 정보를 불러오지 못했습니다", err));
@@ -87,7 +138,7 @@ function CharacterPage({
   // (서버 collectionRate가 정상 동작하지 않아 프론트에서 대체 계산).
   useEffect(() => {
     let cancelled = false;
-    computeCollectionProgress()
+    fetchAndCacheDexStatus()
       .then((progress) => {
         if (!cancelled) setDexStatusByLocalId(progress);
       })
