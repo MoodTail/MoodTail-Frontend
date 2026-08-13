@@ -27,7 +27,9 @@
   align-items: flex-end;
   width: max-content;
   gap: 32px;
+
   animation-name: onboarding-marquee-scroll;
+  animation-duration: 8s;
   animation-timing-function: linear;
   animation-iteration-count: infinite;
 }
