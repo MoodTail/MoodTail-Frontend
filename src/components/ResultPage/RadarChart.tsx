@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import '../../styles/RadarChart.css'
 
 interface RadarChartData {
@@ -139,5 +140,5 @@ function RadarChart({ myData, compareData, maxValue = 100 }: RadarChartProps) {
   )
 }
 
-export default RadarChart
+export default memo(RadarChart)
 export type { RadarChartData, RadarChartProps }

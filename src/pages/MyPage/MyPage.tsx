@@ -102,6 +102,7 @@ function MyPage({
     localStorage.getItem(LOCAL_AUTH_PREVIEW_KEY) === "true";
   const [modalStep, setModalStep] = useState<ModalStep>("none");
   const [profile, setProfile] = useState<MyPageResult | null>(null);
+  const [hasProfileLoaded, setHasProfileLoaded] = useState(false);
 
   useEffect(() => {
     // profile은 isLoggedIn일 때만 화면에 쓰이므로, 로그아웃 상태에서는 그냥 조회하지 않음
@@ -114,6 +115,9 @@ function MyPage({
       })
       .catch(() => {
         // TODO: 실제 로그인 연동 전까지는 401이 정상이라 조용히 mock으로 폴백
+      })
+      .finally(() => {
+        if (!cancelled) setHasProfileLoaded(true);
       });
 
     return () => {
@@ -121,7 +125,9 @@ function MyPage({
     };
   }, [isLoggedIn, isLocalAuthPreview]);
 
-  const nickname = profile?.nickname ?? MOCK_USER.nickname;
+  const isProfileLoading = isLoggedIn && !isLocalAuthPreview && !hasProfileLoaded;
+  const shouldUseProfileFallback = !isProfileLoading;
+  const nickname = profile?.nickname ?? (shouldUseProfileFallback ? MOCK_USER.nickname : "");
   const previewThemeTypeCode = PREVIEW_MY_PAGE_CHARACTER_TYPE;
   const themeTypeCode =
     previewThemeTypeCode ??
@@ -137,15 +143,15 @@ function MyPage({
     PREVIEW_MY_PAGE_BACKEND_IMAGE_URL ??
     (previewThemeTypeCode ? resultTheme?.characterImage : apiAvatarImageSrc) ??
     resultTheme?.characterImage ??
-    CHARACTER_IMAGES[characterType];
+    (shouldUseProfileFallback ? CHARACTER_IMAGES[characterType] : "");
   const characterLabel =
     resultTheme?.name ??
     getNonEmptyValue(profile?.representativeMoodType?.name) ??
-    CHARACTER_LABELS[characterType];
-  const testCount = profile?.totalTestCount ?? MOCK_USER.testCount;
-  const monthlyCount = profile?.monthlyRecordCount ?? MOCK_USER.monthlyCount;
+    (shouldUseProfileFallback ? CHARACTER_LABELS[characterType] : "");
+  const testCount = profile?.totalTestCount;
+  const monthlyCount = profile?.monthlyRecordCount;
   const collectedCount =
-    profile?.unlockedMoodTypeCount ?? MOCK_USER.collectedCount;
+    profile?.unlockedMoodTypeCount;
   const isMockAvatar = !PREVIEW_MY_PAGE_BACKEND_IMAGE_URL && !previewThemeTypeCode && !apiAvatarImageSrc;
   const avatarStyle =
     (isMockAvatar ? MOCK_PROFILE_AVATAR_STYLES[characterType] : undefined) ??
@@ -154,6 +160,7 @@ function MyPage({
   const closeModal = () => setModalStep("none");
 
   const handleEditProfile = () => {
+    if (isProfileLoading) return;
     if (onEditProfile) {
       onEditProfile({ profile, nickname, avatarImageSrc, avatarStyle, characterType, characterLabel });
       return;
@@ -220,16 +227,21 @@ function MyPage({
   return (
     <div className="mypage">
       <section
-        className={`mypage__profile${isLoggedIn ? "" : " mypage__profile--guest"}`}
+        className={`mypage__profile${isLoggedIn ? "" : " mypage__profile--guest"}${
+          isLoggedIn && isProfileLoading ? " mypage__profile--loading" : ""
+        }`}
         style={
-          isLoggedIn
+          isLoggedIn && !isProfileLoading
             ? { background: CHARACTER_GRADIENTS[characterType] }
             : undefined
         }
       >
         {isLoggedIn ? (
           <div className="mypage__profile-trigger">
-            <div className="mypage__avatar" aria-hidden="true">
+            <div
+              className={`mypage__avatar${isProfileLoading ? " mypage__avatar--loading" : ""}`}
+              aria-hidden="true"
+            >
               {avatarImageSrc ? (
                 <img
                   className="mypage__avatar-image"
@@ -239,11 +251,15 @@ function MyPage({
                     transform: `translate(${avatarStyle.x}px, ${avatarStyle.y}px) scale(${avatarStyle.scale})`,
                   }}
                 />
+              ) : isProfileLoading ? (
+                <span className="mypage__avatar-skeleton" />
               ) : (
                 "🍹"
               )}
             </div>
-            <p className="mypage__nickname">{nickname}</p>
+            <p className={`mypage__nickname${isProfileLoading ? " mypage__nickname--loading" : ""}`}>
+              {isProfileLoading ? "" : nickname}
+            </p>
           </div>
         ) : (
           <div className="mypage__profile-trigger mypage__profile-trigger--guest">
@@ -263,15 +279,21 @@ function MyPage({
         {isLoggedIn && (
           <section className="mypage__stats">
             <div className="mypage__stat-card">
-              <p className="mypage__stat-value">{testCount}회</p>
+              <p className="mypage__stat-value">
+                {isProfileLoading ? <span className="mypage__stat-skeleton" /> : `${testCount ?? MOCK_USER.testCount}회`}
+              </p>
               <p className="mypage__stat-label">총 테스트</p>
             </div>
             <div className="mypage__stat-card">
-              <p className="mypage__stat-value">{monthlyCount}회</p>
+              <p className="mypage__stat-value">
+                {isProfileLoading ? <span className="mypage__stat-skeleton" /> : `${monthlyCount ?? MOCK_USER.monthlyCount}회`}
+              </p>
               <p className="mypage__stat-label">이번달 기록</p>
             </div>
             <div className="mypage__stat-card">
-              <p className="mypage__stat-value">{collectedCount}개</p>
+              <p className="mypage__stat-value">
+                {isProfileLoading ? <span className="mypage__stat-skeleton" /> : `${collectedCount ?? MOCK_USER.collectedCount}개`}
+              </p>
               <p className="mypage__stat-label">수집 캐릭터</p>
             </div>
           </section>
@@ -283,6 +305,7 @@ function MyPage({
               type="button"
               className="mypage__menu-item mypage__menu-item--highlight"
               onClick={handleEditProfile}
+              disabled={isProfileLoading}
             >
               <span>프로필 수정</span>
               <MenuArrow />

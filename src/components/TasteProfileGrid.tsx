@@ -1,3 +1,5 @@
+import { memo } from "react";
+
 export interface TasteProfileItem {
   key: string;
   label: string;
@@ -44,7 +46,7 @@ const VARIANTS: Record<TasteProfileVariant, VariantStyle> = {
   },
 };
 
-export default function TasteProfileGrid({
+function TasteProfileGrid({
   items,
   variant = "type",
 }: {
@@ -82,3 +84,5 @@ export default function TasteProfileGrid({
     </div>
   );
 }
+
+export default memo(TasteProfileGrid);
