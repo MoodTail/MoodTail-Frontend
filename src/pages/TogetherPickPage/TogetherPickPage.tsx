@@ -108,6 +108,11 @@ function TogetherPickPage({
     onLogin?.();
   };
 
+  const handleCloseLoginModal = () => {
+    setShowLoginModal(false);
+    onBack?.();
+  };
+
   const handleShare = async (
     imageBlob: Blob,
   ): Promise<{ shareUrl: string; shareImageUrl: string } | null> => {
@@ -237,7 +242,7 @@ function TogetherPickPage({
       {showLoginModal && (
         <LoginRequiredModal
           onLogin={handleLogin}
-          onClose={() => setShowLoginModal(false)}
+          onClose={handleCloseLoginModal}
         />
       )}
     </div>
