@@ -17,13 +17,13 @@
   background: #ffffff;
   border: 1px solid #ffffff;
   border-radius: 30px;
-  padding: 29px 16px 16px;
+  padding: 29px 22px 20px;
   text-align: left;
   box-shadow: 9px 13px 22px rgba(255, 92, 46, 0.09);
 }
 
 .two-button-modal-left__title {
-  margin: 0;
+  margin: 0 0 0 10px;
   font-size: 21px;
   font-weight: 700;
   color: #10161f;
@@ -32,7 +32,7 @@
 }
 
 .two-button-modal-left__description {
-  margin: 13px 0 0;
+  margin: 13px 0 0 10px;
   max-width: 240px;
   font-size: 14px;
   color: #656565;

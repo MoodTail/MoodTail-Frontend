@@ -1,3 +1,4 @@
+import { getMoodTestQuestions } from "../api/mood-tests/moodTests.api";
 import type { MoodTestQuestion } from "../api/mood-tests/moodTests.types";
 
 export type TasteStat = "당도" | "산도" | "쓴맛" | "청량감" | "도수";
@@ -466,4 +467,34 @@ function pickRandom<T>(items: T[], count: number): T[] {
 // 1~5번은 고정 문항, 6~7번은 QUIZ_QUESTION_POOL에서 매번 무작위로 2개를 뽑아 채웁니다.
 export function buildQuizQuestions(): QuizQuestion[] {
   return [...BASE_QUESTIONS, ...pickRandom(QUIZ_QUESTION_POOL, 2)];
+}
+
+// 로그인 직후처럼 퀴즈 화면에 들어가기 전에 미리 받아둔 실제 문항을 캐시해서, 처음 테스트를
+// 시작할 때 로컬 목데이터(제목/부제목 포함)로 잠깐 보였다가 서버 문항으로 바뀌는 지연/깜빡임을
+// 없앱니다. MainPage/QuizQuestionPage(App.tsx 재테스트)가 이 캐시를 공유합니다.
+let cachedQuizQuestions: QuizQuestion[] | null = null;
+
+export function getCachedQuizQuestions(): QuizQuestion[] | null {
+  return cachedQuizQuestions;
+}
+
+// 실제 문항을 받아와 캐시에 반영합니다. 컴포넌트 effect(항상 최신으로 갱신)와
+// prefetchQuizQuestions()가 이 로직을 공유합니다.
+export async function fetchAndCacheQuizQuestions(): Promise<QuizQuestion[] | null> {
+  try {
+    const { questions } = await getMoodTestQuestions();
+    const converted = toQuizQuestions(questions);
+    cachedQuizQuestions = converted;
+    return converted;
+  } catch (err) {
+    console.error("테스트 문항을 불러오지 못했습니다", err);
+    return null;
+  }
+}
+
+// 로그인 직후(예: PostLoginScreen이 도는 동안) 미리 호출해 캐시를 채워둡니다. 이미 캐시가
+// 있으면 중복 요청을 건너뜁니다.
+export function prefetchQuizQuestions(): Promise<void> {
+  if (cachedQuizQuestions) return Promise.resolve();
+  return fetchAndCacheQuizQuestions().then(() => undefined);
 }

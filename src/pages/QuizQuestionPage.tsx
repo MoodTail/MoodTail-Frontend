@@ -63,7 +63,7 @@ export default function QuizQuestionPage({
 
         <br/>
         <br/>
-        <h1 style={{ fontSize: 25, fontWeight: 700, color: COLORS.ink, margin: "0 0 6px" }}>
+        <h1 style={{ fontSize: 25, fontWeight: 700, color: COLORS.ink, margin: "0 0 6px", wordBreak: "keep-all", overflowWrap: "break-word" }}>
           {question.title}
         </h1>
         <p style={{ fontSize: 12.5, color: COLORS.inkSoft, margin: "0 0 20px" }}>{question.subtitle}</p>
