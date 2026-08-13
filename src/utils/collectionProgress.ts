@@ -1,6 +1,7 @@
 import { getDailyHistory, getMonthlyHistory } from "../api/histories/histories.api";
 import { getCocktailsByType } from "../data/cocktailGlasses";
 import { DEX_DATA } from "../data/dexData";
+import { getReceivedTestResultTypes } from "./testResultDex";
 
 // 서버 /api/v1/collections의 unlocked/collectionRate가 정상 동작하지 않아서, 히스토리에
 // 실제 기록된 칵테일을 직접 집계해 프론트에서 계산합니다. "전체 기간 음주 기록 조회" API가
@@ -25,17 +26,14 @@ function getRecentMonths(count: number): { year: number; month: number }[] {
 }
 
 // 최근 MONTHS_TO_SCAN개월 동안 실제로 기록된 칵테일 이름 집합을 모읍니다.
+// 달력 조회가 전부 실패해도(네트워크/CORS, 게스트 등) 빈 집합으로 계속 진행합니다 —
+// 히스토리 기반 해금은 그만큼 못 받아오지만, 테스트 결과 기반 해금(OR 조건)은
+// 히스토리 API와 무관하게 계속 동작해야 하기 때문입니다.
 async function fetchRecordedCocktailNames(): Promise<Set<string>> {
   const months = getRecentMonths(MONTHS_TO_SCAN);
   const calendars = await Promise.all(
     months.map((p) => getMonthlyHistory(p).catch(() => null)),
   );
-
-  // 달력 조회가 전부 실패했다면(네트워크/CORS 등) "기록이 0개"가 아니라 "데이터를 못
-  // 받아온 것"이므로, 잘못된 전체 잠김 상태로 화면에 반영되지 않도록 에러를 던집니다.
-  if (calendars.every((c) => c === null)) {
-    throw new Error("히스토리 달력을 하나도 불러오지 못했습니다");
-  }
 
   const recordedDates = new Set<string>();
   calendars.forEach((calendar) => {
@@ -57,21 +55,24 @@ async function fetchRecordedCocktailNames(): Promise<Set<string>> {
 
 // 로컬 typeId(예: "critic") 기준으로, 그 타입에 배정된 8종 칵테일 중 히스토리에 기록된
 // 이름이 몇 종인지 세어 수집률/해금 여부를 계산합니다.
+// 해금 조건은 둘 중 하나만 만족해도 됩니다(LockedCocktailModal 안내와 동일):
+// 1) 히스토리 기록 50%(4/8잔) 이상, 2) 오늘의 취향 테스트에서 그 타입을 결과로 받은 적 있음.
 export async function computeCollectionProgress(): Promise<Record<string, TypeCollectionProgress>> {
   const recordedNames = await fetchRecordedCocktailNames();
+  const receivedTypes = getReceivedTestResultTypes();
 
   const progress: Record<string, TypeCollectionProgress> = {};
   DEX_DATA.forEach((dex) => {
     const typeCocktails = getCocktailsByType(dex.typeNumber);
     const total = typeCocktails.length;
     if (total === 0) {
-      progress[dex.typeId] = { unlocked: false, collectionRate: 0 };
+      progress[dex.typeId] = { unlocked: receivedTypes.has(dex.typeId), collectionRate: 0 };
       return;
     }
     const matched = typeCocktails.filter((c) => recordedNames.has(c.nameKo)).length;
     progress[dex.typeId] = {
       collectionRate: Math.round((matched / total) * 100),
-      unlocked: matched / total >= UNLOCK_RATIO,
+      unlocked: matched / total >= UNLOCK_RATIO || receivedTypes.has(dex.typeId),
     };
   });
   return progress;

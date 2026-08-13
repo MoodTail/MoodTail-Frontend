@@ -27,8 +27,8 @@
 
 .signup-page__title {
   position: absolute;
-  left: 0;
-  right: 0;
+  left: 2px;
+  right: 0px;
   top: 88px;
   margin: 0;
   font-size: 32px;
@@ -39,8 +39,8 @@
 
 .signup-page__subtitle {
   position: absolute;
-  left: 0;
-  right: 0;
+  left: 2px;
+  right: 0px;
   top: 130px;
   margin: 0;
   font-size: 16px;
@@ -221,25 +221,25 @@
 }
 .signup-page__checkbox--all {
   left: 19.75px;
-  top: 12.75px;
+  top: 13px;
 }
 .signup-page__checkbox--terms1 {
   left: 19.75px;
-  top: 59.75px;
+  top: 53.5px;
 }
 .signup-page__checkbox--terms2 {
   left: 19.75px;
-  top: 84.75px;
+  top: 82px;
 }
 .signup-page__checkbox--privacy {
   left: 19.75px;
-  top: 110.75px;
+  top: 109.25px;
 }
 
 .signup-page__terms-all-label {
   position: absolute;
   left: 51px;
-  top: 16px;
+  top: 14px;
   margin: 0;
   font-size: 14px;
   font-weight: 700;
@@ -249,7 +249,7 @@
 .signup-page__terms-divider {
   position: absolute;
   left: 20px;
-  top: 44px;
+  top: 42px;
   width: 270px;
   height: 1px;
   background: #e8dbd4;
@@ -262,14 +262,15 @@
   font-size: 12.5px;
   color: #73737a;
 }
+
 .signup-page__terms-label--terms1 {
-  top: 61px;
+  top: 55px;
 }
 .signup-page__terms-label--terms2 {
-  top: 86px;
+  top: 83.5px;
 }
 .signup-page__terms-label--privacy {
-  top: 112px;
+  top: 111px;
 }
 
 .signup-page__terms-view {
@@ -284,10 +285,10 @@
   cursor: pointer;
 }
 .signup-page__terms-view--terms2 {
-  top: 83px;
+  top: 81.5px;
 }
 .signup-page__terms-view--privacy {
-  top: 111px;
+  top: 110.5px;
 }
 
 .signup-page__submit {

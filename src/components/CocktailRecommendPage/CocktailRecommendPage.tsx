@@ -15,7 +15,9 @@ interface RankEntry {
 interface CocktailRecommendPageProps {
   onBack?: () => void;
   onRetry?: () => void;
-  onShare?: () => Promise<{ shareUrl: string; shareImageUrl: string } | null>;
+  onGenerateShare?: (
+    imageBlob: Blob,
+  ) => Promise<{ shareUrl: string; shareImageUrl: string } | null>;
   topPick: {
     tagline: string;
     name: string;
@@ -39,7 +41,7 @@ interface CocktailRecommendPageProps {
 const CocktailRecommendPage: FC<CocktailRecommendPageProps> = ({
   onBack,
   onRetry,
-  onShare,
+  onGenerateShare,
   topPick,
   tasteAttribution,
   ranking,
@@ -48,9 +50,6 @@ const CocktailRecommendPage: FC<CocktailRecommendPageProps> = ({
   partnerAvatarUrl,
 }) => {
   const [showShareModal, setShowShareModal] = useState(false);
-  const [shareUrl, setShareUrl] = useState<string | null>(null);
-  const [shareImageUrl, setShareImageUrl] = useState<string | null>(null);
-  const [isSharing, setIsSharing] = useState(false);
 
   useEffect(() => {
     document.body.classList.add("hide-bottom-nav");
@@ -58,57 +57,6 @@ const CocktailRecommendPage: FC<CocktailRecommendPageProps> = ({
       document.body.classList.remove("hide-bottom-nav");
     };
   }, []);
-
-  const handleOpenShare = async () => {
-    if (onShare) {
-      setIsSharing(true);
-      try {
-        const shareData = await onShare();
-        if (shareData) {
-          setShareUrl(shareData.shareUrl);
-          setShareImageUrl(shareData.shareImageUrl);
-        }
-      } finally {
-        setIsSharing(false);
-      }
-    }
-    setShowShareModal(true);
-  };
-
-  const handleSaveImage = async (): Promise<void> => {
-    const imageSrc = topPick.imageUrl || cocktail;
-    const fileName = `moodtail-${topPick.name || "result"}.png`;
-
-    try {
-      const response = await fetch(imageSrc);
-      const blob = await response.blob();
-      const file = new File([blob], fileName, {
-        type: blob.type || "image/png",
-      });
-
-      // 모바일: 공유 시트를 열어서 "사진에 저장"을 고를 수 있게 함
-      if (
-        typeof navigator.share === "function" &&
-        typeof navigator.canShare === "function" &&
-        navigator.canShare({ files: [file] })
-      ) {
-        await navigator.share({ files: [file], title: topPick.name });
-        return;
-      }
-
-      // 데스크톱(또는 공유 API 미지원 브라우저): 바로 다운로드
-      const objectUrl = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = objectUrl;
-      link.download = fileName;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(objectUrl);
-    } catch (error) {
-      console.error(error);
-    }
-  };
 
   return (
     <div className="cocktail-recommend-page">
@@ -231,10 +179,9 @@ const CocktailRecommendPage: FC<CocktailRecommendPageProps> = ({
           <button
             type="button"
             className="cocktail-recommend-page__share"
-            onClick={handleOpenShare}
-            disabled={isSharing}
+            onClick={() => setShowShareModal(true)}
           >
-            {isSharing ? "준비 중..." : "결과 공유"}
+            결과 공유
           </button>
           <button
             type="button"
@@ -246,18 +193,10 @@ const CocktailRecommendPage: FC<CocktailRecommendPageProps> = ({
         </div>
       </div>
 
-      {showShareModal && (
+      {showShareModal && onGenerateShare && (
         <ShareResultModal
           onClose={() => setShowShareModal(false)}
-          onSaveImage={() => void handleSaveImage()}
-          shareUrl={shareUrl ?? window.location.href}
-          kakaoShare={{
-            title: `MoodTail - ${topPick.name}`,
-            description: topPick.description,
-            imageUrl: shareImageUrl ?? "",
-            webUrl: shareUrl ?? window.location.href,
-            buttonTitle: "결과 확인하기",
-          }}
+          onGenerateShare={onGenerateShare}
           topPick={topPick}
           ranking={ranking}
           matchPercent={matchPercent}

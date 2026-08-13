@@ -16,7 +16,6 @@ import {
   postPairShare,
   postPairShareImage,
 } from "../../api/cocktails/cocktails.api";
-import cocktailFallbackImage from "../../assets/images/glass/glass-1.png";
 import "../../styles/TogetherPickPage.css";
 
 type TogetherPickStep = "input" | "compare" | "result";
@@ -102,19 +101,15 @@ function TogetherPickPage({
     onLogin?.();
   };
 
-  const handleShare = async (): Promise<{
-    shareUrl: string;
-    shareImageUrl: string;
-  } | null> => {
+  const handleShare = async (
+    imageBlob: Blob,
+  ): Promise<{ shareUrl: string; shareImageUrl: string } | null> => {
     if (!pairResult) return null;
     const first =
       pairResult.recommendations.find((item) => item.ranking === 1) ??
       pairResult.recommendations[0];
 
     try {
-      const imageResponse = await fetch(cocktailFallbackImage);
-      const rawBlob = await imageResponse.blob();
-      const imageBlob = new Blob([rawBlob], { type: "image/png" });
       const { shareImageUrl } = await postPairShareImage(
         partnerCode,
         imageBlob,
@@ -177,7 +172,7 @@ function TogetherPickPage({
       <CocktailRecommendPage
         onBack={() => setStep("compare")}
         onRetry={() => setStep("input")}
-        onShare={handleShare}
+        onGenerateShare={handleShare}
         matchPercent={first?.matchScore ?? 0}
         topPick={{
           tagline: "둘의 최적 타협점",

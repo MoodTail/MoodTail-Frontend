@@ -1,4 +1,4 @@
-import { useEffect, useState, type CSSProperties } from 'react'
+import { useEffect, useMemo, useState, type CSSProperties } from 'react'
 import chevronLeftIcon from '../../assets/icons/chevron-left-white.svg'
 import shareIcon from '../../assets/icons/share.svg'
 import RadarChart, { type RadarChartData } from '../../components/ResultPage/RadarChart'
@@ -18,6 +18,7 @@ import glass3 from '../../assets/images/glass/glass-3.png'
 import glass4 from '../../assets/images/glass/glass-4.png'
 import { saveMoodTestResult } from '../../api/mood-tests/moodTests.api'
 import type { MoodTestResult } from '../../api/mood-tests/moodTests.types'
+import { markTypeReceivedAsTestResult } from '../../utils/testResultDex'
 import '../../styles/ResultPage.css'
 
 // TODO: 실제 테스트 결과 API 연동 후 실제 응답으로 대체
@@ -141,6 +142,14 @@ function ResultPage({
   const [saveStatusOverride, setSaveStatusOverride] = useState<boolean | null>(null)
   const isResultSaved = saveStatusOverride ?? Boolean(result?.saved || result?.resultId) // 지금 보고 있는 결과를 저장했는지
 
+  // 캐릭터 도감의 "테스트에서 결과 받기" 해금 조건은 히스토리 API로는 알 수 없어서,
+  // 실제 결과를 받는 이 시점에 로컬에 기록해둡니다(로그인 여부와 무관하게 동작).
+  useEffect(() => {
+    if (!result?.moodType.typeCode) return
+    const localId = TYPECODE_TO_LOCAL_TYPE[result.moodType.typeCode]
+    if (localId) markTypeReceivedAsTestResult(localId)
+  }, [result])
+
   // typeCode로 로컬 테마(캐릭터/배경무늬/카피)를 찾음. 실제 결과가 있으면 그 typeCode를,
   // 없으면(로컬 미리보기) PREVIEW_TYPE_CODE를 씀. 아직 테마가 없는 타입(easygoing-optimist 등)은
   // theme이 undefined가 되고, 이때는 API 응답값 -> 목데이터 순으로 폴백.
@@ -150,7 +159,7 @@ function ResultPage({
 
   const wrapWidth = theme?.wrapWidth ?? 355
   const wrapHeight = theme?.wrapHeight ?? 355
-  const contentBounds = getContentBounds(theme)
+  const contentBounds = useMemo(() => getContentBounds(theme), [theme])
   const shapeOffsetX =
     (wrapWidth - (contentBounds.right - contentBounds.left)) / 2 -
     contentBounds.left +
@@ -177,14 +186,18 @@ function ResultPage({
   const shareDescription = theme?.description ?? result?.moodType.shortDescription ?? MOCK_RESULT.shareDescription
   const matchPercent = FORCE_PREVIEW_TYPE ? MOCK_RESULT.matchPercent : (result?.moodType.matchPercent ?? MOCK_RESULT.matchPercent)
 
-  const topCocktails: CocktailTopItem[] = result
-    ? result.recommendations.map((r) => ({
-        rank: r.ranking,
-        name: r.nameKo,
-        matchRate: r.matchScore,
-        glassImage: r.imageUrl,
-      }))
-    : MOCK_TOP_COCKTAILS
+  const topCocktails = useMemo<CocktailTopItem[]>(
+    () =>
+      result
+        ? result.recommendations.map((r) => ({
+            rank: r.ranking,
+            name: r.nameKo,
+            matchRate: r.matchScore,
+            glassImage: r.imageUrl,
+          }))
+        : MOCK_TOP_COCKTAILS,
+    [result],
+  )
 
   const myTaste: RadarChartData = result
     ? {
@@ -203,8 +216,10 @@ function ResultPage({
     bitterness: MOCK_MY_TASTE.쓴맛,
   }
 
-  const currentCharacterType = resolveCharacterType(typeCode)
-  const fallbackMatch = currentCharacterType ? getCharacterMatch(currentCharacterType.id) : {}
+  const fallbackMatch = useMemo(() => {
+    const currentCharacterType = resolveCharacterType(typeCode)
+    return currentCharacterType ? getCharacterMatch(currentCharacterType.id) : {}
+  }, [typeCode])
   const fallbackGoodMatchTypeCode = fallbackMatch.good ? LOCAL_TYPE_TO_TYPECODE[fallbackMatch.good.id] : undefined
   const fallbackBadMatchTypeCode = fallbackMatch.bad ? LOCAL_TYPE_TO_TYPECODE[fallbackMatch.bad.id] : undefined
   const goodMatch = result?.compatibilities.best

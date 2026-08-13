@@ -11,7 +11,7 @@ function LoginRequiredModal({ onLogin, onClose }: LoginRequiredModalProps) {
       <div className="login-required-modal">
         <p className="login-required-modal__title">로그인이 필요해요</p>
         <p className="login-required-modal__description">
-          저장기능은 로그인 유저에게만 가능합니다
+          같이 고르기 기능은 로그인 유저에게만 가능합니다
           <br />
           로그인할까요?
         </p>
