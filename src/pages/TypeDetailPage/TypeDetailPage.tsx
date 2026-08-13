@@ -29,11 +29,6 @@ const TASTE_LABELS: { key: keyof PersonalityType["taste"]; label: string }[] = [
   { key: "refreshing", label: "청량감" },
 ];
 
-
-// 이 화면은 detail의 unlocked/representative/collectionRate 등 사용자별 필드는 전혀 읽지
-// 않고, 이름/설명/맛 프로필/궁합/칵테일 이름·이미지처럼 타입마다 고정된(모든 사용자에게
-// 동일한) 정보만 사용합니다. 그래서 새로고침 후에도 재사용할 수 있게 localStorage에
-// moodTypeId별로 저장해두고, 캐시가 있으면 API 응답을 기다리지 않고 바로 보여줍니다.
 const DETAIL_CACHE_KEY = "moodtail_type_detail_cache";
 
 function loadDetailCache(): Record<number, MoodTypeDetailResult> {
@@ -51,14 +46,10 @@ function cacheDetail(moodTypeId: number, result: MoodTypeDetailResult) {
   detailCache[moodTypeId] = result;
   try {
     localStorage.setItem(DETAIL_CACHE_KEY, JSON.stringify(detailCache));
-  } catch {
-    // 저장 공간 초과 등으로 실패해도 메모리 캐시는 계속 동작하므로 무시합니다.
-  }
+    // eslint-disable-next-line no-empty
+  } catch {}
 }
 
-// 타입 상세 화면에 들어가기 전에(예: 도감 정보를 받아온 직후) 미리 호출해 detailCache를
-// 채워둡니다. 이미 캐시돼 있으면 아무 요청도 하지 않습니다 — 컴포넌트가 마운트될 때는
-// useState 초기값이 이 캐시를 그대로 읽으므로 "불러오는 중" 화면 없이 바로 보여줄 수 있습니다.
 export async function prefetchTypeDetail(moodTypeId: number): Promise<void> {
   if (detailCache[moodTypeId]) return;
   try {
@@ -91,8 +82,6 @@ export default function TypeDetailPage({
   const characterType = getCharacterType(type.id);
   const realCocktails = dexEntry ? getCocktailsByType(dexEntry.typeNumber) : [];
 
-  // 색/이미지는 로컬 데이터를 그대로 쓰고, 이름/설명/맛 프로필/궁합 등 "기본 정보"만
-  // data/typeCodeMapping.ts로 매핑된 실제 서버 타입에서 받아와 대체합니다.
   useEffect(() => {
     if (!moodTypeId) {
       setDetail(null);
@@ -113,16 +102,12 @@ export default function TypeDetailPage({
     };
   }, [moodTypeId]);
 
-  // moodTypeId가 있는(서버 매핑이 있는) 타입인데 아직 detail을 못 받아온 상태면, 로컬
-  // 목데이터로 먼저 그렸다가 서버 값으로 바뀌는 "깜빡임"을 피하기 위해 로딩으로 대기합니다.
-  // moodTypeId 자체가 없는 타입은 서버에서 받아올 방법이 없으므로 로컬 값을 그대로 씁니다.
   const isLoadingDetail = moodTypeId !== undefined && !detail;
 
   const displayName = detail?.name ?? characterType.name;
   const displayShortDescription = detail?.shortDescription ?? characterType.description;
   const displayCatchphrase = detail?.catchphrase ?? type.agreeLine;
   const displayPercent = detail?.typePercent ?? type.agreeRate;
-  // detailDescription은 서버 값으로 덮어쓰지 않고 항상 로컬 목데이터를 씁니다.
   const displayDescription = characterType.detailDescription;
   const goodMatch = localMatch.good;
   const badMatch = localMatch.bad;
@@ -134,8 +119,6 @@ export default function TypeDetailPage({
   const badMatchImg =
     detail?.compatibilities.worst.characterImageUrl ??
     (badMatchDexEntry ? drinkImages[badMatchDexEntry.id] : undefined);
-  // 이름표는 이미지와 같은 소스를 우선 써야 서로 어긋나지 않습니다 — 서버가 내려준
-  // compatibilities에도 name이 포함돼 있어서, 이미지처럼 서버 값을 우선하고 로컬은 폴백으로만 씁니다.
   const goodMatchDisplay = goodMatch
     ? { ...goodMatch, name: detail?.compatibilities.best.name ?? goodMatch.name }
     : undefined;
@@ -151,9 +134,6 @@ export default function TypeDetailPage({
         refreshing: detail.typeFigures.refreshing,
       }
     : type.taste;
-  // 해당 타입에 배정된 칵테일 8종은 잠금/해금 대상이 아니라 항상 공개되는
-  // 기준 정보이므로, 서버 unlocked 값과 무관하게 이름/이미지를 그대로 보여줍니다.
-  // 이미지는 서버 실사진(imageUrl)을 우선 쓰고, 없으면 로컬 잔 실루엣(glassNumber)으로 대체합니다.
   const displayCocktails: DisplayCocktail[] = detail
     ? detail.cocktails.map((c) => ({
         id: String(c.cocktailId),

@@ -13,7 +13,6 @@ import SavedRecipesView from "./SavedRecipesView";
 import TwoButtonModal from "../../components/common/modal/TwoButtonModal";
 import "../../styles/RecipePage.css";
 
-// taste.도수는 이제 실제 ABV(%) 값이라 버튼 라벨의 도수 구간과 그대로 맞춥니다.
 const FILTERS: { label: string; test: (recipe: Recipe) => boolean }[] = [
   { label: "전체", test: () => true },
   { label: "15도 이하", test: (r) => r.taste.도수 <= 15 },
@@ -22,17 +21,9 @@ const FILTERS: { label: string; test: (recipe: Recipe) => boolean }[] = [
 ];
 const SELECT_ANIMATION_MS = 700;
 
-// 레시피 탭을 벗어났다가 돌아오면 RecipePage가 다시 마운트되면서 recipes가 로컬 잔
-// 이미지(RECIPES)로 리셋됐다가, 서버 실사진(getCocktails)을 다시 받아온 뒤에야 바뀌어서
-// 매번 "잔 → 실사진" 전환이 보이는 지연이 생깁니다. 컴포넌트 바깥에 마지막으로 받아온
-// 결과를 캐시해뒀다가 다음 마운트의 초기값으로 재사용해서, 재방문 시에는 바로 실사진을
-// 보여주고 그 사이에도 아래 effect가 최신 데이터로 갱신합니다.
 let cachedRecipes: Recipe[] | null = null;
 let cachedCocktailIdByRecipeId: Record<string, number> | null = null;
 
-// 목록 화면은 실제 API(/api/v1/cocktails)에서 이름/도수/설명을 받아오되, 재료/조리법 등
-// 백엔드에 아직 없는 필드는 이름이 일치하는 로컬 목데이터에서 그대로 가져옵니다. 컴포넌트
-// effect와 아래 프리캐치용 prefetchRecipes()가 이 로직을 공유합니다.
 async function fetchAndCacheRecipes(): Promise<{
   recipes: Recipe[];
   idMap: Record<string, number>;
@@ -59,10 +50,6 @@ async function fetchAndCacheRecipes(): Promise<{
   return { recipes: merged, idMap };
 }
 
-// 실사진 URL만 미리 브라우저에 다운로드해둡니다(로컬 잔 실루엣은 이미 번들에 포함돼 있어
-// 네트워크가 필요 없습니다). 로그인 직후 prefetchRecipes()가 호출되는 시점에 함께 실행돼,
-// 실제로 레시피 목록/상세 화면에 그려질 때는 이미 브라우저 캐시에 있는 이미지라 사진이
-// 늦게 팝인하지 않습니다.
 function preloadRecipePhotos(recipes: Recipe[]): void {
   recipes.forEach((r) => {
     if (!r.hasHeroPhoto || !r.heroImage) return;
@@ -71,10 +58,6 @@ function preloadRecipePhotos(recipes: Recipe[]): void {
   });
 }
 
-// 레시피 탭에 들어가기 전에(예: 로그인 성공 직후, PostLoginScreen이 도는 동안) 실제 칵테일
-// 목록을 미리 받아와 모듈 캐시를 채워둡니다. RecipePage가 마운트될 때 cachedRecipes가 이미
-// 채워져 있으면 로딩 지연 없이 바로 실사진을 보여줄 수 있습니다. 로그인 직후와 App.tsx의
-// 로그인 상태 진입 시점 둘 다에서 호출될 수 있어, 이미 캐시가 있으면 중복 요청을 건너뜁니다.
 export function prefetchRecipes(): Promise<void> {
   if (cachedRecipes) return Promise.resolve();
   return fetchAndCacheRecipes()
@@ -82,9 +65,6 @@ export function prefetchRecipes(): Promise<void> {
     .catch((err) => console.error("칵테일 목록을 불러오지 못했습니다", err));
 }
 
-// "저장된 레시피" 화면도 같은 이유로 지연이 보였습니다 — 즐겨찾기 목록(/api/v1/cocktails/favorites)이
-// 레시피 탭에 들어가야만 요청되던 터라, 그 사이에 "저장된 레시피" 버튼을 누르면 아직 안 채워진
-// 빈 목록이 잠깐 보였습니다. cachedRecipes와 같은 방식으로 모듈 캐시에 저장해둡니다.
 let cachedSavedIds: Set<string> | null = null;
 
 async function fetchAndCacheSavedIds(): Promise<Set<string>> {
@@ -97,8 +77,6 @@ async function fetchAndCacheSavedIds(): Promise<Set<string>> {
   return set;
 }
 
-// 로그인 직후(게스트는 즐겨찾기 API 인증이 안 되므로 제외) 미리 받아와 캐시를 채워둡니다.
-// 이미 캐시가 있으면 중복 요청을 건너뜁니다.
 export function prefetchSavedRecipes(): Promise<void> {
   if (cachedSavedIds) return Promise.resolve();
   return fetchAndCacheSavedIds()
@@ -121,12 +99,8 @@ interface RecipePageProps {
   onNavVisibilityChange?: (visible: boolean) => void;
   isLoggedIn: boolean;
   onGoToLogin: () => void;
-  // 다른 화면(캐릭터 상세 등)에서 특정 칵테일을 눌러 들어온 경우, 목록을 거치지 않고
-  // 이름이 일치하는 레시피의 상세 화면을 바로 엽니다.
   initialDetailName?: string | null;
   onInitialDetailConsumed?: () => void;
-  // initialDetailName으로 열린 상세 화면에서 뒤로가기를 누르면 레시피 목록 대신
-  // 원래 있던 화면(캐릭터 도감)으로 돌아갑니다.
   onExitToOrigin?: () => void;
 }
 
@@ -138,10 +112,6 @@ function RecipePage({
   onInitialDetailConsumed,
   onExitToOrigin,
 }: RecipePageProps) {
-  // 캐릭터 상세 등에서 특정 칵테일 이름으로 들어온 경우, 목록 화면을 먼저 그렸다가 상세로
-  // 전환하면(useEffect는 첫 페인트 이후에 실행됩니다) 목록 화면이 잠깐 보이는 깜빡임이
-  // 생깁니다. 그래서 목록/상세 여부를 useEffect가 아니라 이 초기값 계산에서 바로 정해,
-  // 첫 렌더부터 곧장 상세 화면으로 그립니다.
   const initialMatch = initialDetailName
     ? (cachedRecipes ?? RECIPES).find((r) => r.name === initialDetailName)
     : undefined;
@@ -173,9 +143,6 @@ function RecipePage({
     return () => onNavVisibilityChange?.(true);
   }, [view.name, onNavVisibilityChange]);
 
-  // 목록 썸네일(glassImage)/상세 히어로 이미지(heroImage) 둘 다 서버 실제 칵테일 사진(imageUrl)으로
-  // 대체합니다. 로그인 직후 prefetchRecipes()가 이미 캐시를 채워뒀다면 이 요청은 최신 데이터로
-  // 다시 한번 갱신하는 역할만 합니다.
   useEffect(() => {
     let cancelled = false;
     fetchAndCacheRecipes()
@@ -190,8 +157,6 @@ function RecipePage({
     };
   }, []);
 
-  // 저장(즐겨찾기) 목록은 실제 API(/api/v1/cocktails/favorites)에서만 받아옵니다.
-  // 로그인 상태가 아니면 애초에 저장된 게 없으므로 빈 목록을 유지합니다.
   useEffect(() => {
     if (!isLoggedIn) {
       setSavedIds(new Set());
@@ -210,8 +175,6 @@ function RecipePage({
 
   const detailId = view.name === "detail" ? view.id : null;
 
-  // 상세 화면을 열면 실제 재료/조리법(/api/v1/cocktails/{id})을 받아와 덮어씁니다.
-  // 아직 데이터가 비어있는 칵테일이면 조용히 무시하고 로컬 재료/조리법을 그대로 보여줍니다.
   useEffect(() => {
     if (!detailId) return;
     const cocktailId = cocktailIdByRecipeId[detailId];
@@ -278,8 +241,6 @@ function RecipePage({
       return next;
     });
 
-    // 실제 즐겨찾기 API 반영은 최선 노력으로만 시도합니다.
-    // 실패해도(비로그인 등) 위에서 이미 반영한 로컬 상태는 그대로 유지합니다.
     const cocktailId = cocktailIdByRecipeId[id];
     if (!cocktailId) return;
     const request = wasSaved ? removeFavoriteCocktail(cocktailId) : addFavoriteCocktail(cocktailId);
