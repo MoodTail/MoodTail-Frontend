@@ -12,13 +12,11 @@ import LoadingPage from "../LoadingPage";
 import RecipePage from "../RecipePage/RecipePage";
 import {
   buildQuizQuestions,
-  toQuizQuestions,
+  fetchAndCacheQuizQuestions,
+  getCachedQuizQuestions,
   type QuizQuestion,
 } from "../../data/quiz";
-import {
-  getMoodTestQuestions,
-  postMoodTestResult,
-} from "../../api/mood-tests/moodTests.api";
+import { postMoodTestResult } from "../../api/mood-tests/moodTests.api";
 import type {
   MoodTestAnswer,
   MoodTestResult,
@@ -93,7 +91,7 @@ const MainPage: FC<MainPageProps> = ({
     () => initialQuizProgress?.answers ?? {},
   );
   const [quizQuestions, setQuizQuestions] = useState<QuizQuestion[]>(
-    () => initialQuizProgress?.questions ?? buildQuizQuestions(),
+    () => initialQuizProgress?.questions ?? getCachedQuizQuestions() ?? buildQuizQuestions(),
   );
   const [quizResult, setQuizResult] = useState<MoodTestResult | null>(null);
 
@@ -113,11 +111,9 @@ const MainPage: FC<MainPageProps> = ({
       return;
     }
     let cancelled = false;
-    getMoodTestQuestions()
-      .then(({ questions }) => {
-        if (!cancelled) setQuizQuestions(toQuizQuestions(questions));
-      })
-      .catch((err) => console.error("테스트 질문을 불러오지 못했습니다", err));
+    fetchAndCacheQuizQuestions().then((questions) => {
+      if (!cancelled && questions) setQuizQuestions(questions);
+    });
     return () => {
       cancelled = true;
     };
@@ -158,7 +154,7 @@ const MainPage: FC<MainPageProps> = ({
   };
 
   const startQuiz = () => {
-    setQuizQuestions(buildQuizQuestions());
+    setQuizQuestions(getCachedQuizQuestions() ?? buildQuizQuestions());
     setQuizStep(0);
     setQuizAnswers({});
     setView("quiz");

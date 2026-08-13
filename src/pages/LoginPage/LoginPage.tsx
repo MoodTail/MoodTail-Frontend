@@ -12,6 +12,9 @@ import SignupPage from "../SignupPage/SignupPage";
 import PostLoginScreen from "../PostLoginScreen/PostLoginScreen";
 import { postGuestLogin } from "../../api/auth/auth.api.ts";
 import { postLoginLocal } from "../../api/auth/auth.api.ts";
+import { prefetchRecipes, prefetchSavedRecipes } from "../RecipePage/RecipePage";
+import { prefetchCharacterDex } from "../CharacterPage/CharacterPage";
+import { prefetchQuizQuestions } from "../../data/quiz";
 
 interface LoginPageProps {
   onLogin: () => void;
@@ -58,6 +61,13 @@ const LoginPage: FC<LoginPageProps> = ({ onLogin }) => {
 
       localStorage.removeItem("isGuest");
       localStorage.setItem("accessToken", result.accessToken);
+      // "환영합니다" 애니메이션(PostLoginScreen)이 도는 몇 초 동안 캐릭터 도감/레시피 데이터를
+      // 미리 받아둡니다 — isLoggedIn이 실제로 바뀌는 건 그 애니메이션이 끝난 뒤라, 그때까지
+      // 기다리면 도감 탭에 처음 들어갈 때 매번 로딩이 보였습니다.
+      prefetchRecipes();
+      prefetchCharacterDex();
+      prefetchQuizQuestions();
+      prefetchSavedRecipes();
       setStep("postLogin");
     } catch (error) {
       console.error(error);
@@ -80,6 +90,9 @@ const LoginPage: FC<LoginPageProps> = ({ onLogin }) => {
 
       localStorage.setItem("accessToken", result.accessToken);
       localStorage.setItem("isGuest", "true");
+      // 게스트는 도감 탭 접근이 막혀 있고 도감 API도 인증을 요구하므로 도감은 제외합니다.
+      prefetchRecipes();
+      prefetchQuizQuestions();
       setStep("postLogin");
     } catch (error) {
       console.error(error);
