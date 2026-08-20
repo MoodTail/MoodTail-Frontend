@@ -31,6 +31,7 @@ const LoginPage: FC<LoginPageProps> = ({ onLogin }) => {
   const [step, setStep] = useState<LoginStep>("onboarding");
   const [userId, setUserId] = useState("");
   const [password, setPassword] = useState("");
+  const [loginError, setLoginError] = useState(false);
   // 로그인/게스트 로그인 요청이 오래 걸려도 화면에 아무 표시가 없으면 버튼이 안 눌리는
   // 것처럼 보입니다. 어느 버튼이 요청 중인지는 보여주되, 실패 문구는 표시하지 않습니다.
   const [pendingAction, setPendingAction] = useState<"login" | "skip" | null>(null);
@@ -55,6 +56,7 @@ const LoginPage: FC<LoginPageProps> = ({ onLogin }) => {
 
   const handleLoginClick = async (): Promise<void> => {
     if (pendingAction) return;
+    setLoginError(false);
     setPendingAction("login");
     try {
       const result = await postLoginLocal({ email: userId, password });
@@ -71,6 +73,7 @@ const LoginPage: FC<LoginPageProps> = ({ onLogin }) => {
       setStep("postLogin");
     } catch (error) {
       console.error(error);
+      setLoginError(true);
     } finally {
       setPendingAction(null);
     }
@@ -102,7 +105,7 @@ const LoginPage: FC<LoginPageProps> = ({ onLogin }) => {
   };
 
   return (
-    <div className="login-page">
+    <div className={`login-page${loginError ? " login-page--error" : ""}`}>
       <BackgroundBlur
         idPrefix="login-bg"
         width={393}
@@ -121,7 +124,12 @@ const LoginPage: FC<LoginPageProps> = ({ onLogin }) => {
           type="text"
           placeholder="아이디 입력"
           value={userId}
-          onChange={(e) => setUserId(e.target.value)}
+          onChange={(e) => {
+            setUserId(e.target.value);
+            setLoginError(false);
+          }}
+          className={loginError ? "custom-input--error" : undefined}
+          aria-invalid={loginError}
         />
       </div>
 
@@ -129,9 +137,21 @@ const LoginPage: FC<LoginPageProps> = ({ onLogin }) => {
         <PasswordInput
           placeholder="비밀번호 입력"
           value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          onChange={(e) => {
+            setPassword(e.target.value);
+            setLoginError(false);
+          }}
+          className={loginError ? "custom-input--error" : undefined}
+          aria-invalid={loginError}
+          aria-describedby={loginError ? "login-error-message" : undefined}
         />
       </div>
+
+      {loginError && (
+        <p id="login-error-message" className="login-page__error" role="alert">
+          아이디 또는 비밀번호가 일치하지 않습니다
+        </p>
+      )}
 
       <button
         type="button"

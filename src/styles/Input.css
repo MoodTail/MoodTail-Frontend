@@ -15,3 +15,7 @@
 .custom-input::placeholder {
   color: #aaa;
 }
+
+.custom-input--error {
+  border: 2px solid #ff5638;
+}
