@@ -15,7 +15,6 @@ import MonthlyRecordCard, {
 import HistoryDetailBottomSheet from '../../components/history/HistoryDetailBottomSheet'
 import EmptyHistoryDateBottomSheet from '../../components/history/EmptyHistoryDateBottomSheet'
 import SaveCompleteModal from '../../components/Modal/SaveCompleteModal'
-import TwoButtonModal from '../../components/common/modal/TwoButtonModal'
 import HistoryBackground from '../../components/common/HistoryBackground'
 import {
   hasSeenHistoryEntryNotice,
@@ -40,7 +39,6 @@ interface HistoryPageProps {
   onOpenMonthlyReport: (month: Date) => void
   onStartTest: () => void
   isLoggedIn: boolean
-  onGoToLogin: () => void
 }
 
 function HistoryPage({
@@ -50,7 +48,6 @@ function HistoryPage({
   onOpenMonthlyReport,
   onStartTest,
   isLoggedIn,
-  onGoToLogin,
 }: HistoryPageProps) {
   const [activeMonth, setActiveMonth] = useState(INITIAL_CALENDAR_DATE)
   const [selectedDate, setSelectedDate] = useState<Date>()
@@ -63,9 +60,6 @@ function HistoryPage({
   const [monthlyRecords, setMonthlyRecords] = useState<MonthlyTestRecord[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string>()
-  const [isLoginRequiredModalOpen, setIsLoginRequiredModalOpen] = useState(
-    () => !isLoggedIn,
-  )
 
   const historyDays = monthlyHistory?.days ?? []
   const markedDates = historyDays
@@ -153,10 +147,6 @@ function HistoryPage({
       ignore = true
     }
   }, [activeMonth, isLoggedIn])
-
-  useEffect(() => {
-    if (!isLoggedIn) setIsLoginRequiredModalOpen(true)
-  }, [isLoggedIn])
 
   useEffect(() => {
     if (monthlyHistory && isMonthlyReportModalOpen) {
@@ -297,25 +287,6 @@ function HistoryPage({
         />
       )}
 
-      <TwoButtonModal
-        isOpen={isLoginRequiredModalOpen}
-        title="로그인이 필요해요"
-        description={'히스토리는 로그인 후 이용할 수 있어요.\n로그인 화면으로 이동할까요?'}
-        leftButton={{
-          label: '로그인 하러가기',
-          onClick: () => {
-            setIsLoginRequiredModalOpen(false)
-            onGoToLogin()
-          },
-          variant: 'primary',
-        }}
-        rightButton={{
-          label: '닫기',
-          onClick: () => setIsLoginRequiredModalOpen(false),
-          variant: 'secondary',
-        }}
-        onOverlayClick={() => setIsLoginRequiredModalOpen(false)}
-      />
     </div>
   )
 }
