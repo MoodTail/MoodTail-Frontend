@@ -4,6 +4,7 @@ import TasteSlider from "../../components/CustomRecommend/TasteSlider";
 import "../../styles/CustomRecommend.css";
 import { postCustomCocktail } from "../../api/cocktails/cocktails.api.ts";
 import type { CustomCocktailResult } from "../../api/cocktails/cocktails.types.ts";
+import { RECIPES } from "../RecipePage/recipeData";
 
 interface TasteValues {
   strength: number;
@@ -17,6 +18,53 @@ interface CustomRecommendProps {
   onBack?: () => void;
   onViewResult?: (values: TasteValues, result: CustomCocktailResult) => void;
 }
+
+const getGuestRecommendation = (values: TasteValues): CustomCocktailResult => {
+  const userFigures = {
+    alcoholIntensity: values.strength,
+    sweetness: values.sweetness,
+    sourness: values.acidity,
+    refreshing: values.refreshing,
+    bitterness: values.bitterness,
+  };
+
+  const candidates = RECIPES.map((recipe) => {
+    const cocktailFigures = {
+      alcoholIntensity: recipe.taste.도수,
+      sweetness: recipe.taste.단맛,
+      sourness: recipe.taste.산도,
+      refreshing: recipe.taste.청량감,
+      bitterness: recipe.taste.쓴맛,
+    };
+    const differences = [
+      Math.abs(userFigures.alcoholIntensity - cocktailFigures.alcoholIntensity),
+      Math.abs(userFigures.sweetness - cocktailFigures.sweetness),
+      Math.abs(userFigures.sourness - cocktailFigures.sourness),
+      Math.abs(userFigures.refreshing - cocktailFigures.refreshing),
+      Math.abs(userFigures.bitterness - cocktailFigures.bitterness),
+    ];
+    const matchRate = Math.max(
+      0,
+      Math.round(100 - differences.reduce((sum, value) => sum + value, 0) / differences.length),
+    );
+
+    return { recipe, cocktailFigures, matchRate };
+  });
+
+  const bestMatch = candidates.reduce((best, candidate) =>
+    candidate.matchRate > best.matchRate ? candidate : best,
+  );
+
+  return {
+    cocktailId: 0,
+    name: bestMatch.recipe.name,
+    description: bestMatch.recipe.description,
+    imageUrl: bestMatch.recipe.heroImage,
+    matchRate: bestMatch.matchRate,
+    userFigures,
+    cocktailFigures: bestMatch.cocktailFigures,
+  };
+};
 
 const CustomRecommend: FC<CustomRecommendProps> = ({
   onBack,
@@ -46,6 +94,11 @@ const CustomRecommend: FC<CustomRecommendProps> = ({
     setIsSubmitting(true);
 
     try {
+      if (localStorage.getItem("isGuest") === "true") {
+        onViewResult?.(values, getGuestRecommendation(values));
+        return;
+      }
+
       const result = await postCustomCocktail({
         alcoholIntensity: values.strength,
         sweetness: values.sweetness,
