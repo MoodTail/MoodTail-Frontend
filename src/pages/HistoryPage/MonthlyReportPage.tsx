@@ -298,7 +298,9 @@ function SummaryCard({
         </span>
         <h2
           className="monthly-report-page__summary-type"
-          style={{ fontSize: report.monthlyMoodType.name.length > 8 ? '18px' : undefined }}
+          style={report.monthlyMoodType.name.length > 8
+            ? { fontSize: '20px', lineHeight: '24px' }
+            : undefined}
         >
           {report.monthlyMoodType.name}
         </h2>
