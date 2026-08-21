@@ -3,7 +3,8 @@
   height: min(824px, 100dvh);
   min-height: 568px;
   position: relative;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
   box-sizing: border-box;
   margin: 0 auto;
   background: linear-gradient(
@@ -17,9 +18,11 @@
 
 .login-page__title {
   position: absolute;
-  left: 132px;
+  left: 0;
+  right: 0;
   top: 160px;
   margin: 0;
+  text-align: center;
   font-size: 32px;
   font-weight: 700;
   color: #ff6f4f;
@@ -27,9 +30,11 @@
 
 .login-page__subtitle {
   position: absolute;
-  left: 103px;
+  left: 0;
+  right: 0;
   top: 202px;
   margin: 0;
+  text-align: center;
   font-size: 16px;
   font-weight: 700;
   line-height: 1.32;
@@ -38,23 +43,24 @@
 
 .login-page__id-input {
   position: absolute;
-  left: 39.5px;
+  left: 40px;
+  right: 40px;
   top: 282.5px;
-  width: 310px;
   height: 48px;
 }
 
 .login-page__password-input {
   position: absolute;
-  left: 39.5px;
+  left: 40px;
+  right: 40px;
   top: 338.5px;
-  width: 310px;
   height: 48px;
 }
 
 .login-page__error {
   position: absolute;
   left: 40px;
+  right: 40px;
   top: 390px;
   margin: 0;
   color: #ff6f4f;
@@ -66,8 +72,8 @@
 .login-page__login-button {
   position: absolute;
   left: 40px;
+  right: 40px;
   top: 395px;
-  width: 310px;
   height: 50px;
   border: none;
   border-radius: 100px;
@@ -84,7 +90,8 @@
 
 .login-page__links {
   position: absolute;
-  left: 139px;
+  left: 50%;
+  transform: translateX(-50%);
   top: 453px;
   width: 116px;
   height: 16px;
@@ -116,7 +123,8 @@
 
 .login-page__skip-link {
   position: absolute;
-  left: 154px;
+  left: 50%;
+  transform: translateX(-50%);
   top: 477px;
   margin: 0;
   padding: 0;
@@ -135,9 +143,9 @@
 
 .login-page__divider {
   position: absolute;
-  left: 27.5px;
+  left: 28px;
+  right: 28px;
   top: 610px;
-  width: 337px;
   display: flex;
   align-items: center;
   gap: 4px;
@@ -158,9 +166,28 @@
 
 .login-page__sns {
   position: absolute;
-  left: 71.5px;
+  left: 72px;
+  right: 72px;
   top: 655.63px;
-  width: 249px;
+}
+
+@media (max-width: 360px) {
+  .login-page__id-input,
+  .login-page__password-input,
+  .login-page__login-button {
+    left: 24px;
+    right: 24px;
+  }
+
+  .login-page__error {
+    left: 24px;
+    right: 24px;
+  }
+
+  .login-page__sns {
+    left: 40px;
+    right: 40px;
+  }
 }
 
 .login-page {
