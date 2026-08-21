@@ -52,6 +52,17 @@
   height: 48px;
 }
 
+.login-page__error {
+  position: absolute;
+  left: 40px;
+  top: 390px;
+  margin: 0;
+  color: #ff6f4f;
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 14px;
+}
+
 .login-page__login-button {
   position: absolute;
   left: 40px;
@@ -67,6 +78,10 @@
   cursor: pointer;
 }
 
+.login-page--error .login-page__login-button {
+  top: 412px;
+}
+
 .login-page__links {
   position: absolute;
   left: 139px;
@@ -77,6 +92,10 @@
   align-items: center;
   gap: 4px;
   white-space: nowrap;
+}
+
+.login-page--error .login-page__links {
+  top: 470px;
 }
 
 .login-page__link {
@@ -108,6 +127,10 @@
   color: rgba(255, 111, 79, 0.68);
   text-decoration: underline;
   cursor: pointer;
+}
+
+.login-page--error .login-page__skip-link {
+  top: 494px;
 }
 
 .login-page__divider {
