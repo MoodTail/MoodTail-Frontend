@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import BackgroundBlur from "../../components/common/BackgroundBlur";
 import TrendHeader from "../../components/Trend/TrendHeader";
 import TopTypeCard from "../../components/Trend/TopTypeCard";
@@ -16,6 +16,24 @@ interface TrendPageProps {
 function TrendPage({ onBack }: TrendPageProps) {
   const [isCocktailExpanded, setIsCocktailExpanded] = useState(false);
   const [trend, setTrend] = useState<CocktailTrendResult | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [hasError, setHasError] = useState(false);
+
+  const requestTrend = useCallback(() => {
+    getCocktailTrend()
+      .then(setTrend)
+      .catch((error) => {
+        console.error(error);
+        setHasError(true);
+      })
+      .finally(() => setIsLoading(false));
+  }, []);
+
+  const retryTrend = () => {
+    setIsLoading(true);
+    setHasError(false);
+    requestTrend();
+  };
 
   useEffect(() => {
     document.body.classList.add("hide-bottom-nav");
@@ -25,16 +43,8 @@ function TrendPage({ onBack }: TrendPageProps) {
   }, []);
 
   useEffect(() => {
-    getCocktailTrend()
-      .then((data) => {
-        console.log(
-          "popularCocktails:",
-          JSON.stringify(data.popularCocktails, null, 2),
-        );
-        setTrend(data);
-      })
-      .catch((error) => console.error(error));
-  }, []);
+    requestTrend();
+  }, [requestTrend]);
 
   return (
     <div className="trend-page">
@@ -54,6 +64,37 @@ function TrendPage({ onBack }: TrendPageProps) {
         description="지난달과 이번달의 도수, 당도, 산도 변화를 한눈에 비교해요"
         onBack={onBack}
       />
+      {isLoading && (
+        <div
+          className="trend-skeleton"
+          role="status"
+          aria-label="트렌드 정보를 불러오는 중"
+        >
+          <div className="trend-skeleton__card trend-skeleton__card--types">
+            <span className="trend-skeleton__line trend-skeleton__line--title" />
+            <div className="trend-skeleton__tiles">
+              {[0, 1, 2].map((item) => (
+                <span key={item} className="trend-skeleton__tile" />
+              ))}
+            </div>
+          </div>
+          <div className="trend-skeleton__card trend-skeleton__card--taste">
+            <span className="trend-skeleton__line trend-skeleton__line--heading" />
+            <span className="trend-skeleton__line trend-skeleton__line--description" />
+            {[0, 1, 2, 3, 4].map((item) => (
+              <span key={item} className="trend-skeleton__bar" />
+            ))}
+          </div>
+        </div>
+      )}
+      {!isLoading && hasError && (
+        <section className="trend-error" role="alert">
+          <p>트렌드 정보를 불러오지 못했어요.</p>
+          <button type="button" onClick={retryTrend}>
+            다시 시도
+          </button>
+        </section>
+      )}
       {trend && (
         <>
           <TopTypeCard items={trend.popularMoodTypes} />
