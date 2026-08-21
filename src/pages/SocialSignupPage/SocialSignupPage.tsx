@@ -37,6 +37,7 @@ const SocialSignupPage: FC<SocialSignupPageProps> = ({
   const [agreePrivacy, setAgreePrivacy] = useState(false);
   const [terms, setTerms] = useState<Term[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState("");
   const [viewingTerm, setViewingTerm] = useState<Term | null>(null);
   const hasCheckedOauth = useRef(false);
 
@@ -103,6 +104,7 @@ const SocialSignupPage: FC<SocialSignupPageProps> = ({
   const handleSubmit = async (): Promise<void> => {
     if (!isFormValid || !signupToken) return;
 
+    setSubmitError("");
     setIsSubmitting(true);
     try {
       const serviceTermId = terms.find((t) => t.termType === "SERVICE")?.termId;
@@ -110,6 +112,7 @@ const SocialSignupPage: FC<SocialSignupPageProps> = ({
 
       if (!serviceTermId || !privacyTermId) {
         console.error("약관 정보를 불러오지 못했습니다.");
+        setSubmitError("약관 정보를 불러오지 못했어요. 잠시 후 다시 시도해주세요.");
         return;
       }
 
@@ -120,13 +123,13 @@ const SocialSignupPage: FC<SocialSignupPageProps> = ({
 
       const result = await postSignupSocial({
         signupToken,
-        nickname,
+        nickname: nickname.trim(),
         agreements,
       });
 
       if (!result.accessToken) {
         console.error("회원가입 응답에 accessToken이 없습니다.", result);
-        onLoginFailed?.();
+        setSubmitError("회원가입을 완료하지 못했어요. 다시 시도해주세요.");
         return;
       }
 
@@ -134,7 +137,7 @@ const SocialSignupPage: FC<SocialSignupPageProps> = ({
       onSignupComplete?.();
     } catch (error) {
       console.error(error);
-      onLoginFailed?.();
+      setSubmitError("회원가입을 완료하지 못했어요. 닉네임을 확인해주세요.");
     } finally {
       setIsSubmitting(false);
     }
@@ -208,8 +211,23 @@ const SocialSignupPage: FC<SocialSignupPageProps> = ({
         className="social-signup-page__nickname-input"
         placeholder="닉네임을 입력해주세요"
         value={nickname}
-        onChange={(e) => setNickname(e.target.value)}
+        onChange={(e) => {
+          setNickname(e.target.value);
+          setSubmitError("");
+        }}
+        aria-invalid={Boolean(submitError)}
+        aria-describedby={submitError ? "social-signup-error" : undefined}
       />
+
+      {submitError && (
+        <p
+          id="social-signup-error"
+          className="social-signup-page__error"
+          role="alert"
+        >
+          {submitError}
+        </p>
+      )}
 
       <p className="social-signup-page__terms-title">이용약관 동의</p>
       <div className="social-signup-page__terms-card">

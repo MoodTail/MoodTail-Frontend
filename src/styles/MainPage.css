@@ -36,8 +36,8 @@
 .main-page__banner {
   position: absolute;
   left: 19px;
+  right: 19px;
   top: 104px;
-  width: 353px;
   height: 162px;
   border-radius: 22px;
   background: #ff6f4f;
@@ -68,7 +68,7 @@
 
 .main-page__banner-button {
   position: absolute;
-  left: 197px;
+  right: 11px;
   top: 115px;
   width: 145px;
   height: 34px;
@@ -87,14 +87,14 @@
 .main-page__below-title {
   position: absolute;
   left: 0;
+  right: 0;
   top: 309px;
-  width: 393px;
 }
 
 .main-page__cocktail-card {
   position: relative;
-  margin: 0 0 17.5px 19px;
-  width: 353px;
+  margin: 0 19px 17.5px;
+  width: calc(100% - 38px);
   min-height: 114px;
   border-radius: 18px;
   background: #fff;
@@ -152,9 +152,9 @@
 }
 
 .main-page__menu-list {
-  margin: 0 0 0 19.5px;
+  margin: 0 19px;
   padding: 0;
-  width: 353px;
+  width: calc(100% - 38px);
   list-style: none;
   display: flex;
   flex-direction: column;
@@ -199,4 +199,31 @@
 .main-page__menu-item-arrow-icon {
   position: relative;
   top: 2px;
+}
+
+@media (max-width: 360px) {
+  .main-page__banner,
+  .main-page__cocktail-card,
+  .main-page__menu-list {
+    margin-left: 14px;
+    margin-right: 14px;
+  }
+
+  .main-page__banner {
+    left: 0;
+    right: 0;
+  }
+
+  .main-page__cocktail-card,
+  .main-page__menu-list {
+    width: calc(100% - 28px);
+  }
+
+  .main-page__banner-title {
+    font-size: 18px;
+  }
+
+  .main-page__banner-button {
+    width: 138px;
+  }
 }
