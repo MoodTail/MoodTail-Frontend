@@ -5,13 +5,13 @@
 }
 
 .social-signup-page {
-  position: fixed;
-  left: 50%;
-  top: 0;
-  transform: translateX(-50%);
-  width: 393px;
-  height: 824px;
-  overflow: hidden;
+  position: relative;
+  width: min(100%, 393px);
+  height: min(824px, 100dvh);
+  min-height: 568px;
+  margin: 0 auto;
+  overflow-x: hidden;
+  overflow-y: auto;
   background: linear-gradient(
     224.79deg,
     #fee5e5 -16.15%,
@@ -29,7 +29,8 @@
 
 .social-signup-page__title {
   position: absolute;
-  left: 131px;
+  left: 0;
+  right: 0;
   top: 88px;
   font-size: 32px;
   font-weight: 700;
@@ -39,7 +40,8 @@
 
 .social-signup-page__subtitle {
   position: absolute;
-  left: 103px;
+  left: 0;
+  right: 0;
   top: 130px;
   font-size: 16px;
   font-weight: 700;
@@ -58,8 +60,8 @@
 .social-signup-page__nickname-input {
   position: absolute;
   left: 39px;
+  right: 39px;
   top: 208px;
-  width: 310px;
   height: 48px;
   padding: 0 20px;
   box-sizing: border-box;
@@ -68,6 +70,20 @@
   background: #fff;
   font-size: 14px;
   color: #1b1c30;
+}
+
+.social-signup-page__nickname-input[aria-invalid="true"] {
+  border: 2px solid #ff5638;
+}
+
+.social-signup-page__error {
+  position: absolute;
+  left: 40px;
+  right: 40px;
+  top: 262px;
+  color: #ff5638;
+  font-size: 11px;
+  line-height: 15px;
 }
 
 .social-signup-page__nickname-input::placeholder {
@@ -87,8 +103,8 @@
 .social-signup-page__terms-card {
   position: absolute;
   left: 39px;
+  right: 39px;
   top: 539px;
-  width: 310px;
   height: 138px;
   border-radius: 18px;
   background: #fff;
@@ -135,7 +151,7 @@
   position: absolute;
   left: 20px;
   top: 42px;
-  width: 270px;
+  right: 20px;
   height: 1px;
   background: #e8dbd4;
 }
@@ -176,7 +192,7 @@
 
 .social-signup-page__terms-view {
   position: absolute;
-  left: 269px;
+  right: 20px;
   font-size: 12.5px;
   font-weight: 700;
   color: #ff6f4f;
@@ -197,8 +213,9 @@
 .social-signup-page__submit {
   position: absolute;
   left: 40px;
-  top: 718px;
-  width: 310px;
+  right: 40px;
+  bottom: max(32px, calc(env(safe-area-inset-bottom) + 20px));
+  z-index: 3;
   height: 50px;
   border: none;
   border-radius: 100px;
@@ -207,6 +224,26 @@
   font-weight: 700;
   color: #fff;
   cursor: pointer;
+  box-shadow: 0 8px 18px rgba(255, 111, 79, 0.2);
+}
+
+@media (max-width: 360px) {
+  .social-signup-page__nickname-input,
+  .social-signup-page__terms-card,
+  .social-signup-page__submit {
+    left: 24px;
+    right: 24px;
+  }
+
+  .social-signup-page__label,
+  .social-signup-page__terms-title {
+    left: 32px;
+  }
+
+  .social-signup-page__error {
+    left: 25px;
+    right: 25px;
+  }
 }
 
 .social-signup-page__submit:disabled {
